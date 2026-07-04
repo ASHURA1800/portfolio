@@ -59,8 +59,9 @@ export async function sendContactAcknowledgement(
 
   const transporter = createTransport();
 
+  const senderName = process.env.SENDER_NAME ?? 'Portfolio';
   await transporter.sendMail({
-    from: `"${process.env.SENDER_NAME ?? 'Alex'}" <${process.env.SMTP_USER}>`,
+    from: `"${senderName}" <${process.env.SMTP_USER}>`,
     to: data.email,
     subject: "I've received your message!",
     html: `
@@ -68,7 +69,7 @@ export async function sendContactAcknowledgement(
         <h2 style="color:#7c3aed;margin-top:0">Hey ${escapeHtml(data.name)} 👋</h2>
         <p style="color:#1e293b">Thanks for reaching out! I've received your message and will get back to you within <strong>24 hours</strong>.</p>
         <p style="color:#64748b;font-size:14px">In the meantime, feel free to check out my projects on <a href="${process.env.NEXT_PUBLIC_SITE_URL}" style="color:#7c3aed">my portfolio</a>.</p>
-        <p style="color:#1e293b;margin-top:24px">Cheers,<br/><strong>Alex</strong></p>
+        <p style="color:#1e293b;margin-top:24px">Cheers,<br/><strong>${escapeHtml(senderName)}</strong></p>
       </div>
     `,
   });
