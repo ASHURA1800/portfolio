@@ -1,0 +1,94 @@
+import Link from "next/link";
+import type { ReactNode } from "react";
+
+type ButtonVariant = "primary" | "secondary" | "ghost";
+type ButtonSize = "sm" | "md";
+
+interface ButtonProps {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  href?: string;
+  external?: boolean;
+  icon?: ReactNode;
+  iconPosition?: "left" | "right";
+  onClick?: () => void;
+  type?: "button" | "submit";
+  className?: string;
+  children: ReactNode;
+}
+
+const VARIANTS: Record<ButtonVariant, string> = {
+  primary:
+    "bg-accent-600 text-white hover:bg-accent-700 border border-transparent",
+  secondary:
+    "bg-transparent text-ink border border-line hover:border-accent-300",
+  ghost: "bg-transparent text-muted hover:text-ink border border-transparent",
+};
+
+const SIZES: Record<ButtonSize, string> = {
+  sm: "text-sm px-4 py-2 gap-1.5",
+  md: "text-sm px-5 py-2.5 gap-2",
+};
+
+/**
+ * One button, three calm variants. Renders a next/link for internal hrefs, a
+ * plain anchor for external ones, and a <button> otherwise. Motion is limited
+ * to a color transition — no scale, no bounce.
+ */
+export function Button({
+  variant = "primary",
+  size = "md",
+  href,
+  external,
+  icon,
+  iconPosition = "left",
+  onClick,
+  type = "button",
+  className = "",
+  children,
+}: ButtonProps) {
+  const classes = `inline-flex items-center justify-center rounded-lg font-medium transition-colors duration-200 ${VARIANTS[variant]} ${SIZES[size]} ${className}`;
+
+  const content = (
+    <>
+      {icon && iconPosition === "left" && icon}
+      {children}
+      {icon && iconPosition === "right" && icon}
+    </>
+  );
+
+  if (href) {
+    // Hash, mailto, tel, and external hrefs are plain anchors (smooth-scroll /
+    // protocol handlers). Everything else is an internal route via next/link.
+    const isPlainAnchor =
+      external ||
+      href.startsWith("#") ||
+      href.startsWith("mailto:") ||
+      href.startsWith("tel:");
+
+    if (isPlainAnchor) {
+      return (
+        <a
+          href={href}
+          target={external ? "_blank" : undefined}
+          rel={external ? "noopener noreferrer" : undefined}
+          onClick={onClick}
+          className={classes}
+        >
+          {content}
+        </a>
+      );
+    }
+    return (
+      <Link href={href} onClick={onClick} className={classes}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button type={type} onClick={onClick} className={classes}>
+      {content}
+    </button>
+  );
+}
