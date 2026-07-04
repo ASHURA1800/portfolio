@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
+  // Silence the "multiple lockfiles" warning on monorepo-style directory layouts.
+  // Tells Next.js that this package is the root of its own dependency tree.
+  outputFileTracingRoot: path.resolve(__dirname),
   images: {
     remotePatterns: [
       // Vercel Blob Storage (used for project/blog/cert images and resume)
