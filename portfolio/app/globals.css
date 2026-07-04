@@ -1,0 +1,219 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/* Design tokens — light editorial theme                               */
+/* ------------------------------------------------------------------ */
+@theme {
+  /* Fonts (CSS vars supplied by next/font in layout.tsx) */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, "Times New Roman", serif;
+
+  /* Surfaces & text */
+  --color-bg: #faf8f5;            /* soft off-white page background */
+  --color-surface: #ffffff;       /* cards / raised surfaces */
+  --color-muted-surface: #f3f0ea; /* muted fills / inset panels */
+  --color-ink: #111111;           /* primary text */
+  --color-muted: #5f5f5f;         /* secondary text */
+  --color-faint: #8a857d;         /* faint labels / captions (derived) */
+  --color-line: #e8e4dd;          /* hairline borders / dividers */
+
+  /* Single accent — muted violet, recentered on #5b50c8 */
+  --color-accent-50: #f4f3fb;
+  --color-accent-100: #eae8f6;
+  --color-accent-200: #d6d2ee;
+  --color-accent-300: #b7afe1;
+  --color-accent-400: #9085d0;
+  --color-accent-500: #6c5fc6;
+  --color-accent-600: #5b50c8;   /* primary accent */
+  --color-accent-700: #4b43a4;
+  --color-accent-800: #3e3782;
+  --color-accent-900: #352f68;
+  --color-accent: #5b50c8;
+
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.125rem;
+
+  /* Shadows — minimal only */
+  --shadow-xs: 0 1px 2px rgba(17, 17, 17, 0.04);
+  --shadow-card: 0 1px 2px rgba(17, 17, 17, 0.05);
+  --shadow-pop: 0 6px 24px rgba(17, 17, 17, 0.06);
+
+  /* Typography scale (editorial, fluid) */
+  --text-display: clamp(2.75rem, 6vw, 4.5rem); /* hero serif */
+  --text-h1: clamp(2rem, 4vw, 3rem);
+  --text-h2: clamp(1.6rem, 3vw, 2.25rem);
+  --text-lead: 1.25rem;
+  --text-body: 1.0625rem;
+
+  /* Spacing rhythm */
+  --space-section: clamp(5rem, 10vw, 8.5rem); /* vertical section padding */
+  --space-gutter: clamp(1.25rem, 5vw, 2rem);  /* horizontal page gutter */
+}
+
+:root {
+  --background: #faf8f5;
+  --foreground: #111111;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Quiet light scrollbar — no gradient, no neon */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #ddd7cd;
+  border-radius: 9999px;
+  border: 3px solid var(--background);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #cbc4b7;
+}
+
+/* Selection — faint accent wash */
+::selection {
+  background: rgba(91, 80, 200, 0.16);
+  color: #111111;
+}
+
+/* Minimal entrance — the only motion primitive used outside framer-motion */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Utility: hide scrollbar where a horizontal rail is intentional */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Blog article prose — hand-rolled light typography                   */
+/* (no @tailwindcss/typography plugin installed)                       */
+/* ------------------------------------------------------------------ */
+.prose-light {
+  color: var(--color-muted);
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  max-width: 68ch;
+}
+.prose-light > * + * {
+  margin-top: 1.4em;
+}
+.prose-light h1,
+.prose-light h2,
+.prose-light h3,
+.prose-light h4 {
+  font-family: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  color: var(--color-ink);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin-top: 2em;
+  margin-bottom: 0.6em;
+}
+.prose-light h1 { font-size: 2.1rem; }
+.prose-light h2 { font-size: 1.6rem; }
+.prose-light h3 { font-size: 1.3rem; }
+.prose-light h4 { font-size: 1.1rem; }
+.prose-light p,
+.prose-light li {
+  color: var(--color-muted);
+}
+.prose-light strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.prose-light a {
+  color: var(--color-accent-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-accent-200);
+  transition: text-decoration-color 0.2s ease;
+}
+.prose-light a:hover {
+  text-decoration-color: var(--color-accent-600);
+}
+.prose-light ul,
+.prose-light ol {
+  padding-left: 1.4em;
+}
+.prose-light ul { list-style: disc; }
+.prose-light ol { list-style: decimal; }
+.prose-light li::marker {
+  color: var(--color-faint);
+}
+.prose-light code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+  background: #f0ede8;
+  color: var(--color-ink);
+  padding: 0.15em 0.4em;
+  border-radius: 0.3rem;
+}
+.prose-light pre {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 0.75rem;
+  padding: 1.1rem 1.25rem;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.prose-light pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+.prose-light blockquote {
+  border-left: 2px solid var(--color-accent-300);
+  padding-left: 1.1rem;
+  color: var(--color-muted);
+  font-style: italic;
+}
+.prose-light img {
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-line);
+}
+.prose-light hr {
+  border: none;
+  border-top: 1px solid var(--color-line);
+  margin: 2.4em 0;
+}
