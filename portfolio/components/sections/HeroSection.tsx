@@ -71,7 +71,7 @@ export function HeroSection({ profile, socials }: { profile: Profile; socials: S
                   target={s.platform === 'email' ? undefined : '_blank'}
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  onClick={() => track('github_click', { platform: s.label })}
+                  onClick={s.platform === 'github' ? () => track('github_click', { platform: s.label }) : undefined}
                   className="text-faint hover:text-ink transition-colors duration-200"
                 >
                   <SocialIcon name={s.icon} size={18} />
