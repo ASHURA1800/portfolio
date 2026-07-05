@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowUpRight } from 'lucide-react';
+import Image from 'next/image';
 import type { Profile, Social } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { SocialIcon } from '@/components/ui/SocialIcon';
@@ -18,7 +19,8 @@ export function HeroSection({ profile, socials }: { profile: Profile; socials: S
       {/* Left-hugging block inside a wide frame — open whitespace on the right
           keeps the hero quietly asymmetric rather than dead-centered. */}
       <div className="mx-auto w-full max-w-6xl">
-        <div className="max-w-[62ch] animate-[fadeIn_0.7s_ease]">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-16">
+          <div className="max-w-[62ch] animate-[fadeIn_0.7s_ease] lg:flex-1">
           {displayName && (
             <h1 className="font-serif font-normal tracking-tight text-ink leading-[1.02] text-[length:var(--text-display)]">
               {displayName}
@@ -77,6 +79,22 @@ export function HeroSection({ profile, socials }: { profile: Profile; socials: S
                   <SocialIcon name={s.icon} size={18} />
                 </a>
               ))}
+            </div>
+          )}
+          </div>
+
+          {profile.avatar && (
+            <div className="flex-shrink-0 animate-[fadeIn_0.9s_ease]">
+              <div className="relative h-52 w-52 overflow-hidden rounded-2xl border border-line lg:h-64 lg:w-64">
+                <Image
+                  src={profile.avatar}
+                  alt={displayName || 'Profile'}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 208px, 256px"
+                  priority
+                />
+              </div>
             </div>
           )}
         </div>
