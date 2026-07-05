@@ -80,13 +80,9 @@ portfolio/
 │   │   │   ├── page.tsx      Dashboard with content stats
 │   │   │   ├── profile/      Profile editor
 │   │   │   ├── projects/     Project CRUD
-│   │   │   ├── blogs/        Blog CRUD + publish toggle
 │   │   │   ├── skills/       Skills editor
 │   │   │   ├── experience/   Work history editor
 │   │   │   ├── certifications/
-│   │   │   ├── testimonials/
-│   │   │   ├── contacts/     Read-only contact messages
-│   │   │   ├── analytics/    Event viewer
 │   │   │   ├── buildlog/
 │   │   │   ├── learnings/
 │   │   │   └── roadmap/
