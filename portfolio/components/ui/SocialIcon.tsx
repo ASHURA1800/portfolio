@@ -56,8 +56,8 @@ const MAP: Record<string, (p: IconProps) => React.ReactNode> = {
   Github: GithubIcon,
   Linkedin: LinkedinIcon,
   Twitter: TwitterIcon,
-  Globe: (p) => <Globe size={p.size ?? 18} className={p.className} />,
-  Mail: (p) => <Mail size={p.size ?? 18} className={p.className} />,
+  Globe: (p) => <Globe size={p.size ?? 18} className={p.className} aria-hidden={true} />,
+  Mail: (p) => <Mail size={p.size ?? 18} className={p.className} aria-hidden={true} />,
 };
 
 export function SocialIcon({
