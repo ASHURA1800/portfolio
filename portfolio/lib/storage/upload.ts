@@ -9,6 +9,9 @@ import {
 // Allowed extensions cross-checked against MIME type to prevent spoofing
 const ALLOWED_IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "gif"];
 const ALLOWED_RESUME_EXTENSIONS = ["pdf"];
+// Profile images: stricter subset — no gif (animated images not appropriate for avatars)
+const AVATAR_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
+const AVATAR_ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "webp"];
 
 function generateId(): string {
   // Use crypto for collision-resistant IDs instead of Math.random()
@@ -53,6 +56,13 @@ export async function uploadFile(
   if (bucket === "resume") {
     if (file.type !== "application/pdf" || !ALLOWED_RESUME_EXTENSIONS.includes(ext)) {
       throw new Error("Resume must be a PDF file");
+    }
+  } else if (bucket === "avatars") {
+    if (!AVATAR_ALLOWED_TYPES.includes(file.type as never)) {
+      throw new Error(`File type "${file.type}" is not allowed for profile images`);
+    }
+    if (!AVATAR_ALLOWED_EXTENSIONS.includes(ext)) {
+      throw new Error(`File extension ".${ext}" is not allowed for profile images`);
     }
   } else {
     // Validate MIME type
