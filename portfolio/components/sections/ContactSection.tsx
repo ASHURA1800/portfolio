@@ -113,9 +113,9 @@ export function ContactSection({ profile, socials: allSocials }: { profile: Prof
 
               <div className="grid gap-4 sm:grid-cols-2">
                 {[
-                  { field: 'name', label: 'Name', placeholder: 'Your name', type: 'text' },
-                  { field: 'email', label: 'Email', placeholder: 'you@example.com', type: 'email' },
-                ].map(({ field, label, placeholder, type }) => (
+                  { field: 'name', label: 'Name', placeholder: 'Your name', type: 'text', autoComplete: 'name' },
+                  { field: 'email', label: 'Email', placeholder: 'you@example.com', type: 'email', autoComplete: 'email' },
+                ].map(({ field, label, placeholder, type, autoComplete }) => (
                   <div key={field}>
                     <label htmlFor={field} className="mb-1.5 block text-xs font-medium text-muted">
                       {label}
@@ -126,6 +126,7 @@ export function ContactSection({ profile, socials: allSocials }: { profile: Prof
                       name={field}
                       required
                       placeholder={placeholder}
+                      autoComplete={autoComplete}
                       className={inputClass}
                     />
                     {fieldErrors[field] && (
@@ -145,6 +146,7 @@ export function ContactSection({ profile, socials: allSocials }: { profile: Prof
                   name="subject"
                   required
                   placeholder="What's this about?"
+                  autoComplete="off"
                   className={inputClass}
                 />
                 {fieldErrors.subject && (
