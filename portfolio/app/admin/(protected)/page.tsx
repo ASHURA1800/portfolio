@@ -112,14 +112,14 @@ async function getSectionCounts(): Promise<SectionCounts> {
   }
 }
 
-const STAT_CARDS = [
+const STAT_CARDS: Array<{ key: keyof typeof EMPTY_STATS; label: string; icon: string; href: string | null }> = [
   { key: 'projects',        label: 'Projects',          icon: '🚀', href: '/admin/projects' },
-  { key: 'blogs',           label: 'Blog Posts',        icon: '✍️', href: '/admin/blogs' },
+  { key: 'blogs',           label: 'Blog Posts',        icon: '✍️', href: null },
   { key: 'certifications',  label: 'Certifications',    icon: '🏆', href: '/admin/certifications' },
-  { key: 'testimonials',    label: 'Testimonials',      icon: '💬', href: '/admin/testimonials' },
-  { key: 'contacts',        label: 'Contact Messages',  icon: '📬', href: '/admin/contacts' },
-  { key: 'analytics30d',    label: 'Events (30d)',       icon: '📈', href: '/admin/analytics' },
-] as const;
+  { key: 'testimonials',    label: 'Testimonials',      icon: '💬', href: null },
+  { key: 'contacts',        label: 'Contact Messages',  icon: '📬', href: null },
+  { key: 'analytics30d',    label: 'Events (30d)',       icon: '📈', href: null },
+];
 
 const CHECKLIST_ITEMS = [
   { key: 'profile',       label: 'Profile',         href: '/admin/profile',        desc: 'Name and title' },
@@ -178,21 +178,31 @@ export default async function AdminDashboard() {
       <p className="text-gray-500 text-sm mb-8">Portfolio content overview</p>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {STAT_CARDS.map(({ key, label, icon, href }) => (
-          <Link
-            key={key}
-            href={href}
-            className="bg-white/5 border border-white/8 rounded-2xl p-5 hover:border-violet-500/30 hover:bg-white/6 transition-all group"
-          >
-            <div className="text-2xl mb-3">{icon}</div>
-            <div className="text-3xl font-bold text-white mb-1">
-              {stats[key].toLocaleString()}
+        {STAT_CARDS.map(({ key, label, icon, href }) =>
+          href ? (
+            <Link
+              key={key}
+              href={href}
+              className="bg-white/5 border border-white/8 rounded-2xl p-5 hover:border-violet-500/30 hover:bg-white/6 transition-all group"
+            >
+              <div className="text-2xl mb-3">{icon}</div>
+              <div className="text-3xl font-bold text-white mb-1">
+                {stats[key].toLocaleString()}
+              </div>
+              <div className="text-gray-500 text-sm group-hover:text-gray-400 transition-colors">
+                {label}
+              </div>
+            </Link>
+          ) : (
+            <div key={key} className="bg-white/5 border border-white/8 rounded-2xl p-5">
+              <div className="text-2xl mb-3">{icon}</div>
+              <div className="text-3xl font-bold text-white mb-1">
+                {stats[key].toLocaleString()}
+              </div>
+              <div className="text-gray-500 text-sm">{label}</div>
             </div>
-            <div className="text-gray-500 text-sm group-hover:text-gray-400 transition-colors">
-              {label}
-            </div>
-          </Link>
-        ))}
+          )
+        )}
       </div>
 
       {/* Content checklist — only shown when sections are incomplete */}
