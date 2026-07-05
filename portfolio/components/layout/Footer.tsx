@@ -57,7 +57,7 @@ export function Footer({ profile, socials: allSocials }: { profile: Profile; soc
             className="inline-flex items-center gap-1.5 text-xs text-faint hover:text-ink transition-colors duration-200"
           >
             Back to top
-            <ArrowUp size={12} />
+            <ArrowUp size={12} aria-hidden={true} />
           </button>
         </div>
       </div>
