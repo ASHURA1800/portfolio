@@ -13,10 +13,6 @@ const NAV = [
   { href: '/admin/buildlog',       label: 'Build Log',       icon: '🧱' },
   { href: '/admin/learnings',      label: 'Learnings',       icon: '💡' },
   { href: '/admin/roadmap',        label: 'Roadmap',         icon: '🗺️' },
-  { href: '/admin/blogs',          label: 'Blogs',           icon: '✍️' },
-  { href: '/admin/testimonials',   label: 'Testimonials',    icon: '💬' },
-  { href: '/admin/contacts',       label: 'Contacts',        icon: '📬' },
-  { href: '/admin/analytics',      label: 'Analytics',       icon: '📈' },
 ];
 
 export default function AdminSidebar({ userEmail }: { userEmail: string }) {
