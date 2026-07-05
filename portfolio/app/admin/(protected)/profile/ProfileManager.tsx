@@ -132,7 +132,7 @@ export default function ProfileManager({ initial }: { initial: Partial<ProfileFo
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={form.avatar} alt="Avatar" className="h-14 w-14 rounded-full object-cover border border-white/8" />
                 )}
-                <input id="avatar-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif" disabled={uploading === 'avatar'}
+                <input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading === 'avatar'}
                   onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f, 'avatars', 'avatar'); }}
                   className="block w-full text-sm text-gray-400 file:mr-3 file:rounded-lg file:border-0 file:bg-violet-600/20 file:px-3 file:py-2 file:text-sm file:text-violet-300 hover:file:bg-violet-600/30 disabled:opacity-50" />
               </div>
