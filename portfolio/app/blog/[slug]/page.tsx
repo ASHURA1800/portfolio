@@ -114,7 +114,7 @@ export default async function BlogPostPage({
             {article.tags?.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center gap-1 text-accent-700 font-medium uppercase tracking-[0.12em]"
+                className="inline-flex items-center gap-1 text-accent-400 font-medium uppercase tracking-[0.12em]"
               >
                 <Tag size={10} />
                 {tag}
@@ -128,7 +128,7 @@ export default async function BlogPostPage({
             )}
           </div>
 
-          <h1 className="font-serif text-4xl md:text-5xl font-medium text-ink leading-[1.1] tracking-tight mb-5">
+          <h1 className="text-4xl md:text-5xl font-medium text-ink leading-[1.1] tracking-tight mb-5">
             {article.title}
           </h1>
 
@@ -141,7 +141,7 @@ export default async function BlogPostPage({
             return (
               <div className="flex items-center gap-3 pt-6 border-t border-line">
                 {author && (
-                  <div className="w-9 h-9 rounded-full bg-accent-600 flex items-center justify-center text-white font-medium text-sm">
+                  <div className="w-9 h-9 rounded-full bg-accent-500 flex items-center justify-center text-white font-medium text-sm">
                     {author.charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -166,7 +166,7 @@ export default async function BlogPostPage({
         <div className="mt-16 pt-8 border-t border-line">
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-sm text-accent-700 hover:text-accent-800 transition-colors group"
+            className="inline-flex items-center gap-2 text-sm text-accent-400 hover:text-accent-300 transition-colors group"
           >
             <ArrowLeft size={15} className="group-hover:-translate-x-1 transition-transform" />
             Back to all articles
