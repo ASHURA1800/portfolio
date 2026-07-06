@@ -54,9 +54,9 @@ export default async function BlogListPage() {
         </Link>
 
         <div className="mb-16">
-          <p className="text-xs text-accent-700 font-medium uppercase tracking-[0.2em] mb-4">Writing</p>
-          <h1 className="font-serif text-4xl md:text-6xl font-medium tracking-tight text-ink leading-[1.05] mb-5">
-            All <span className="text-accent-700 italic">articles</span>
+          <p className="text-xs text-accent-400 font-medium uppercase tracking-[0.2em] mb-4">Writing</p>
+          <h1 className="text-4xl md:text-6xl font-medium tracking-tight text-ink leading-[1.05] mb-5">
+            All <span className="font-semibold text-accent-400">articles</span>
           </h1>
           {blogIntro && (
             <p className="text-muted text-lg max-w-xl leading-relaxed">
@@ -82,7 +82,7 @@ export default async function BlogListPage() {
                 <Link key={post.id} href={`/blog/${post.slug}`} className="group block">
                   <article className="py-8 border-b border-line">
                     <div className="flex items-center gap-3 mb-3 text-xs">
-                      <span className="text-accent-700 font-medium uppercase tracking-[0.12em]">
+                      <span className="text-accent-400 font-medium uppercase tracking-[0.12em]">
                         {tag}
                       </span>
                       {post.read_time && (
@@ -92,7 +92,7 @@ export default async function BlogListPage() {
                         </span>
                       )}
                     </div>
-                    <h2 className="font-serif text-2xl md:text-3xl font-medium text-ink leading-snug mb-2 group-hover:text-accent-700 transition-colors duration-200">
+                    <h2 className="text-2xl md:text-3xl font-medium text-ink leading-snug mb-2 group-hover:text-accent-400 transition-colors duration-200">
                       {post.title}
                     </h2>
                     {post.excerpt && (
@@ -102,7 +102,7 @@ export default async function BlogListPage() {
                     )}
                     <div className="flex items-center gap-3 text-sm">
                       <span className="text-faint">{dateStr}</span>
-                      <span className="text-accent-700 font-medium">Read more →</span>
+                      <span className="text-accent-400 font-medium">Read more →</span>
                     </div>
                   </article>
                 </Link>
