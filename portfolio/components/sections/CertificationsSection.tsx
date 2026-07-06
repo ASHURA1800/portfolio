@@ -77,11 +77,11 @@ export function CertificationsSection() {
           {items.map((cert) => {
             const issued = formatIssued(cert.issued_date);
             const inner = (
-              <article className="group flex gap-4 rounded-xl border border-line bg-surface p-5 transition-colors duration-200 hover:border-accent-300">
+              <article className="group flex gap-4 rounded-xl border border-line bg-card p-5 transition-colors duration-200 hover:border-accent-300">
                 {cert.image && <CertImage src={cert.image} alt={cert.title} />}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between gap-4">
-                    <h3 className="flex items-center gap-1.5 font-medium text-ink transition-colors duration-200 group-hover:text-accent-700">
+                    <h3 className="flex items-center gap-1.5 font-medium text-ink transition-colors duration-200 group-hover:text-accent-400">
                       {cert.title}
                       {cert.credential_url && (
                         <ArrowUpRight
