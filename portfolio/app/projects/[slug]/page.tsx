@@ -1,10 +1,12 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Code } from 'lucide-react';
 import { getProjectBySlug, getCaseStudySlugs, getProjects } from '@/lib/content';
 import type { ProjectStatus } from '@/types';
 import { Button } from '@/components/ui/Button';
+import { CountUp } from '@/components/ui/CountUp';
 
 const STATUS_LABEL: Record<ProjectStatus, string> = {
   live: 'Live',
@@ -92,7 +94,7 @@ export default async function ProjectDetailPage({
   const next = idx >= 0 && idx < caseStudies.length - 1 ? caseStudies[idx + 1] : null;
 
   return (
-    <main className="px-[var(--space-gutter)] py-24">
+    <main id="main-content" className="px-[var(--space-gutter)] py-24">
       <div className="mx-auto max-w-3xl">
         <Link
           href="/#projects"
@@ -172,7 +174,9 @@ export default async function ProjectDetailPage({
                 {project.metrics.map((m) => (
                   <div key={m.label}>
                     <dt className="text-xs uppercase tracking-[0.14em] text-faint">{m.label}</dt>
-                    <dd className="mt-1 text-2xl text-ink">{m.value}</dd>
+                    <dd className="mt-1 text-2xl text-ink">
+                      <CountUp value={m.value} />
+                    </dd>
                   </div>
                 ))}
               </dl>
@@ -194,12 +198,13 @@ export default async function ProjectDetailPage({
                 rel="noopener noreferrer"
                 className="block overflow-hidden rounded-xl border border-line bg-card"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={src}
                   alt={`${project.title} screenshot`}
-                  loading="lazy"
-                  className="w-full"
+                  width={1280}
+                  height={800}
+                  sizes="(max-width: 1024px) 100vw, 1024px"
+                  className="h-auto w-full"
                 />
               </a>
             ))}
