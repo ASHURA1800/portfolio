@@ -304,3 +304,23 @@ export const ownerAccounts = pgTable('owner_accounts', {
   password_hash: text('password_hash').notNull(),
   created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+// ─── password_reset_tokens ────────────────────────────────────
+// Time-limited tokens for the Forgot Password flow.
+// Stores a SHA-256 hash of the raw token (raw token goes only in the email).
+// Invalidated on use (used_at set) or expiry (expires_at passed).
+export const passwordResetTokens = pgTable(
+  'password_reset_tokens',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    owner_id: uuid('owner_id').notNull().references(() => ownerAccounts.id, { onDelete: 'cascade' }),
+    token_hash: text('token_hash').notNull().unique(),
+    expires_at: timestamp('expires_at', { withTimezone: true }).notNull(),
+    used_at: timestamp('used_at', { withTimezone: true }),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index('idx_prt_owner').on(t.owner_id),
+    index('idx_prt_expires').on(t.expires_at),
+  ]
+);
