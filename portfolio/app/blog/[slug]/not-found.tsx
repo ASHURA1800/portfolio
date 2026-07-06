@@ -6,7 +6,7 @@ export default function BlogNotFound() {
     <main className="min-h-screen bg-bg text-ink flex items-center justify-center px-6">
       <div className="text-center">
         <FileQuestion size={56} className="mx-auto mb-6 text-faint" />
-        <h1 className="font-serif text-3xl font-medium text-ink mb-3">Article not found</h1>
+        <h1 className="text-3xl font-medium text-ink mb-3">Article not found</h1>
         <p className="text-muted mb-8">
           This article doesn&apos;t exist or hasn&apos;t been published yet.
         </p>
