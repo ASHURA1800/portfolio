@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 import { SectionContainer } from '@/components/ui/SectionContainer';
 import { SectionHeading } from '@/components/ui/SectionHeading';
-import { Reveal } from '@/components/ui/Reveal';
+import { Reveal, staggerDelay } from '@/components/ui/Reveal';
 import type { Certification } from '@/types';
 
 // Data lives in Neon, managed from /admin/certifications. Fetched client-side
@@ -25,13 +26,13 @@ function CertImage({ src, alt }: { src: string; alt: string }) {
         loaded ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src={src}
         alt={alt}
-        loading="lazy"
+        fill
+        sizes="56px"
         onLoad={() => setLoaded(true)}
-        className="h-full w-full object-cover"
+        className="object-cover"
       />
     </div>
   );
@@ -72,12 +73,11 @@ export function CertificationsSection() {
     <SectionContainer id="certifications" width="wide">
       <SectionHeading eyebrow="Credentials" title="Certifications" />
 
-      <Reveal className="mt-14">
-        <ul className="max-w-3xl space-y-4">
-          {items.map((cert) => {
+      <ul className="mt-14 max-w-3xl space-y-4">
+          {items.map((cert, i) => {
             const issued = formatIssued(cert.issued_date);
             const inner = (
-              <article className="group flex gap-4 rounded-xl border border-line bg-card p-5 transition-colors duration-200 hover:border-accent-300">
+              <article className="hover-lift group flex gap-4 rounded-xl border border-line bg-card p-5 transition-colors duration-200 hover:border-accent-300">
                 {cert.image && <CertImage src={cert.image} alt={cert.title} />}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between gap-4">
@@ -124,23 +124,24 @@ export function CertificationsSection() {
 
             return (
               <li key={cert.id}>
-                {cert.credential_url ? (
-                  <a
-                    href={cert.credential_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${cert.title} — view credential`}
-                  >
-                    {inner}
-                  </a>
-                ) : (
-                  inner
-                )}
+                <Reveal delay={staggerDelay(i)}>
+                  {cert.credential_url ? (
+                    <a
+                      href={cert.credential_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${cert.title} — view credential`}
+                    >
+                      {inner}
+                    </a>
+                  ) : (
+                    inner
+                  )}
+                </Reveal>
               </li>
             );
           })}
-        </ul>
-      </Reveal>
+      </ul>
     </SectionContainer>
   );
 }
