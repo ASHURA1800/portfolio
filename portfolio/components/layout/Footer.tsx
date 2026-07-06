@@ -44,7 +44,7 @@ export function Footer({ profile, socials: allSocials }: { profile: Profile; soc
                   target={s.platform === 'email' ? undefined : '_blank'}
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="p-2 rounded-lg text-muted hover:text-ink transition-colors duration-200"
+                  className="flex h-12 w-12 items-center justify-center rounded-lg text-muted hover:text-ink transition-colors duration-200"
                 >
                   <SocialIcon name={s.icon} size={17} />
                 </a>
@@ -54,7 +54,7 @@ export function Footer({ profile, socials: allSocials }: { profile: Profile; soc
           )}
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="inline-flex items-center gap-1.5 text-xs text-faint hover:text-ink transition-colors duration-200"
+            className="inline-flex h-12 items-center gap-1.5 px-3 text-xs text-faint hover:text-ink transition-colors duration-200"
           >
             Back to top
             <ArrowUp size={12} aria-hidden={true} />
