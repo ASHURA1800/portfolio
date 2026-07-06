@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import type { Social } from '@/types';
@@ -27,6 +27,9 @@ export function Navbar({
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [active, setActive] = useState('');
+  const [indicator, setIndicator] = useState<{ left: number; width: number } | null>(null);
+  const navRef = useRef<HTMLDivElement>(null);
+  const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
 
   // Filter nav links to only those whose section has real content.
   const links = visibleSections
@@ -53,6 +56,25 @@ export function Navbar({
     return () => observer.disconnect();
   }, [links]);
 
+  // Shared layout transition: slide one indicator to the active link's rect
+  // instead of toggling a per-link underline.
+  useEffect(() => {
+    const measure = () => {
+      const el = active ? linkRefs.current[active] : null;
+      const nav = navRef.current;
+      if (el && nav) {
+        const navRect = nav.getBoundingClientRect();
+        const rect = el.getBoundingClientRect();
+        setIndicator({ left: rect.left - navRect.left, width: rect.width });
+      } else {
+        setIndicator(null);
+      }
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [active, links]);
+
   return (
     <>
       <nav
@@ -70,10 +92,13 @@ export function Navbar({
           </Link>
 
           {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-7">
+          <div ref={navRef} className="hidden md:flex items-center gap-7 relative">
             {links.map((link) => (
               <a
                 key={link.href}
+                ref={(el) => {
+                  linkRefs.current[link.href] = el;
+                }}
                 href={link.href}
                 className={cn(
                   'relative text-sm py-1 transition-colors duration-200',
@@ -81,16 +106,20 @@ export function Navbar({
                 )}
               >
                 {link.label}
-                {active === link.href && (
-                  <span className="absolute -bottom-0.5 inset-x-0 h-px bg-accent-500" />
-                )}
               </a>
             ))}
+            {indicator && (
+              <span
+                aria-hidden="true"
+                className="absolute -bottom-0.5 h-px bg-accent-500 transition-[left,width] duration-300 ease-out"
+                style={{ left: indicator.left, width: indicator.width }}
+              />
+            )}
           </div>
 
           {/* Mobile toggle */}
           <button
-            className="md:hidden p-2 -mr-2 rounded-lg text-muted hover:text-ink transition-colors"
+            className="md:hidden flex h-12 w-12 -mr-2 items-center justify-center rounded-lg text-muted hover:text-ink transition-colors"
             onClick={() => setMenuOpen((o) => !o)}
             aria-label="Toggle menu"
             aria-expanded={menuOpen}
@@ -124,7 +153,7 @@ export function Navbar({
                     target={s.platform === 'email' ? undefined : '_blank'}
                     rel="noopener noreferrer"
                     aria-label={s.label}
-                    className="p-2.5 rounded-lg text-muted hover:text-ink hover:bg-bg transition-colors"
+                    className="flex h-12 w-12 items-center justify-center rounded-lg text-muted hover:text-ink hover:bg-bg transition-colors"
                   >
                     <SocialIcon name={s.icon} size={18} />
                   </a>
