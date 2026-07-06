@@ -22,7 +22,7 @@ export function HeroSection({ profile, socials }: { profile: Profile; socials: S
         <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-16">
           <div className="max-w-[62ch] animate-[fadeIn_0.7s_ease] lg:flex-1">
           {displayName && (
-            <h1 className="font-serif font-normal tracking-tight text-ink leading-[1.02] text-[length:var(--text-display)]">
+            <h1 className="font-normal tracking-tight text-ink leading-[1.02] text-[length:var(--text-display)]">
               {displayName}
             </h1>
           )}
