@@ -2,6 +2,7 @@ import { SectionContainer } from '@/components/ui/SectionContainer';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { Reveal } from '@/components/ui/Reveal';
 import { TimelineItem } from '@/components/ui/TimelineItem';
+import { TimelineProgress } from '@/components/ui/TimelineProgress';
 import { formatDateRange } from '@/lib/utils';
 import type { Experience } from '@/types';
 
@@ -20,7 +21,7 @@ export function ExperienceSection({
 
       <Reveal className="mt-14">
         {experience.length > 0 ? (
-          <div>
+          <TimelineProgress>
             {experience.map((e, i) => (
               <TimelineItem
                 key={e.id}
@@ -35,7 +36,7 @@ export function ExperienceSection({
                 isLast={i === experience.length - 1}
               />
             ))}
-          </div>
+          </TimelineProgress>
         ) : (
           <p className="max-w-[60ch] text-lg leading-relaxed text-muted">
             {currentWork}
