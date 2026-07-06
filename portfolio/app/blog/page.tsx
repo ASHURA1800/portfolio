@@ -42,7 +42,7 @@ export default async function BlogListPage() {
   const [posts, blogIntro] = await Promise.all([getPublishedPosts(), getBlogIntro()]);
 
   return (
-    <main className="min-h-screen bg-bg text-ink">
+    <main id="main-content" className="min-h-screen bg-bg text-ink">
       <div className="max-w-4xl mx-auto px-6 md:px-8 py-24">
         {/* Header */}
         <Link
