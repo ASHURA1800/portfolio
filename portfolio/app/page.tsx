@@ -69,7 +69,7 @@ export default async function Home() {
   return (
     <>
       <Navbar brand={brand} socials={socials} visibleSections={visibleSections} />
-      <main>
+      <main id="main-content">
         <HeroSection profile={profile} socials={socials} />
         <AboutSection profile={profile} skills={skills} />
         <ProjectsSection projects={projects} githubUrl={profile.github} />
