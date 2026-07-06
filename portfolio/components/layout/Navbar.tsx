@@ -64,9 +64,9 @@ export function Navbar({
         )}
       >
         <div className="max-w-7xl mx-auto px-[var(--space-gutter)] h-16 flex items-center justify-between">
-          <Link href="/" className="font-serif text-lg text-ink tracking-tight">
+          <Link href="/" className="text-lg text-ink tracking-tight">
             {brand}
-            <span className="text-accent-600">.</span>
+            <span className="text-accent-400">.</span>
           </Link>
 
           {/* Desktop links */}
@@ -82,7 +82,7 @@ export function Navbar({
               >
                 {link.label}
                 {active === link.href && (
-                  <span className="absolute -bottom-0.5 inset-x-0 h-px bg-accent-600" />
+                  <span className="absolute -bottom-0.5 inset-x-0 h-px bg-accent-500" />
                 )}
               </a>
             ))}
