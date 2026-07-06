@@ -107,10 +107,33 @@ body {
   color: var(--color-ink);
 }
 
-/* Keyboard-nav focus ring */
+/* Keyboard-nav focus ring — fades in/out instead of snapping */
+:is(a, button, input, textarea, select, [tabindex]) {
+  transition: outline-offset 0.15s ease-out, box-shadow 0.15s ease-out;
+}
 :is(a, button, input, textarea, select, [tabindex]):focus-visible {
   outline: 2px solid var(--color-accent-400);
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15);
+}
+
+/* Skip link — visually hidden until keyboard-focused */
+.skip-link {
+  position: fixed;
+  top: -100%;
+  left: 1rem;
+  z-index: 100;
+  background: var(--color-card);
+  color: var(--color-ink);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: top 0.2s ease-out;
+}
+.skip-link:focus-visible {
+  top: 1rem;
 }
 
 /* Minimal entrance — the only motion primitive used outside framer-motion */
@@ -125,6 +148,17 @@ body {
   }
 }
 
+/* Shared hover-elevation treatment for interactive cards */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+@media (hover: hover) and (pointer: fine) {
+  .hover-lift:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: var(--shadow-pop);
+  }
+}
+
 /* Utility: hide scrollbar where a horizontal rail is intentional */
 .scrollbar-hide {
   -ms-overflow-style: none;
@@ -132,6 +166,32 @@ body {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Skeleton loading shimmer */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.skeleton {
+  background: var(--color-card);
+  border: 1px solid var(--color-line);
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+/* Respect reduced-motion: replace movement/scale with plain opacity fades */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hover-lift:hover {
+    transform: none !important;
+  }
 }
 
 /* ------------------------------------------------------------------ */
