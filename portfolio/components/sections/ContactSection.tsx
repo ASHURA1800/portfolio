@@ -49,7 +49,7 @@ export function ContactSection({ profile, socials: allSocials }: { profile: Prof
                   <dd className="mt-0.5 text-ink">
                     <a
                       href={`mailto:${profile.email}`}
-                      className="transition-colors duration-200 hover:text-accent-700"
+                      className="transition-colors duration-200 hover:text-accent-400"
                     >
                       {profile.email}
                     </a>
@@ -89,13 +89,13 @@ export function ContactSection({ profile, socials: allSocials }: { profile: Prof
         {/* Right: form */}
         <div>
           {sent ? (
-            <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-line bg-surface p-10 text-center">
-              <CheckCircle2 size={40} className="text-emerald-600" />
-              <h3 className="font-serif text-2xl text-ink">Message sent</h3>
+            <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-line bg-card p-10 text-center">
+              <CheckCircle2 size={40} className="text-success" />
+              <h3 className="text-2xl text-ink">Message sent</h3>
               <p className="text-sm text-muted">Thanks for reaching out — I&apos;ll read it and reply.</p>
               <button
                 onClick={reset}
-                className="text-sm text-accent-700 transition-colors duration-200 hover:text-accent-800"
+                className="text-sm text-accent-400 transition-colors duration-200 hover:text-accent-300"
               >
                 Send another →
               </button>
@@ -103,10 +103,10 @@ export function ContactSection({ profile, socials: allSocials }: { profile: Prof
           ) : (
             <form
               onSubmit={handleSubmit}
-              className="space-y-4 rounded-xl border border-line bg-surface p-6"
+              className="space-y-4 rounded-xl border border-line bg-card p-6"
             >
               {error && (
-                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                <div className="rounded-lg border border-error/30 bg-error/10 p-3 text-sm text-error">
                   {error}
                 </div>
               )}
@@ -130,7 +130,7 @@ export function ContactSection({ profile, socials: allSocials }: { profile: Prof
                       className={inputClass}
                     />
                     {fieldErrors[field] && (
-                      <p className="mt-1 text-xs text-red-600">{fieldErrors[field][0]}</p>
+                      <p className="mt-1 text-xs text-error">{fieldErrors[field][0]}</p>
                     )}
                   </div>
                 ))}
@@ -150,7 +150,7 @@ export function ContactSection({ profile, socials: allSocials }: { profile: Prof
                   className={inputClass}
                 />
                 {fieldErrors.subject && (
-                  <p className="mt-1 text-xs text-red-600">{fieldErrors.subject[0]}</p>
+                  <p className="mt-1 text-xs text-error">{fieldErrors.subject[0]}</p>
                 )}
               </div>
 
@@ -167,7 +167,7 @@ export function ContactSection({ profile, socials: allSocials }: { profile: Prof
                   className={`${inputClass} resize-none`}
                 />
                 {fieldErrors.message && (
-                  <p className="mt-1 text-xs text-red-600">{fieldErrors.message[0]}</p>
+                  <p className="mt-1 text-xs text-error">{fieldErrors.message[0]}</p>
                 )}
               </div>
 
@@ -177,7 +177,7 @@ export function ContactSection({ profile, socials: allSocials }: { profile: Prof
               <button
                 type="submit"
                 disabled={sending}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent-600 py-3 text-sm font-medium text-white transition-colors duration-200 hover:bg-accent-700 disabled:opacity-70"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent-500 py-3 text-sm font-medium text-white transition-colors duration-200 hover:bg-accent-600 disabled:opacity-70"
               >
                 {sending ? (
                   <>
