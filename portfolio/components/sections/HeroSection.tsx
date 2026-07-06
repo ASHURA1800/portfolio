@@ -5,6 +5,7 @@ import Image from 'next/image';
 import type { Profile, Social } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { SocialIcon } from '@/components/ui/SocialIcon';
+import { MagneticButton } from '@/components/ui/MagneticButton';
 import { useAnalytics } from '@/hooks/useAnalytics';
 
 export function HeroSection({ profile, socials }: { profile: Profile; socials: Social[] }) {
@@ -38,20 +39,24 @@ export function HeroSection({ profile, socials }: { profile: Profile; socials: S
           )}
 
           <div className="mt-12 flex flex-wrap items-center gap-3">
-            <Button
-              href="#projects"
-              icon={<ArrowUpRight size={16} />}
-              iconPosition="right"
-            >
-              View Projects
-            </Button>
-            <Button
-              href="#contact"
-              variant="secondary"
-              onClick={() => track('page_view', { section: 'contact_cta' })}
-            >
-              Contact Me
-            </Button>
+            <MagneticButton>
+              <Button
+                href="#projects"
+                icon={<ArrowUpRight size={16} />}
+                iconPosition="right"
+              >
+                View Projects
+              </Button>
+            </MagneticButton>
+            <MagneticButton>
+              <Button
+                href="#contact"
+                variant="secondary"
+                onClick={() => track('page_view', { section: 'contact_cta' })}
+              >
+                Contact Me
+              </Button>
+            </MagneticButton>
             {profile.resume && (
               <Button
                 href={profile.resume}
