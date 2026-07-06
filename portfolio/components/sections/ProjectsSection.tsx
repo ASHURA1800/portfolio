@@ -35,7 +35,7 @@ function ProjectBlock({ project, index }: { project: Project; index: number }) {
             )}
           </div>
 
-          <h3 className="mt-3 font-serif text-3xl md:text-4xl font-normal tracking-tight text-ink">
+          <h3 className="mt-3 text-3xl md:text-4xl font-normal tracking-tight text-ink">
             {project.title}
           </h3>
 
@@ -79,7 +79,7 @@ function ProjectBlock({ project, index }: { project: Project; index: number }) {
           {/* Key learning teaser — first learning only, shown only if present */}
           {keyLearning && (
             <p className="mt-6 max-w-[55ch] leading-relaxed text-ink">
-              <span className="font-medium text-accent-700">Key learning → </span>
+              <span className="font-medium text-accent-400">Key learning → </span>
               {keyLearning}
             </p>
           )}
