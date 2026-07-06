@@ -18,9 +18,9 @@ export function Footer({ profile, socials: allSocials }: { profile: Profile; soc
       <div className="max-w-7xl mx-auto flex flex-col items-center gap-6 text-center md:flex-row md:items-center md:justify-between md:text-left">
         {/* Identity */}
         <div>
-          <a href="#" className="font-serif text-base text-ink tracking-tight">
+          <a href="#" className="text-base text-ink tracking-tight">
             {brand}
-            <span className="text-accent-600">.</span>
+            <span className="text-accent-400">.</span>
           </a>
           <p className="mt-1 text-sm text-faint">
             © {year}
