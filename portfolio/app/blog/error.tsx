@@ -17,7 +17,7 @@ export default function BlogListError({
   return (
     <main className="min-h-screen bg-bg flex items-center justify-center px-6">
       <div className="text-center max-w-md">
-        <h1 className="font-serif text-2xl font-medium text-ink mb-2">Failed to load articles</h1>
+        <h1 className="text-2xl font-medium text-ink mb-2">Failed to load articles</h1>
         <p className="text-muted text-sm mb-6">
           There was a problem fetching the blog posts. Please try again.
         </p>
