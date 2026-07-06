@@ -31,7 +31,7 @@ export function SkillsSection({ skills, skillsNote }: { skills: Skill[]; skillsN
               className="grid gap-x-12 gap-y-4 border-b border-line py-10 md:grid-cols-12"
             >
               <div className="md:col-span-3">
-                <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-accent-700">
+                <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-accent-400">
                   {cat}
                 </h3>
               </div>
