@@ -7,7 +7,7 @@ import type { Profile, Skill } from '@/types';
 function Block({ label, body }: { label: string; body: string }) {
   return (
     <div>
-      <h3 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-accent-700">
+      <h3 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-accent-400">
         {label}
       </h3>
       <p className="max-w-[60ch] text-lg leading-relaxed text-muted">{body}</p>
@@ -54,7 +54,7 @@ export function AboutSection({ profile, skills }: { profile: Profile; skills: Sk
             <div className="space-y-8 md:sticky md:top-24">
               {hasSkills && (
                 <div>
-                  <h3 className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-accent-700">
+                  <h3 className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-accent-400">
                     Stack
                   </h3>
                   <div className="space-y-4">
@@ -78,7 +78,7 @@ export function AboutSection({ profile, skills }: { profile: Profile; skills: Sk
 
               {hasLocation && (
                 <div>
-                  <h3 className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-accent-700">
+                  <h3 className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-accent-400">
                     Based in
                   </h3>
                   <p className="text-[15px] text-ink">{location}</p>
