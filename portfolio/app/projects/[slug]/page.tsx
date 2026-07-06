@@ -51,7 +51,7 @@ export async function generateMetadata({
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <section>
-      <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-accent-700">
+      <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-accent-400">
         {label}
       </h2>
       {children}
@@ -114,7 +114,7 @@ export default async function ProjectDetailPage({
               </>
             )}
           </div>
-          <h1 className="mt-4 font-serif text-4xl font-normal leading-[1.1] tracking-tight text-ink md:text-5xl">
+          <h1 className="mt-4 text-4xl font-normal leading-[1.1] tracking-tight text-ink md:text-5xl">
             {project.title}
           </h1>
           {overview && (
@@ -172,7 +172,7 @@ export default async function ProjectDetailPage({
                 {project.metrics.map((m) => (
                   <div key={m.label}>
                     <dt className="text-xs uppercase tracking-[0.14em] text-faint">{m.label}</dt>
-                    <dd className="mt-1 font-serif text-2xl text-ink">{m.value}</dd>
+                    <dd className="mt-1 text-2xl text-ink">{m.value}</dd>
                   </div>
                 ))}
               </dl>
@@ -192,7 +192,7 @@ export default async function ProjectDetailPage({
                 href={src}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block overflow-hidden rounded-xl border border-line bg-surface"
+                className="block overflow-hidden rounded-xl border border-line bg-card"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
