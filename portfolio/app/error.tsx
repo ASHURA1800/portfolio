@@ -16,10 +16,10 @@ export default function GlobalError({
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center px-6">
       <div className="text-center max-w-md">
-        <div className="w-16 h-16 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center mx-auto mb-6">
-          <span className="text-2xl text-red-600">⚠</span>
+        <div className="w-16 h-16 rounded-2xl bg-error/10 border border-error/30 flex items-center justify-center mx-auto mb-6">
+          <span className="text-2xl text-error">⚠</span>
         </div>
-        <h1 className="font-serif text-2xl font-medium text-ink mb-2">Something went wrong</h1>
+        <h1 className="text-2xl font-medium text-ink mb-2">Something went wrong</h1>
         <p className="text-muted text-sm mb-6">
           An unexpected error occurred. Please try again.
         </p>
