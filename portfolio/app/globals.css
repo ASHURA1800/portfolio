@@ -1,48 +1,53 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------ */
-/* Design tokens — light editorial theme                               */
+/* Design tokens — Deep Graphite + Electric Blue dark theme            */
 /* ------------------------------------------------------------------ */
 @theme {
   /* Fonts (CSS vars supplied by next/font in layout.tsx) */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, "Times New Roman", serif;
 
   /* Surfaces & text */
-  --color-bg: #faf8f5;            /* soft off-white page background */
-  --color-surface: #ffffff;       /* cards / raised surfaces */
-  --color-muted-surface: #f3f0ea; /* muted fills / inset panels */
-  --color-ink: #111111;           /* primary text */
-  --color-muted: #5f5f5f;         /* secondary text */
-  --color-faint: #8a857d;         /* faint labels / captions (derived) */
-  --color-line: #e8e4dd;          /* hairline borders / dividers */
+  --color-bg: #0B0F14;            /* page background */
+  --color-surface: #141A23;       /* raised surfaces */
+  --color-card: #181F2B;          /* cards */
+  --color-muted-surface: #141A23; /* muted fills / inset panels */
+  --color-ink: #F8FAFC;           /* primary text */
+  --color-muted: #94A3B8;         /* secondary text */
+  --color-faint: #64748B;         /* faint labels / captions */
+  --color-line: #1E293B;          /* hairline borders / dividers */
 
-  /* Single accent — muted violet, recentered on #5b50c8 */
-  --color-accent-50: #f4f3fb;
-  --color-accent-100: #eae8f6;
-  --color-accent-200: #d6d2ee;
-  --color-accent-300: #b7afe1;
-  --color-accent-400: #9085d0;
-  --color-accent-500: #6c5fc6;
-  --color-accent-600: #5b50c8;   /* primary accent */
-  --color-accent-700: #4b43a4;
-  --color-accent-800: #3e3782;
-  --color-accent-900: #352f68;
-  --color-accent: #5b50c8;
+  /* Single accent — electric blue, recentered on #3B82F6 */
+  --color-accent-50: #eff6ff;
+  --color-accent-100: #dbeafe;
+  --color-accent-200: #bfdbfe;
+  --color-accent-300: #93c5fd;
+  --color-accent-400: #60A5FA;
+  --color-accent-500: #3B82F6;   /* primary accent */
+  --color-accent-600: #2563EB;
+  --color-accent-700: #1d4ed8;
+  --color-accent-800: #1e40af;
+  --color-accent-900: #1e3a8a;
+  --color-accent: #3B82F6;
+
+  /* Status */
+  --color-success: #22C55E;
+  --color-error: #EF4444;
+  --color-warning: #F59E0B;
 
   /* Radius */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.625rem;
-  --radius-lg: 0.875rem;
-  --radius-xl: 1.125rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
 
-  /* Shadows — minimal only */
-  --shadow-xs: 0 1px 2px rgba(17, 17, 17, 0.04);
-  --shadow-card: 0 1px 2px rgba(17, 17, 17, 0.05);
-  --shadow-pop: 0 6px 24px rgba(17, 17, 17, 0.06);
+  /* Shadows — adjusted for visibility on dark backgrounds */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-pop: 0 8px 24px rgba(0, 0, 0, 0.45);
 
-  /* Typography scale (editorial, fluid) */
-  --text-display: clamp(2.75rem, 6vw, 4.5rem); /* hero serif */
+  /* Typography scale (fluid) */
+  --text-display: clamp(2.75rem, 6vw, 4.5rem); /* hero */
   --text-h1: clamp(2rem, 4vw, 3rem);
   --text-h2: clamp(1.6rem, 3vw, 2.25rem);
   --text-lead: 1.25rem;
@@ -54,8 +59,8 @@
 }
 
 :root {
-  --background: #faf8f5;
-  --foreground: #111111;
+  --background: var(--color-bg);
+  --foreground: var(--color-ink);
 }
 
 * {
@@ -79,7 +84,7 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Quiet light scrollbar — no gradient, no neon */
+/* Quiet dark scrollbar — no gradient, no neon */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -88,18 +93,24 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #ddd7cd;
+  background: var(--color-line);
   border-radius: 9999px;
   border: 3px solid var(--background);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #cbc4b7;
+  background: var(--color-muted);
 }
 
 /* Selection — faint accent wash */
 ::selection {
-  background: rgba(91, 80, 200, 0.16);
-  color: #111111;
+  background: rgba(59, 130, 246, 0.25);
+  color: var(--color-ink);
+}
+
+/* Keyboard-nav focus ring */
+:is(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent-400);
+  outline-offset: 2px;
 }
 
 /* Minimal entrance — the only motion primitive used outside framer-motion */
@@ -124,7 +135,7 @@ body {
 }
 
 /* ------------------------------------------------------------------ */
-/* Blog article prose — hand-rolled light typography                   */
+/* Blog article prose — hand-rolled dark typography                    */
 /* (no @tailwindcss/typography plugin installed)                       */
 /* ------------------------------------------------------------------ */
 .prose-light {
@@ -140,7 +151,6 @@ body {
 .prose-light h2,
 .prose-light h3,
 .prose-light h4 {
-  font-family: var(--font-instrument-serif), ui-serif, Georgia, serif;
   color: var(--color-ink);
   font-weight: 600;
   line-height: 1.2;
@@ -161,15 +171,15 @@ body {
   font-weight: 600;
 }
 .prose-light a {
-  color: var(--color-accent-700);
+  color: var(--color-accent-400);
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
-  text-decoration-color: var(--color-accent-200);
+  text-decoration-color: var(--color-accent-800);
   transition: text-decoration-color 0.2s ease;
 }
 .prose-light a:hover {
-  text-decoration-color: var(--color-accent-600);
+  text-decoration-color: var(--color-accent-400);
 }
 .prose-light ul,
 .prose-light ol {
@@ -183,15 +193,15 @@ body {
 .prose-light code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.9em;
-  background: #f0ede8;
+  background: var(--color-surface);
   color: var(--color-ink);
   padding: 0.15em 0.4em;
-  border-radius: 0.3rem;
+  border-radius: var(--radius-sm);
 }
 .prose-light pre {
   background: var(--color-surface);
   border: 1px solid var(--color-line);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-md);
   padding: 1.1rem 1.25rem;
   overflow-x: auto;
   font-size: 0.9rem;
