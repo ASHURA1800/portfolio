@@ -37,7 +37,7 @@ export function TimelineItem({
       )}
       {/* Static node */}
       <span
-        className="absolute left-0 top-1.5 h-[11px] w-[11px] rounded-full border-2 border-accent-600 bg-bg"
+        className="absolute left-0 top-1.5 h-[11px] w-[11px] rounded-full border-2 border-accent-500 bg-bg"
         aria-hidden="true"
       />
 
