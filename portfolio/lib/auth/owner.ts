@@ -9,13 +9,10 @@ export interface Owner {
 }
 
 /**
- * Returns true when setup has been completed — either a DB owner row exists
- * or legacy env-var credentials (ADMIN_EMAIL + ADMIN_PASSWORD_HASH) are set.
+ * Returns true when setup has been completed — a DB owner row exists.
  * Falls back to false on DB error so a fresh deploy triggers /setup.
  */
 export async function ownerExists(): Promise<boolean> {
-  // Legacy: env var credentials present → skip setup
-  if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD_HASH) return true;
   try {
     const [row] = await db
       .select({ id: ownerAccounts.id })
@@ -42,4 +39,12 @@ export async function getOwnerByEmail(email: string): Promise<Owner | null> {
   } catch {
     return null;
   }
+}
+
+/** Updates the bcrypt password hash for the given owner account. */
+export async function updateOwnerPassword(id: string, password_hash: string): Promise<void> {
+  await db
+    .update(ownerAccounts)
+    .set({ password_hash })
+    .where(eq(ownerAccounts.id, id));
 }
