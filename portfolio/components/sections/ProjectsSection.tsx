@@ -3,7 +3,7 @@
 import { Code, ArrowUpRight, FileText } from 'lucide-react';
 import { SectionContainer } from '@/components/ui/SectionContainer';
 import { SectionHeading } from '@/components/ui/SectionHeading';
-import { Reveal } from '@/components/ui/Reveal';
+import { Reveal, staggerDelay } from '@/components/ui/Reveal';
 import { ProjectFrame } from '@/components/ui/ProjectFrame';
 import { Button } from '@/components/ui/Button';
 import type { Project } from '@/types';
@@ -15,7 +15,7 @@ function ProjectBlock({ project, index }: { project: Project; index: number }) {
   const keyLearning = project.learnings[0];
 
   return (
-    <Reveal>
+    <Reveal delay={staggerDelay(index)}>
       <article
         className={`grid items-center gap-10 lg:grid-cols-2 lg:gap-16 ${
           reversed ? 'lg:[&>*:first-child]:order-2' : ''
