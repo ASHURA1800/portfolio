@@ -28,7 +28,7 @@ export function ProjectFrame({
 
   return (
     <div
-      className={`overflow-hidden rounded-xl border border-line bg-surface shadow-[var(--shadow-card)] ${className}`}
+      className={`overflow-hidden rounded-xl border border-line bg-card shadow-[var(--shadow-card)] ${className}`}
     >
       <div className="flex h-9 items-center gap-1.5 border-b border-line bg-bg px-4">
         <span className="h-2.5 w-2.5 rounded-full bg-line" />
