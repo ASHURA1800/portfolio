@@ -26,16 +26,16 @@ export function SectionHeading({
   return (
     <div className={`${aligned} max-w-2xl`}>
       {eyebrow && (
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent-700 mb-4">
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent-400 mb-4">
           {eyebrow}
         </p>
       )}
-      <Tag className="font-serif font-normal tracking-tight text-ink text-[length:var(--text-h2)] leading-[1.1]">
+      <Tag className="font-normal tracking-tight text-ink text-[length:var(--text-h2)] leading-[1.1]">
         {title}
         {highlight && (
           <>
             {" "}
-            <span className="italic text-accent-700">{highlight}</span>
+            <span className="font-semibold text-accent-400">{highlight}</span>
           </>
         )}
       </Tag>
