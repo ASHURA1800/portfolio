@@ -97,7 +97,7 @@ export default async function BlogPostPage({
     : "";
 
   return (
-    <main className="min-h-screen bg-bg text-ink">
+    <main id="main-content" className="min-h-screen bg-bg text-ink">
       <div className="max-w-3xl mx-auto px-6 md:px-8 py-24">
         {/* Back nav */}
         <Link
