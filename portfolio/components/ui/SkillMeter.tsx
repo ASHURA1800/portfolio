@@ -50,7 +50,7 @@ export function SkillMeter({
           <span
             key={i}
             className={`h-1 flex-1 rounded-full ${
-              i < filled ? "bg-accent-600" : "bg-line"
+              i < filled ? "bg-accent-500" : "bg-line"
             }`}
           />
         ))}
