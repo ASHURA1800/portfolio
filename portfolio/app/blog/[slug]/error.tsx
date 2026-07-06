@@ -17,7 +17,7 @@ export default function BlogPostError({
   return (
     <main className="min-h-screen bg-bg flex items-center justify-center px-6">
       <div className="text-center max-w-md">
-        <h1 className="font-serif text-2xl font-medium text-ink mb-2">Failed to load article</h1>
+        <h1 className="text-2xl font-medium text-ink mb-2">Failed to load article</h1>
         <p className="text-muted text-sm mb-6">
           There was a problem loading this post. Please try again.
         </p>
