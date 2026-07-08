@@ -8,9 +8,6 @@ import { SectionHeading } from '@/components/ui/SectionHeading';
 import { Reveal, staggerDelay } from '@/components/ui/Reveal';
 import type { Certification } from '@/types';
 
-// Data lives in Neon, managed from /admin/certifications. Fetched client-side
-// so the homepage stays statically prerendered. Only real credentials render.
-
 function formatIssued(date?: string | null): string {
   if (!date) return '';
   const d = new Date(`${date}T00:00:00`);
@@ -22,18 +19,11 @@ function CertImage({ src, alt }: { src: string; alt: string }) {
   const [loaded, setLoaded] = useState(false);
   return (
     <div
-      className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-line bg-muted-surface transition-opacity duration-500 ${
+      className={`relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-line bg-surface transition-opacity duration-500 ${
         loaded ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        sizes="56px"
-        onLoad={() => setLoaded(true)}
-        className="object-cover"
-      />
+      <Image src={src} alt={alt} fill sizes="40px" onLoad={() => setLoaded(true)} className="object-cover" />
     </div>
   );
 }
@@ -52,95 +42,74 @@ export function CertificationsSection() {
         list.sort((a, b) => Number(b.is_featured) - Number(a.is_featured));
         setItems(list);
       })
-      .catch(() => {
-        /* leave empty on failure — no fake data */
-      })
-      .finally(() => {
-        if (active) setReady(true);
-      });
-    return () => {
-      active = false;
-    };
+      .catch(() => {})
+      .finally(() => { if (active) setReady(true); });
+    return () => { active = false; };
   }, []);
 
-  // Don't render until the fetch settles — no hollow section flash.
-  if (!ready) return null;
-
-  // No certifications in DB — don't render a hollow section.
-  if (items.length === 0) return null;
+  if (!ready || items.length === 0) return null;
 
   return (
     <SectionContainer id="certifications" width="wide">
       <SectionHeading eyebrow="Credentials" title="Certifications" />
 
-      <ul className="mt-14 max-w-3xl space-y-4">
-          {items.map((cert, i) => {
-            const issued = formatIssued(cert.issued_date);
-            const inner = (
-              <article className="hover-lift group flex gap-4 rounded-xl border border-line bg-card p-5 transition-colors duration-200 hover:border-accent-300">
-                {cert.image && <CertImage src={cert.image} alt={cert.title} />}
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <h3 className="flex items-center gap-1.5 font-medium text-ink transition-colors duration-200 group-hover:text-accent-400">
-                      {cert.title}
-                      {cert.credential_url && (
-                        <ArrowUpRight
-                          size={14}
-                          aria-hidden="true"
-                          className="text-faint opacity-0 transition-opacity group-hover:opacity-100"
-                        />
-                      )}
-                    </h3>
-                    {issued && (
-                      <span className="whitespace-nowrap text-sm text-faint">
-                        {issued}
-                      </span>
+      <ul className="mt-14 max-w-3xl space-y-0 border-t border-line">
+        {items.map((cert, i) => {
+          const issued = formatIssued(cert.issued_date);
+
+          const inner = (
+            <article className="group flex gap-4 border-b border-line py-5 transition-colors duration-200 hover:bg-surface/50 px-1 -mx-1 rounded-lg">
+              {cert.image && <CertImage src={cert.image} alt={cert.title} />}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline justify-between gap-4 flex-wrap">
+                  <h3 className="flex items-center gap-1.5 text-sm font-semibold text-ink transition-colors duration-200 group-hover:text-accent-400">
+                    {cert.title}
+                    {cert.credential_url && (
+                      <ArrowUpRight
+                        size={12}
+                        aria-hidden="true"
+                        className="text-faint opacity-0 transition-opacity group-hover:opacity-100"
+                      />
                     )}
-                  </div>
-
-                  <div className="mt-0.5 text-sm text-muted">{cert.issuer}</div>
-
-                  {cert.description && (
-                    <p className="mt-2 text-sm leading-relaxed text-muted">
-                      {cert.description}
-                    </p>
-                  )}
-
-                  {cert.skills?.length > 0 && (
-                    <ul className="mt-3 flex flex-wrap gap-1.5">
-                      {cert.skills.map((skill) => (
-                        <li
-                          key={skill}
-                          className="rounded-md border border-line bg-muted-surface px-2 py-0.5 text-xs text-muted"
-                        >
-                          {skill}
-                        </li>
-                      ))}
-                    </ul>
+                  </h3>
+                  {issued && (
+                    <span className="whitespace-nowrap text-xs tabular-nums text-faint">{issued}</span>
                   )}
                 </div>
-              </article>
-            );
+                <p className="mt-0.5 text-xs text-muted">{cert.issuer}</p>
+                {cert.description && (
+                  <p className="mt-2 text-xs leading-relaxed text-muted">{cert.description}</p>
+                )}
+                {cert.skills?.length > 0 && (
+                  <ul className="mt-2.5 flex flex-wrap gap-1.5">
+                    {cert.skills.map((skill) => (
+                      <li key={skill} className="tech-pill">{skill}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </article>
+          );
 
-            return (
-              <li key={cert.id}>
-                <Reveal delay={staggerDelay(i)}>
-                  {cert.credential_url ? (
-                    <a
-                      href={cert.credential_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`${cert.title} — view credential`}
-                    >
-                      {inner}
-                    </a>
-                  ) : (
-                    inner
-                  )}
-                </Reveal>
-              </li>
-            );
-          })}
+          return (
+            <li key={cert.id}>
+              <Reveal delay={staggerDelay(i, 40)}>
+                {cert.credential_url ? (
+                  <a
+                    href={cert.credential_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${cert.title} — view credential`}
+                  >
+                    {inner}
+                  </a>
+                ) : (
+                  inner
+                )}
+              </Reveal>
+            </li>
+          );
+        })}
       </ul>
     </SectionContainer>
   );
