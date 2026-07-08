@@ -1,93 +1,109 @@
 'use client';
 
 import { Code, ArrowUpRight, FileText } from 'lucide-react';
+import Image from 'next/image';
 import { SectionContainer } from '@/components/ui/SectionContainer';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { Reveal, staggerDelay } from '@/components/ui/Reveal';
-import { ProjectFrame } from '@/components/ui/ProjectFrame';
 import { Button } from '@/components/ui/Button';
 import type { Project } from '@/types';
 import { useAnalytics } from '@/hooks/useAnalytics';
 
+function ProjectImage({ src, alt }: { src?: string; alt: string }) {
+  if (!src) {
+    return (
+      <div className="aspect-[16/10] w-full rounded-xl border border-line bg-surface flex items-center justify-center">
+        <span className="text-xs text-faint">No preview</span>
+      </div>
+    );
+  }
+  return (
+    <div className="aspect-[16/10] w-full overflow-hidden rounded-xl border border-line bg-surface">
+      <Image
+        src={src}
+        alt={alt}
+        width={800}
+        height={500}
+        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+      />
+    </div>
+  );
+}
+
 function ProjectBlock({ project, index }: { project: Project; index: number }) {
   const { track } = useAnalytics();
-  const reversed = index % 2 === 1; // alternating — large screens only
+  const reversed = index % 2 === 1;
   const keyLearning = project.learnings[0];
+  const num = String(index + 1).padStart(2, '0');
 
   return (
-    <Reveal delay={staggerDelay(index)}>
+    <Reveal delay={staggerDelay(index, 60)}>
       <article
-        className={`grid items-center gap-10 lg:grid-cols-2 lg:gap-16 ${
+        className={`group grid items-start gap-10 lg:grid-cols-2 lg:gap-16 ${
           reversed ? 'lg:[&>*:first-child]:order-2' : ''
         }`}
       >
-        <ProjectFrame src={project.image ?? undefined} alt={`${project.title} preview`} />
+        {/* Image */}
+        <div className="overflow-hidden">
+          <ProjectImage src={project.image ?? undefined} alt={`${project.title} preview`} />
+        </div>
 
-        <div>
-          {/* Year (+ quiet category context) — typography only, no badges */}
-          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-faint">
-            <span>{project.year}</span>
-            {project.category && (
-              <>
-                <span className="text-line">·</span>
-                <span>{project.category}</span>
-              </>
-            )}
+        {/* Content */}
+        <div className="flex flex-col justify-center">
+          {/* Number + meta */}
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-[0.6875rem] font-medium tabular-nums text-accent-500/60">
+              {num}
+            </span>
+            <span className="h-px flex-1 max-w-[2rem] bg-line" aria-hidden="true" />
+            <span className="text-[0.6875rem] uppercase tracking-[0.16em] text-faint">
+              {project.year}
+              {project.category && <> · {project.category}</>}
+            </span>
           </div>
 
-          <h3 className="mt-3 text-3xl md:text-4xl font-normal tracking-tight text-ink">
+          <h3 className="text-2xl md:text-3xl font-semibold tracking-[-0.02em] text-ink leading-tight">
             {project.title}
           </h3>
 
-          {/* Story first: problem → solution */}
+          {/* Story */}
           <div className="mt-5 space-y-4">
             {project.problem && (
               <div>
-                <div className="mb-1 text-xs uppercase tracking-[0.15em] text-faint">
-                  Problem
-                </div>
-                <p className="max-w-[55ch] leading-relaxed text-muted">
-                  {project.problem}
-                </p>
+                <p className="mb-1 text-[0.625rem] uppercase tracking-[0.16em] text-faint">Problem</p>
+                <p className="max-w-[52ch] text-sm leading-relaxed text-muted">{project.problem}</p>
               </div>
             )}
             {(project.solution || project.description) && (
               <div>
-                <div className="mb-1 text-xs uppercase tracking-[0.15em] text-faint">
-                  Solution
-                </div>
-                <p className="max-w-[55ch] leading-relaxed text-muted">
+                <p className="mb-1 text-[0.625rem] uppercase tracking-[0.16em] text-faint">Solution</p>
+                <p className="max-w-[52ch] text-sm leading-relaxed text-muted">
                   {project.solution || project.description}
                 </p>
               </div>
             )}
           </div>
 
+          {/* Stack */}
           {project.tech_stack.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-2">
+            <div className="mt-5 flex flex-wrap gap-1.5">
               {project.tech_stack.map((t) => (
-                <span
-                  key={t}
-                  className="rounded-md border border-line px-2.5 py-1 text-xs text-muted"
-                >
-                  {t}
-                </span>
+                <span key={t} className="tech-pill">{t}</span>
               ))}
             </div>
           )}
 
-          {/* Key learning teaser — first learning only, shown only if present */}
+          {/* Key learning */}
           {keyLearning && (
-            <p className="mt-6 max-w-[55ch] leading-relaxed text-ink">
-              <span className="font-medium text-accent-400">Key learning → </span>
-              {keyLearning}
-            </p>
+            <div className="mt-5 editorial-bar">
+              <p className="text-xs text-muted leading-relaxed">{keyLearning}</p>
+            </div>
           )}
 
-          {/* Buttons: Case Study → Live → GitHub (story-first), only if present */}
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          {/* Actions */}
+          <div className="mt-7 flex flex-wrap items-center gap-2.5">
             {project.case_study && project.slug && (
-              <Button href={`/projects/${project.slug}`} icon={<FileText size={15} />}>
+              <Button href={`/projects/${project.slug}`} size="sm" icon={<FileText size={13} />}>
                 Case study
               </Button>
             )}
@@ -96,7 +112,8 @@ function ProjectBlock({ project, index }: { project: Project; index: number }) {
                 href={project.live_url}
                 external
                 variant="secondary"
-                icon={<ArrowUpRight size={15} />}
+                size="sm"
+                icon={<ArrowUpRight size={13} />}
                 iconPosition="right"
                 onClick={() => track('live_url_click', { project: project.title })}
               >
@@ -107,11 +124,10 @@ function ProjectBlock({ project, index }: { project: Project; index: number }) {
               <Button
                 href={project.github_url}
                 external
-                variant="secondary"
-                icon={<Code size={15} />}
-                onClick={() =>
-                  track('project_click', { project: project.title, type: 'github' })
-                }
+                variant="ghost"
+                size="sm"
+                icon={<Code size={13} />}
+                onClick={() => track('project_click', { project: project.title, type: 'github' })}
               >
                 Code
               </Button>
@@ -131,37 +147,33 @@ export function ProjectsSection({
   githubUrl: string;
 }) {
   const { track } = useAnalytics();
-
   if (projects.length === 0) return null;
 
   return (
     <SectionContainer id="projects" width="wide">
       <SectionHeading
         eyebrow="Selected work"
-        title="Things I've"
-        highlight="built"
+        title="Things I've built"
         description="A few projects worth talking about — what they solve, how they're built, and what I took away."
       />
 
-      <div className="mt-16 space-y-20 md:space-y-28">
+      <div className="mt-16 space-y-24 md:space-y-32">
         {projects.map((p, i) => (
           <ProjectBlock key={p.id} project={p} index={i} />
         ))}
-
       </div>
 
       {githubUrl && (
-        <div className="mt-20">
+        <div className="mt-20 pt-8 border-t border-line">
           <a
             href={githubUrl}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => track('github_click', { source: 'projects_more' })}
-            className="inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-ink transition-colors duration-200"
+            className="inline-flex items-center gap-2 text-sm text-faint hover:text-ink transition-colors duration-200"
           >
-            <Code size={16} />
             More on GitHub
-            <ArrowUpRight size={16} />
+            <ArrowUpRight size={14} />
           </a>
         </div>
       )}
