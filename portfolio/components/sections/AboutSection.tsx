@@ -6,11 +6,13 @@ import type { Profile, Skill } from '@/types';
 
 function Block({ label, body }: { label: string; body: string }) {
   return (
-    <div>
-      <h3 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-accent-400">
+    <div className="group">
+      <p className="mb-2 text-[0.6875rem] font-medium uppercase tracking-[0.2em] text-faint">
         {label}
-      </h3>
-      <p className="max-w-[60ch] text-lg leading-relaxed text-muted">{body}</p>
+      </p>
+      <p className="max-w-[60ch] text-[length:var(--text-lead)] leading-relaxed text-muted">
+        {body}
+      </p>
     </div>
   );
 }
@@ -32,9 +34,9 @@ export function AboutSection({ profile, skills }: { profile: Profile; skills: Sk
 
   return (
     <SectionContainer id="about" width="wide">
-      <SectionHeading eyebrow="About" title="A bit of" highlight="background" />
+      <SectionHeading eyebrow="About" title="A bit of background" />
 
-      <div className="mt-14 grid gap-12 md:grid-cols-12 lg:gap-16">
+      <div className="mt-14 grid gap-14 md:grid-cols-12 lg:gap-20">
         {blocks.length > 0 && (
           <Reveal className="space-y-10 md:col-span-7">
             {blocks.map((b) => (
@@ -44,30 +46,38 @@ export function AboutSection({ profile, skills }: { profile: Profile; skills: Sk
         )}
 
         {(hasSkills || hasLocation) && (
-          <aside
+          <Reveal
+            delay={80}
             className={
               blocks.length > 0
-                ? 'md:col-span-5 md:border-l md:border-line md:pl-6 lg:pl-10'
+                ? 'md:col-span-5 md:border-l md:border-line md:pl-8 lg:pl-12'
                 : 'md:col-span-12'
             }
           >
             <div className="space-y-8 md:sticky md:top-24">
               {hasSkills && (
                 <div>
-                  <h3 className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-accent-400">
+                  <p className="mb-4 text-[0.6875rem] font-medium uppercase tracking-[0.2em] text-faint">
                     Stack
-                  </h3>
-                  <div className="space-y-4">
+                  </p>
+                  <div className="space-y-5">
                     {skillCategories.map((cat) => {
                       const items = skillsByCategory(skills, cat);
                       if (!items.length) return null;
                       return (
                         <div key={cat}>
-                          <div className="mb-1 text-xs uppercase tracking-[0.14em] text-faint">
+                          <div className="mb-1.5 text-[0.625rem] uppercase tracking-[0.16em] text-faint/60">
                             {cat}
                           </div>
-                          <div className="text-[15px] text-ink">
-                            {items.map((s) => s.name).join('  ·  ')}
+                          <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+                            {items.map((s, i) => (
+                              <span key={s.name} className="text-sm text-ink">
+                                {s.name}
+                                {i < items.length - 1 && (
+                                  <span className="ml-3 text-line" aria-hidden="true">·</span>
+                                )}
+                              </span>
+                            ))}
                           </div>
                         </div>
                       );
@@ -78,14 +88,14 @@ export function AboutSection({ profile, skills }: { profile: Profile; skills: Sk
 
               {hasLocation && (
                 <div>
-                  <h3 className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-accent-400">
+                  <p className="mb-2 text-[0.6875rem] font-medium uppercase tracking-[0.2em] text-faint">
                     Based in
-                  </h3>
-                  <p className="text-[15px] text-ink">{location}</p>
+                  </p>
+                  <p className="text-sm text-ink">{location}</p>
                 </div>
               )}
             </div>
-          </aside>
+          </Reveal>
         )}
       </div>
     </SectionContainer>
