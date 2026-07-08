@@ -31,7 +31,6 @@ export function Navbar({
   const navRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
 
-  // Filter nav links to only those whose section has real content.
   const links = visibleSections
     ? NAV_LINKS.filter((l) => visibleSections.includes(l.href))
     : NAV_LINKS;
@@ -45,8 +44,7 @@ export function Navbar({
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) => e.isIntersecting && setActive('#' + e.target.id)),
+      (entries) => entries.forEach((e) => e.isIntersecting && setActive('#' + e.target.id)),
       { rootMargin: '-40% 0px -40% 0px' },
     );
     links.forEach((l) => {
@@ -56,8 +54,6 @@ export function Navbar({
     return () => observer.disconnect();
   }, [links]);
 
-  // Shared layout transition: slide one indicator to the active link's rect
-  // instead of toggling a per-link underline.
   useEffect(() => {
     const measure = () => {
       const el = active ? linkRefs.current[active] : null;
@@ -79,30 +75,32 @@ export function Navbar({
     <>
       <nav
         className={cn(
-          'fixed inset-x-0 top-0 z-40 transition-colors duration-300',
+          'fixed inset-x-0 top-0 z-40 transition-all duration-300',
           scrolled
-            ? 'bg-bg border-b border-line'
+            ? 'bg-bg/95 backdrop-blur-md border-b border-line'
             : 'bg-transparent border-b border-transparent',
         )}
       >
-        <div className="max-w-7xl mx-auto px-[var(--space-gutter)] h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg text-ink tracking-tight">
+        <div className="max-w-7xl mx-auto px-[var(--space-gutter)] h-14 flex items-center justify-between">
+          {/* Brand */}
+          <Link
+            href="/"
+            className="text-sm font-medium text-ink tracking-tight hover:text-accent-400 transition-colors duration-200"
+          >
             {brand}
-            <span className="text-accent-400">.</span>
+            <span className="text-accent-500">.</span>
           </Link>
 
           {/* Desktop links */}
-          <div ref={navRef} className="hidden md:flex items-center gap-7 relative">
+          <div ref={navRef} className="hidden md:flex items-center gap-6 relative">
             {links.map((link) => (
               <a
                 key={link.href}
-                ref={(el) => {
-                  linkRefs.current[link.href] = el;
-                }}
+                ref={(el) => { linkRefs.current[link.href] = el; }}
                 href={link.href}
                 className={cn(
-                  'relative text-sm py-1 transition-colors duration-200',
-                  active === link.href ? 'text-ink' : 'text-muted hover:text-ink',
+                  'relative text-xs font-medium tracking-wide py-1 transition-colors duration-200',
+                  active === link.href ? 'text-ink' : 'text-faint hover:text-muted',
                 )}
               >
                 {link.label}
@@ -111,56 +109,78 @@ export function Navbar({
             {indicator && (
               <span
                 aria-hidden="true"
-                className="absolute -bottom-0.5 h-px bg-accent-500 transition-[left,width] duration-300 ease-out"
+                className="absolute -bottom-0.5 h-px bg-accent-500 transition-[left,width] duration-250 ease-out"
                 style={{ left: indicator.left, width: indicator.width }}
               />
             )}
           </div>
 
+          {/* Desktop socials */}
+          {socials.length > 0 && (
+            <div className="hidden md:flex items-center gap-0.5">
+              {socials.slice(0, 3).map((s) => (
+                <a
+                  key={s.platform}
+                  href={s.href}
+                  target={s.platform === 'email' ? undefined : '_blank'}
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  className="flex h-8 w-8 items-center justify-center rounded-md text-faint hover:text-ink hover:bg-surface transition-colors duration-200"
+                >
+                  <SocialIcon name={s.icon} size={15} />
+                </a>
+              ))}
+            </div>
+          )}
+
           {/* Mobile toggle */}
           <button
-            className="md:hidden flex h-12 w-12 -mr-2 items-center justify-center rounded-lg text-muted hover:text-ink transition-colors"
+            className="md:hidden flex h-10 w-10 items-center justify-center rounded-lg text-faint hover:text-ink transition-colors"
             onClick={() => setMenuOpen((o) => !o)}
             aria-label="Toggle menu"
             aria-expanded={menuOpen}
           >
-            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            {menuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </nav>
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="fixed top-16 inset-x-4 z-30 bg-surface border border-line rounded-xl p-4 shadow-[var(--shadow-pop)] md:hidden animate-[fadeIn_0.2s_ease]">
-          <div className="flex flex-col">
+        <div className="fixed top-[57px] inset-x-4 z-30 bg-surface border border-line rounded-xl overflow-hidden shadow-[var(--shadow-pop)] md:hidden animate-[fadeIn_0.18s_ease]">
+          <div className="p-2">
             {links.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className="px-3 py-3 rounded-lg text-sm font-medium text-muted hover:text-ink hover:bg-bg transition-colors"
+                className={cn(
+                  'flex items-center px-3 py-2.5 rounded-lg text-sm transition-colors',
+                  active === link.href
+                    ? 'text-ink bg-card'
+                    : 'text-muted hover:text-ink hover:bg-card',
+                )}
               >
                 {link.label}
               </a>
             ))}
-
-            {socials.length > 0 && (
-              <div className="flex items-center gap-1 mt-3 pt-3 border-t border-line">
-                {socials.map((s) => (
-                  <a
-                    key={s.platform}
-                    href={s.href}
-                    target={s.platform === 'email' ? undefined : '_blank'}
-                    rel="noopener noreferrer"
-                    aria-label={s.label}
-                    className="flex h-12 w-12 items-center justify-center rounded-lg text-muted hover:text-ink hover:bg-bg transition-colors"
-                  >
-                    <SocialIcon name={s.icon} size={18} />
-                  </a>
-                ))}
-              </div>
-            )}
           </div>
+          {socials.length > 0 && (
+            <div className="flex items-center gap-0.5 px-3 py-3 border-t border-line">
+              {socials.map((s) => (
+                <a
+                  key={s.platform}
+                  href={s.href}
+                  target={s.platform === 'email' ? undefined : '_blank'}
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  className="flex h-10 w-10 items-center justify-center rounded-lg text-faint hover:text-ink hover:bg-bg transition-colors"
+                >
+                  <SocialIcon name={s.icon} size={16} />
+                </a>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </>
