@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, ArrowDown } from 'lucide-react';
 import Image from 'next/image';
 import type { Profile, Social } from '@/types';
 import { Button } from '@/components/ui/Button';
@@ -15,93 +15,110 @@ export function HeroSection({ profile, socials }: { profile: Profile; socials: S
   return (
     <section
       id="hero"
-      className="relative flex min-h-[88vh] items-center px-[var(--space-gutter)] py-24"
+      className="relative flex min-h-[96vh] flex-col justify-between px-[var(--space-gutter)] pt-28 pb-12"
     >
-      {/* Left-hugging block inside a wide frame — open whitespace on the right
-          keeps the hero quietly asymmetric rather than dead-centered. */}
-      <div className="mx-auto w-full max-w-6xl">
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-16">
-          <div className="max-w-[62ch] animate-[fadeIn_0.7s_ease] lg:flex-1">
-          {displayName && (
-            <h1 className="font-normal tracking-tight text-ink leading-[1.02] text-[length:var(--text-display)]">
-              {displayName}
-            </h1>
-          )}
+      {/* Top row: name + availability status */}
+      <div className="mx-auto w-full max-w-7xl">
+        <div className="flex items-start justify-between gap-8">
+          {/* Left: index label */}
+          <div className="hidden lg:block pt-1">
+            <span className="section-index">Portfolio</span>
+          </div>
 
-          {profile.title && (
-            <p className="mt-6 text-xl text-muted">{profile.title}</p>
-          )}
+          {/* Centre: hero content */}
+          <div className="flex-1 animate-[fadeUp_0.6s_ease_both]">
+            {/* Title line above name */}
+            {profile.title && (
+              <p className="mb-5 text-xs font-medium uppercase tracking-[0.22em] text-faint">
+                {profile.title}
+              </p>
+            )}
 
-          {profile.bio && (
-            <p className="mt-7 max-w-[55ch] text-lg leading-relaxed text-muted">
-              {profile.bio}
-            </p>
-          )}
+            {displayName && (
+              <h1 className="font-semibold tracking-[-0.03em] text-ink leading-[0.95] text-[length:var(--text-display)]">
+                {displayName}
+              </h1>
+            )}
 
-          <div className="mt-12 flex flex-wrap items-center gap-3">
-            <MagneticButton>
-              <Button
-                href="#projects"
-                icon={<ArrowUpRight size={16} />}
-                iconPosition="right"
-              >
-                View Projects
-              </Button>
-            </MagneticButton>
-            <MagneticButton>
-              <Button
-                href="#contact"
-                variant="secondary"
-                onClick={() => track('page_view', { section: 'contact_cta' })}
-              >
-                Contact Me
-              </Button>
-            </MagneticButton>
-            {profile.resume && (
-              <Button
-                href={profile.resume}
-                external
-                variant="ghost"
-                onClick={() => track('resume_download', { source: 'hero' })}
-              >
-                Resume
-              </Button>
+            {profile.bio && (
+              <p className="mt-8 max-w-[52ch] text-[length:var(--text-lead)] leading-relaxed text-muted">
+                {profile.bio}
+              </p>
+            )}
+
+            <div className="mt-10 flex flex-wrap items-center gap-3">
+              <MagneticButton>
+                <Button
+                  href="#projects"
+                  icon={<ArrowUpRight size={14} />}
+                  iconPosition="right"
+                >
+                  View work
+                </Button>
+              </MagneticButton>
+              <MagneticButton>
+                <Button
+                  href="#contact"
+                  variant="secondary"
+                  onClick={() => track('page_view', { section: 'contact_cta' })}
+                >
+                  Get in touch
+                </Button>
+              </MagneticButton>
+              {profile.resume && (
+                <Button
+                  href={profile.resume}
+                  external
+                  variant="ghost"
+                  onClick={() => track('resume_download', { source: 'hero' })}
+                >
+                  Résumé ↗
+                </Button>
+              )}
+            </div>
+
+            {socials.length > 0 && (
+              <div className="mt-12 flex items-center gap-4">
+                {socials.map((s) => (
+                  <a
+                    key={s.platform}
+                    href={s.href}
+                    target={s.platform === 'email' ? undefined : '_blank'}
+                    rel="noopener noreferrer"
+                    aria-label={s.label}
+                    onClick={s.platform === 'github' ? () => track('github_click', { platform: s.label }) : undefined}
+                    className="text-faint hover:text-ink transition-colors duration-200"
+                  >
+                    <SocialIcon name={s.icon} size={17} />
+                  </a>
+                ))}
+              </div>
             )}
           </div>
 
-          {socials.length > 0 && (
-            <div className="mt-14 flex items-center gap-5">
-              {socials.map((s) => (
-                <a
-                  key={s.platform}
-                  href={s.href}
-                  target={s.platform === 'email' ? undefined : '_blank'}
-                  rel="noopener noreferrer"
-                  aria-label={s.label}
-                  onClick={s.platform === 'github' ? () => track('github_click', { platform: s.label }) : undefined}
-                  className="text-faint hover:text-ink transition-colors duration-200"
-                >
-                  <SocialIcon name={s.icon} size={18} />
-                </a>
-              ))}
-            </div>
-          )}
-          </div>
-
+          {/* Right: avatar — minimal, no border box */}
           {profile.avatar && (
-            <div className="flex-shrink-0 animate-[fadeIn_0.9s_ease]">
-              <div className="relative h-52 w-52 overflow-hidden rounded-2xl border border-line lg:h-64 lg:w-64">
+            <div className="hidden lg:block shrink-0 animate-[fadeIn_0.9s_ease_both]">
+              <div className="relative h-[180px] w-[180px] overflow-hidden rounded-2xl">
                 <Image
                   src={profile.avatar}
-                  alt={displayName || 'Profile'}
+                  alt={displayName || 'Profile photo'}
                   fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 208px, 256px"
+                  className="object-cover grayscale-[15%]"
+                  sizes="180px"
                   priority
                 />
               </div>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Bottom: scroll cue — purely decorative */}
+      <div className="mx-auto w-full max-w-7xl">
+        <div className="flex items-center gap-3 text-faint opacity-50">
+          <ArrowDown size={12} strokeWidth={1.5} />
+          <span className="text-xs tracking-widest uppercase">Scroll</span>
         </div>
       </div>
     </section>
