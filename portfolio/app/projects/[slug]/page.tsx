@@ -144,7 +144,7 @@ export default async function ProjectDetailPage({
                 {project.tech_stack.map((t) => (
                   <span
                     key={t}
-                    className="rounded-md border border-line px-2.5 py-1 text-xs text-muted"
+                    className="rounded-md border border-border px-2.5 py-1 text-xs text-muted"
                   >
                     {t}
                   </span>
@@ -196,7 +196,7 @@ export default async function ProjectDetailPage({
                 href={src}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block overflow-hidden rounded-xl border border-line bg-card"
+                className="block overflow-hidden rounded-xl border border-border bg-card"
               >
                 <Image
                   src={src}
@@ -234,7 +234,7 @@ export default async function ProjectDetailPage({
         )}
 
         {(prev || next) && (
-          <nav className="mt-12 flex items-center justify-between gap-4 border-t border-line pt-6 text-sm">
+          <nav className="mt-12 flex items-center justify-between gap-4 border-t border-border pt-6 text-sm">
             {prev ? (
               <Link
                 href={`/projects/${prev.slug}`}
