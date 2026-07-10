@@ -1,0 +1,390 @@
+/* ==================================================================== */
+/* ADMIN THEME — "Aurora Graphite / Console"                             */
+/* Extends the public design system (app/globals.css) rather than        */
+/* replacing it. Every color, radius, shadow, blur, and type token below */
+/* reuses the public @theme values via var(--color-*) etc. This file     */
+/* only adds what the public site genuinely doesn't need: density-tuned  */
+/* spacing for data-heavy CRUD screens, a z-index scale, layout          */
+/* dimensions (sidebar/topbar), table/list utilities, and status/badge   */
+/* utilities for record states. No components are defined here.          */
+/*                                                                        */
+/* Import once, from app/admin/layout.tsx:                               */
+/*   import './admin-theme.css';                                        */
+/* Never re-import per-route — this stylesheet is global to /admin.      */
+/* ==================================================================== */
+
+@import "../globals.css";
+
+@theme {
+  /* -------------------------------------------------------------- */
+  /* LAYOUT DIMENSIONS                                                */
+  /* Concrete pixel/rem values for chrome that public pages don't     */
+  /* have (sidebar, topbar, dense toolbars). Fluid tokens don't apply */
+  /* here — admin chrome is fixed, not responsive-fluid, by design.   */
+  /* -------------------------------------------------------------- */
+  --admin-sidebar-w: 15rem;        /* 240px — matches existing w-60 */
+  --admin-sidebar-w-collapsed: 4.5rem;
+  --admin-topbar-h: 3.75rem;       /* mobile drawer trigger bar */
+  --admin-content-max-w: 72rem;
+
+  /* -------------------------------------------------------------- */
+  /* DENSITY-TUNED SPACING                                            */
+  /* Public --space-* tokens are built for editorial section rhythm   */
+  /* (5.5–10rem). Admin is a working surface: tables, forms, toolbars */
+  /* stacked densely. These are tighter, non-fluid (data screens      */
+  /* shouldn't reflow scale the way marketing sections do).           */
+  /* -------------------------------------------------------------- */
+  --admin-space-page: 2rem;         /* outer page padding, desktop */
+  --admin-space-page-sm: 1.25rem;   /* outer page padding, mobile */
+  --admin-space-section: 2rem;      /* gap between major page blocks */
+  --admin-space-toolbar: 1rem;      /* gap in header/toolbar rows */
+  --admin-space-card: 1.25rem;      /* internal card/list-item padding */
+  --admin-space-card-sm: 0.875rem;  /* compact card padding (dense lists) */
+  --admin-space-field-gap: 1rem;    /* gap between form fields */
+  --admin-space-inline: 0.5rem;     /* gap between inline controls/icons */
+
+  /* -------------------------------------------------------------- */
+  /* Z-INDEX SCALE                                                    */
+  /* Public site has none (confirmed — only ad-hoc -1/100). Admin     */
+  /* needs a real stack: sidebar, sticky toolbars, dropdowns, modals, */
+  /* toasts, and the confirm-dialog that replaces confirm().          */
+  /* -------------------------------------------------------------- */
+  --z-admin-base: 0;
+  --z-admin-sticky: 10;        /* sticky table headers, toolbar */
+  --z-admin-sidebar: 20;       /* desktop sidebar / mobile drawer */
+  --z-admin-sidebar-overlay: 25; /* mobile drawer backdrop */
+  --z-admin-dropdown: 30;      /* menus, comboboxes, popovers */
+  --z-admin-modal-backdrop: 40;
+  --z-admin-modal: 41;
+  --z-admin-toast: 50;         /* save/delete success toasts */
+
+  /* -------------------------------------------------------------- */
+  /* ANIMATION TIMING                                                 */
+  /* Named durations/eases for Framer Motion variants defined later   */
+  /* (Phase 2.2+). Kept as CSS vars so both CSS transitions and JS    */
+  /* (via getComputedStyle, if ever needed) share one source.         */
+  /* -------------------------------------------------------------- */
+  --admin-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --admin-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --admin-duration-instant: 0.12s;
+  --admin-duration-fast: 0.18s;
+  --admin-duration-base: 0.25s;
+  --admin-duration-slow: 0.4s;
+  --admin-duration-stagger: 0.045s; /* per-item delay in list stagger */
+
+  /* -------------------------------------------------------------- */
+  /* TYPOGRAPHY — admin-specific sizes only                           */
+  /* Public --text-display/-h1/-h2/-h3 are marketing-scale (up to     */
+  /* 6.5rem) and unused here. Admin needs one page-title size and     */
+  /* reuses --text-sm/-xs/-body/-micro directly from the public       */
+  /* scale for everything else (labels, table cells, buttons).        */
+  /* -------------------------------------------------------------- */
+  --admin-text-page-title: clamp(1.375rem, 2.5vw, 1.75rem);
+  --admin-text-section-title: 1.0625rem;
+
+  /* -------------------------------------------------------------- */
+  /* STATUS COLORS FOR RECORD STATE                                   */
+  /* Public site has --color-success/-error/-warning already; admin   */
+  /* adds "neutral/draft/info" for CRUD record states (e.g. roadmap   */
+  /* item status, certification expiry) that don't map to a form-     */
+  /* validation success/error/warning meaning.                        */
+  /* -------------------------------------------------------------- */
+  --color-neutral: var(--color-faint);
+  --color-neutral-bg: rgba(255, 255, 255, 0.06);
+  --color-info: var(--color-accent2-500);
+  --color-info-bg: rgba(34, 197, 245, 0.12);
+}
+
+/* ====================================================================== */
+/* ADMIN SURFACE                                                           */
+/* The admin shell sits on the same --color-bg as the public site (same    */
+/* body::before ambient glow carries over via globals.css import above),  */
+/* but panels default to the flatter --color-surface rather than          */
+/* --color-card, since dense CRUD screens read better with less glow.     */
+/* ====================================================================== */
+.admin-shell {
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+.admin-page {
+  max-width: var(--admin-content-max-w);
+  margin-inline: auto;
+  padding: var(--admin-space-page-sm);
+}
+@media (min-width: 768px) {
+  .admin-page {
+    padding: var(--admin-space-page);
+  }
+}
+
+.admin-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--admin-space-toolbar);
+  margin-bottom: var(--admin-space-section);
+}
+.admin-page-title {
+  font-size: var(--admin-text-page-title);
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-ink);
+}
+.admin-page-subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  margin-top: 0.25rem;
+}
+
+/* ====================================================================== */
+/* ADMIN CARD / LIST-ITEM VARIANTS                                         */
+/* Built on the public .card family so hover/shadow behavior matches the  */
+/* rest of the product exactly — only padding and default surface differ. */
+/* ====================================================================== */
+.admin-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--admin-space-card);
+  transition: border-color var(--admin-duration-base) var(--admin-ease-out),
+              box-shadow var(--admin-duration-base) var(--admin-ease-out);
+}
+.admin-card:hover {
+  border-color: var(--color-border-hover);
+}
+
+.admin-list-item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--admin-space-card-sm) var(--admin-space-card);
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-toolbar);
+  transition: border-color var(--admin-duration-fast) var(--admin-ease-out),
+              background-color var(--admin-duration-fast) var(--admin-ease-out),
+              transform var(--admin-duration-fast) var(--admin-ease-out);
+}
+.admin-list-item:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-hover);
+}
+
+/* Compact glass panel for sidebar / sticky toolbar chrome, distinct from   */
+/* public .glass-nav which is tuned for a full-bleed marketing navbar.      */
+.admin-glass-panel {
+  background: rgba(13, 15, 22, 0.85);
+  backdrop-filter: blur(var(--blur-md)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--blur-md)) saturate(140%);
+  border-color: var(--color-border);
+}
+
+/* ====================================================================== */
+/* STAT / DASHBOARD CARD                                                   */
+/* ====================================================================== */
+.admin-stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--admin-space-card);
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  transition: border-color var(--admin-duration-base) var(--admin-ease-out),
+              box-shadow var(--admin-duration-base) var(--admin-ease-out);
+}
+.admin-stat-card[data-linked="true"] {
+  cursor: pointer;
+}
+.admin-stat-card[data-linked="true"]:hover {
+  border-color: rgba(124, 77, 255, 0.4);
+  box-shadow: var(--shadow-glow-accent);
+}
+.admin-stat-value {
+  font-size: 1.875rem;
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+.admin-stat-label {
+  font-size: var(--text-xs);
+  color: var(--color-faint);
+  font-weight: 500;
+}
+
+/* ====================================================================== */
+/* STATUS BADGE                                                            */
+/* One shared shape, colored via data-tone. Reuses --color-success/error/  */
+/* warning/info/neutral tokens so badge colors always match form-state     */
+/* colors elsewhere in the admin (no separate badge palette to maintain).  */
+/* ====================================================================== */
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 1.5rem;
+  padding: 0 0.625rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-micro);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.admin-badge[data-tone="success"] { color: var(--color-success); background: var(--color-success-bg); }
+.admin-badge[data-tone="error"]   { color: var(--color-error);   background: var(--color-error-bg); }
+.admin-badge[data-tone="warning"] { color: var(--color-warning); background: var(--color-warning-bg); }
+.admin-badge[data-tone="info"]    { color: var(--color-info);    background: var(--color-info-bg); }
+.admin-badge[data-tone="neutral"] { color: var(--color-neutral); background: var(--color-neutral-bg); }
+
+/* ====================================================================== */
+/* TABLE / DENSE LIST UTILITIES                                            */
+/* For any future table-shaped views (contact messages, blog list).        */
+/* ====================================================================== */
+.admin-table-wrap {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+.admin-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-admin-sticky);
+  background: var(--color-bg-elevated);
+  text-align: left;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-faint);
+  padding: 0.75rem var(--admin-space-card);
+  border-bottom: 1px solid var(--color-border);
+}
+.admin-table tbody td {
+  padding: 0.875rem var(--admin-space-card);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-muted);
+}
+.admin-table tbody tr:last-child td { border-bottom: none; }
+.admin-table tbody tr {
+  transition: background-color var(--admin-duration-fast) var(--admin-ease-out);
+}
+.admin-table tbody tr:hover { background: var(--color-surface-hover); }
+
+/* ====================================================================== */
+/* SIDEBAR / TOPBAR SHELL UTILITIES                                        */
+/* Pure layout + surface, no motion/interaction wired here (Phase 2.2).    */
+/* ====================================================================== */
+.admin-sidebar {
+  width: var(--admin-sidebar-w);
+  flex-shrink: 0;
+  min-height: 100vh;
+  background: var(--color-bg-elevated);
+  border-right: 1px solid var(--color-border);
+  z-index: var(--z-admin-sidebar);
+}
+.admin-topbar {
+  height: var(--admin-topbar-h);
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-toolbar);
+  padding-inline: var(--admin-space-page-sm);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-admin-sticky);
+}
+.admin-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-admin-sidebar-overlay);
+  background: rgba(4, 5, 8, 0.6);
+  backdrop-filter: blur(var(--blur-sm));
+  -webkit-backdrop-filter: blur(var(--blur-sm));
+}
+
+/* ====================================================================== */
+/* MODAL / CONFIRM DIALOG SURFACE                                          */
+/* Replaces native confirm()/alert(). Layout only — open/close motion      */
+/* and focus trapping are wired in the component layer (Phase 2.2+).       */
+/* ====================================================================== */
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-admin-modal-backdrop);
+  background: rgba(4, 5, 8, 0.65);
+  backdrop-filter: blur(var(--blur-sm));
+  -webkit-backdrop-filter: blur(var(--blur-sm));
+}
+.admin-modal {
+  position: fixed;
+  z-index: var(--z-admin-modal);
+  background: var(--color-card);
+  border: 1px solid var(--color-border-hover);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-pop);
+  padding: var(--admin-space-card);
+}
+
+/* ====================================================================== */
+/* TOAST                                                                   */
+/* ====================================================================== */
+.admin-toast {
+  position: fixed;
+  z-index: var(--z-admin-toast);
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  background: var(--color-card);
+  border: 1px solid var(--color-border-hover);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 0.75rem 1rem;
+  font-size: var(--text-sm);
+  color: var(--color-ink);
+}
+
+/* ====================================================================== */
+/* SKELETON — dense variant for table rows / list items                    */
+/* Reuses public .skeleton + shimmer keyframe; adds a fixed-height row     */
+/* shape for CRUD lists so loading states don't jump when data arrives.    */
+/* ====================================================================== */
+.admin-skeleton-row {
+  height: 3.5rem;
+  border-radius: var(--radius-md);
+}
+
+/* ====================================================================== */
+/* SCROLLBAR — dense/sidebar variant                                       */
+/* Thinner than the public 8px scrollbar; sidebars and side panels are     */
+/* narrow and a full-width scrollbar reads heavy at that scale.            */
+/* ====================================================================== */
+.admin-scroll-thin::-webkit-scrollbar { width: 5px; height: 5px; }
+.admin-scroll-thin::-webkit-scrollbar-track { background: transparent; }
+.admin-scroll-thin::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+/* ====================================================================== */
+/* REDUCED MOTION                                                          */
+/* Public globals.css already disables animation/transition durations     */
+/* globally under prefers-reduced-motion; this just guards admin-specific */
+/* transform-based hover states the same way .hover-lift/.card-interactive */
+/* are guarded there.                                                      */
+/* ====================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .admin-stat-card[data-linked="true"]:hover,
+  .admin-list-item:hover {
+    transform: none !important;
+  }
+}
