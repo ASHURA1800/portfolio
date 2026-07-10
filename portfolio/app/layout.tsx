@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { getProfile } from "@/lib/content";
+import { ThemeProvider, themeInitScript } from "@/components/providers/ThemeProvider";
+import { SiteChrome } from "@/components/providers/SiteChrome";
 import "./globals.css";
 
 const inter = Inter({
@@ -34,6 +36,9 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: ["Developer", "Engineer", "Next.js", "React", "TypeScript"],
     authors: profile.name ? [{ name: profile.name }] : undefined,
     creator: profile.name || undefined,
+    alternates: {
+      canonical: SITE_URL,
+    },
     openGraph: {
       type: "website",
       locale: "en_US",
@@ -59,7 +64,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0B0F14",
+  themeColor: "#08090D",
 };
 
 export default function RootLayout({
@@ -68,9 +73,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <head>
+        {/* Runs before hydration to avoid a flash of the wrong theme. */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="font-sans antialiased bg-bg text-ink">
-        {children}
+        <ThemeProvider>
+          <SiteChrome>{children}</SiteChrome>
+        </ThemeProvider>
       </body>
     </html>
   );
