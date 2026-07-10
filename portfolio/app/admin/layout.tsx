@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import './admin-theme.css';
 
 // The entire /admin subtree — including /admin/login — must never appear
 // in search results or be followed by crawlers.
