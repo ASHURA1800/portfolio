@@ -216,6 +216,8 @@ export interface Experience {
   achievements: string[];
   current: boolean;
   order_index: number;
+  /** Optional company logo URL — not yet in the DB schema; safely undefined until added. */
+  logo?: string;
 }
 
 export type BuildStatus = 'shipped' | 'in-progress' | 'planned';
