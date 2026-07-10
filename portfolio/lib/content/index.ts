@@ -13,7 +13,6 @@ import {
 import type {
   Profile,
   Skill,
-  SkillCategory,
   Experience,
   Project,
   BuildLogEntry,
@@ -27,14 +26,7 @@ import type {
 // defaults and never throws during a render (ISR/SSR).
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const skillCategories: SkillCategory[] = [
-  'Frontend',
-  'Backend',
-  'AI',
-  'Database',
-  'DevOps',
-  'Tools',
-];
+export { skillCategories, skillsByCategory } from './skills';
 
 export const EMPTY_PROFILE: Profile = {
   name: '', username: '', github: '', email: '', bio: '', title: '',
@@ -94,9 +86,6 @@ export async function getSkills(): Promise<Skill[]> {
   }
 }
 
-export function skillsByCategory(list: Skill[], c: SkillCategory): Skill[] {
-  return list.filter((s) => s.category === c);
-}
 
 export async function getExperience(): Promise<Experience[]> {
   try {
