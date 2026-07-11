@@ -2,9 +2,10 @@ import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getAdminUser } from '@/lib/auth/session';
 import { ownerExists } from '@/lib/auth/owner';
-import AdminSidebar from '../_components/AdminSidebar';
+import { SidebarProvider } from '../_components/nav/SidebarContext';
+import AdminSidebar from '../_components/nav/AdminSidebar';
+import TopNavbar from '../_components/nav/TopNavbar';
 
-// Admin area must never appear in search results.
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
@@ -14,19 +15,38 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // If no owner exists, first-run setup hasn't been completed.
   const configured = await ownerExists();
   if (!configured) redirect('/setup');
 
-  // Defence-in-depth: middleware already guards this route group,
-  // but we re-verify server-side in case the edge layer is bypassed.
   const user = await getAdminUser();
   if (!user) redirect('/admin/login');
 
   return (
-    <div className="h-screen bg-gray-950 flex overflow-hidden">
-      <AdminSidebar userEmail={user.email} />
-      <main className="flex-1 p-8 overflow-auto">{children}</main>
-    </div>
+    <SidebarProvider>
+      <div
+        className="admin-shell"
+        style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}
+      >
+        <AdminSidebar userEmail={user.email} />
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            minWidth: 0,
+          }}
+        >
+          <TopNavbar userEmail={user.email} />
+          <main
+            id="main-content"
+            className="admin-page admin-scroll-thin"
+            style={{ flex: 1, overflowY: 'auto' }}
+          >
+            {children}
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 }
