@@ -57,7 +57,7 @@ export default function ActivityEmptyState() {
             maxWidth: '18rem',
           }}
         >
-          Add a project, skill, or build log — it'll show up here.
+          Add a project, skill, or build log — it&apos;ll show up here.
         </p>
       </div>
 
