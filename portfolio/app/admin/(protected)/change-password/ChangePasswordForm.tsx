@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AuthAlert, AuthButton, PasswordInput } from '@/components/admin/auth/shared';
 
 export function ChangePasswordForm() {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -25,7 +26,11 @@ export function ChangePasswordForm() {
       });
 
       let data: { error?: string; message?: string } = {};
-      try { data = await res.json(); } catch { /* non-JSON */ }
+      try {
+        data = await res.json();
+      } catch {
+        /* non-JSON */
+      }
 
       if (res.status === 429) {
         setError('Too many attempts. Please wait before trying again.');
@@ -48,86 +53,56 @@ export function ChangePasswordForm() {
     }
   };
 
-  const inputClass =
-    'w-full bg-white/5 border border-white/8 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-violet-500/50 transition-all disabled:opacity-50';
-
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 bg-white/5 border border-white/8 rounded-2xl p-6"
+      className="flex flex-col gap-4 admin-glass-panel rounded-[var(--radius-lg)] border p-[var(--admin-space-card)]"
+      aria-label="Change password"
     >
-      {error && (
-        <div role="alert" className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-          {error}
-        </div>
-      )}
-      {success && (
-        <div role="status" className="p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm">
-          {success}
-        </div>
-      )}
+      <AuthAlert error={error} success={success} />
 
-      <div>
-        <label htmlFor="currentPassword" className="block text-xs text-gray-500 mb-1.5 font-medium">
-          Current Password
-        </label>
-        <input
-          id="currentPassword"
-          type="password"
-          name="currentPassword"
-          required
-          autoComplete="current-password"
-          disabled={loading}
-          value={currentPassword}
-          onChange={(e) => setCurrentPassword(e.target.value)}
-          className={inputClass}
-          placeholder="••••••••"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="newPassword" className="block text-xs text-gray-500 mb-1.5 font-medium">
-          New Password <span className="text-gray-600">(min. 8 characters)</span>
-        </label>
-        <input
-          id="newPassword"
-          type="password"
-          name="newPassword"
-          required
-          autoComplete="new-password"
-          disabled={loading}
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          className={inputClass}
-          placeholder="••••••••"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="confirmPassword" className="block text-xs text-gray-500 mb-1.5 font-medium">
-          Confirm New Password
-        </label>
-        <input
-          id="confirmPassword"
-          type="password"
-          name="confirmPassword"
-          required
-          autoComplete="new-password"
-          disabled={loading}
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          className={inputClass}
-          placeholder="••••••••"
-        />
-      </div>
-
-      <button
-        type="submit"
+      <PasswordInput
+        id="currentPassword"
+        label="Current Password"
+        name="currentPassword"
+        required
+        autoComplete="current-password"
         disabled={loading}
-        className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm font-semibold disabled:opacity-70 hover:opacity-90 transition-opacity"
-      >
-        {loading ? 'Updating…' : 'Change Password'}
-      </button>
+        value={currentPassword}
+        onChange={(e) => setCurrentPassword(e.target.value)}
+        placeholder="••••••••"
+      />
+
+      <PasswordInput
+        id="newPassword"
+        label="New Password"
+        hint="At least 8 characters"
+        name="newPassword"
+        required
+        autoComplete="new-password"
+        disabled={loading}
+        value={newPassword}
+        onChange={(e) => setNewPassword(e.target.value)}
+        placeholder="••••••••"
+        showStrength
+        showChecklist
+      />
+
+      <PasswordInput
+        id="confirmPassword"
+        label="Confirm New Password"
+        name="confirmPassword"
+        required
+        autoComplete="new-password"
+        disabled={loading}
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        placeholder="••••••••"
+      />
+
+      <AuthButton loading={loading} loadingLabel="Updating…">
+        Change Password
+      </AuthButton>
     </form>
   );
 }
