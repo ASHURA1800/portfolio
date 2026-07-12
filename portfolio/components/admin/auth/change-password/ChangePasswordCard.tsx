@@ -167,7 +167,7 @@ export function ChangePasswordCard() {
                       marginTop: '0.25rem',
                     }}
                   >
-                    Passwords don't match
+                    Passwords don&apos;t match
                   </p>
                 )}
               </AnimatePresence>
