@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ChangePasswordForm } from './ChangePasswordForm';
+import { ChangePasswordCard } from '@/components/admin/auth/change-password';
 
 export const metadata: Metadata = {
   title: 'Change Password',
@@ -7,12 +7,16 @@ export const metadata: Metadata = {
 
 export default function ChangePasswordPage() {
   return (
-    <div className="max-w-md">
+    <div className="max-w-lg">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Change Password</h1>
-        <p className="text-gray-500 text-sm mt-1">Update your admin account password</p>
+        <h1 className="text-[var(--admin-text-page-title)] font-bold text-[var(--color-ink)] tracking-tight">
+          Change password
+        </h1>
+        <p className="text-sm text-[var(--color-faint)] mt-1.5">
+          Update your admin account password
+        </p>
       </div>
-      <ChangePasswordForm />
+      <ChangePasswordCard />
     </div>
   );
 }
