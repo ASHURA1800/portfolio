@@ -216,7 +216,7 @@ export default async function AdminDashboard() {
         score: 0,
         profileFieldsDone: 0,
         profileFieldsTotal: 0,
-        missingSections: [] as { key: string; label: string; href: string }[],
+        missingSections: [] as { key: string; label: string; href: string; done: boolean }[],
         uploads: [] as { key: string; label: string; done: boolean }[],
       })),
       getHealthScore().catch(() => ({
