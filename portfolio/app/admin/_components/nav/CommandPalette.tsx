@@ -5,35 +5,24 @@ import {
   type KeyboardEvent,
 } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'motion/react';
-import {
-  Search, LayoutDashboard, User, FolderOpen, Wrench,
-  Briefcase, Award, Blocks, BookOpen, Map, KeyRound, X,
-  ArrowUpRight, type LucideIcon,
-} from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { Search, X, ArrowUpRight } from 'lucide-react';
+import { getSearchableRoutes, type SearchableRoute } from '@/lib/admin/route-helpers';
 
-interface CmdItem {
+interface CmdItem extends SearchableRoute {
   id: string;
-  label: string;
-  group: string;
   href: string;
-  icon: LucideIcon;
-  keywords?: string[];
-  shortcut?: string;
 }
 
-const ALL_ITEMS: CmdItem[] = [
-  { id: 'dash',  label: 'Dashboard',       group: 'Pages', href: '/admin',                icon: LayoutDashboard, keywords: ['home','overview'] },
-  { id: 'prof',  label: 'Profile',          group: 'Pages', href: '/admin/profile',        icon: User,            keywords: ['bio','about'] },
-  { id: 'proj',  label: 'Projects',         group: 'Pages', href: '/admin/projects',       icon: FolderOpen,      keywords: ['work','portfolio'] },
-  { id: 'skill', label: 'Skills',           group: 'Pages', href: '/admin/skills',         icon: Wrench,          keywords: ['tech','stack'] },
-  { id: 'exp',   label: 'Experience',       group: 'Pages', href: '/admin/experience',     icon: Briefcase,       keywords: ['jobs','work','career'] },
-  { id: 'cert',  label: 'Certifications',   group: 'Pages', href: '/admin/certifications', icon: Award,           keywords: ['certs','courses'] },
-  { id: 'blog',  label: 'Build Log',        group: 'Pages', href: '/admin/buildlog',       icon: Blocks,          keywords: ['log','notes'] },
-  { id: 'learn', label: 'Learnings',        group: 'Pages', href: '/admin/learnings',      icon: BookOpen,        keywords: ['reading','notes'] },
-  { id: 'road',  label: 'Roadmap',          group: 'Pages', href: '/admin/roadmap',        icon: Map,             keywords: ['plan','todo'] },
-  { id: 'cpw',   label: 'Change Password',  group: 'Settings', href: '/admin/change-password', icon: KeyRound,   keywords: ['security','password'] },
-];
+// Palette items are derived from every route in NavigationConfig that
+// opted into search (via `group` or `searchGroup`) — not a separate
+// hardcoded list. Renaming a page or adding search keywords only
+// requires editing lib/admin/navigation.config.ts.
+const ALL_ITEMS: CmdItem[] = getSearchableRoutes().map((r) => ({
+  ...r,
+  id: r.path,
+  href: r.path,
+}));
 
 /**
  * CommandPalette
@@ -42,6 +31,7 @@ const ALL_ITEMS: CmdItem[] = [
  */
 export default function CommandPalette() {
   const [open, setOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
   const [query, setQuery] = useState('');
   const [cursor, setCursor] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -172,7 +162,7 @@ export default function CommandPalette() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
+              transition={{ duration: reduceMotion ? 0.08 : 0.18 }}
               className="admin-modal-backdrop"
               onClick={close}
               aria-hidden="true"
@@ -192,13 +182,14 @@ export default function CommandPalette() {
             >
               <motion.div
                 key="palette"
-                initial={{ opacity: 0, scale: 0.96, y: -8 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.96, y: -6 }}
-                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: -8 }}
+                animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+                exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: -6 }}
+                transition={{ duration: reduceMotion ? 0.1 : 0.2, ease: [0.22, 1, 0.36, 1] }}
               >
                 {/* Search input */}
                 <div
+                  className="admin-command-search-row"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -207,7 +198,11 @@ export default function CommandPalette() {
                     borderBottom: '1px solid var(--color-border)',
                   }}
                 >
-                  <Search size={16} style={{ color: 'var(--color-faint)', flexShrink: 0 }} />
+                  <Search
+                    size={16}
+                    className="admin-command-search-icon"
+                    style={{ color: 'var(--color-faint)', flexShrink: 0 }}
+                  />
                   <input
                     ref={inputRef}
                     type="text"
@@ -254,6 +249,12 @@ export default function CommandPalette() {
                   className="admin-scroll-thin"
                   style={{ maxHeight: '360px', overflowY: 'auto', padding: '0.375rem' }}
                 >
+                  <motion.div
+                    key={query}
+                    initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: reduceMotion ? 0 : 0.12 }}
+                  >
                   {flatList.length === 0 ? (
                     <p
                       style={{
@@ -283,7 +284,6 @@ export default function CommandPalette() {
                         {items.map((item) => {
                           const idx = flatList.indexOf(item);
                           const active = idx === cursor;
-                          const Icon = item.icon;
                           return (
                             <button
                               key={item.id}
@@ -310,7 +310,7 @@ export default function CommandPalette() {
                                 transition: 'background 0.1s',
                               }}
                             >
-                              <Icon
+                              <item.icon
                                 size={15}
                                 style={{ color: active ? 'var(--color-accent-400)' : 'var(--color-faint)', flexShrink: 0 }}
                               />
@@ -324,6 +324,7 @@ export default function CommandPalette() {
                       </div>
                     ))
                   )}
+                  </motion.div>
                 </div>
 
                 {/* Footer hint */}
