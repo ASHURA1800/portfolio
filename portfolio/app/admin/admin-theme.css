@@ -586,6 +586,86 @@
 }
 
 /* ====================================================================== */
+/* AUTH — shared input/button primitives                                   */
+/* Used by the forgot/reset/change-password forms (components/admin/auth/  */
+/* recovery, components/admin/auth/change-password). Kept minimal and     */
+/* reuses the same tokens as components/admin/ui/Input.tsx and Button.tsx  */
+/* so the raw-input auth forms stay visually identical to the componentized*/
+/* login form.                                                             */
+/* ====================================================================== */
+.admin-input {
+  height: 2.5rem;
+  padding: 0 0.875rem;
+  font-size: var(--text-sm);
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--admin-duration-fast) ease, box-shadow var(--admin-duration-fast) ease;
+}
+.admin-input::placeholder {
+  color: var(--color-faint);
+}
+.admin-input:hover:not(:disabled) {
+  border-color: var(--color-border-hover);
+}
+.admin-input:focus-visible {
+  outline: none;
+  border-color: var(--color-accent-500);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent-500) 25%, transparent);
+}
+.admin-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: color-mix(in srgb, var(--color-surface) 50%, transparent);
+}
+.admin-input[aria-invalid="true"] {
+  border-color: rgb(239, 68, 68);
+}
+
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 2.5rem;
+  padding: 0 1.25rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: opacity var(--admin-duration-fast) ease, transform var(--admin-duration-fast) ease, box-shadow var(--admin-duration-fast) ease;
+}
+.admin-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent-500) 35%, transparent);
+}
+.admin-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.admin-btn-primary {
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-accent-500) 0%, var(--color-accent2-500) 100%);
+  box-shadow: 0 0 20px rgba(124, 77, 255, 0.25);
+}
+.admin-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 0 28px rgba(124, 77, 255, 0.35);
+}
+.admin-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Spinner rotation used by the auth forms' inline loading indicators. */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ====================================================================== */
 /* REDUCED MOTION                                                          */
 /* Public globals.css already disables animation/transition durations     */
 /* globally under prefers-reduced-motion; this just guards admin-specific */
@@ -594,7 +674,11 @@
 /* ====================================================================== */
 @media (prefers-reduced-motion: reduce) {
   .admin-stat-card[data-linked="true"]:hover,
-  .admin-list-item:hover {
+  .admin-list-item:hover,
+  .admin-btn-primary:hover {
     transform: none !important;
+  }
+  *[style*="animation: spin"] {
+    animation: none !important;
   }
 }
