@@ -56,6 +56,20 @@ import {
   getActivityTimeline,
 } from '@/lib/analytics/queries';
 
+// Phase 4.6 — dashboard widgets
+import {
+  PortfolioProgress,
+  SystemStatus,
+  InsightsPanel,
+  HealthScore,
+  CompletionCard,
+  StorageWidget,
+  SessionWidget,
+} from '@/components/admin/dashboard/widgets';
+import { getPortfolioProgress, getHealthScore } from '@/lib/widgets/queries';
+import { getUser } from '@/lib/auth/session';
+import { SESSION_MAX_AGE } from '@/lib/auth/constants';
+
 // Admin dashboard is auth-gated and shows live counts — render per request,
 // never statically prerendered at build time.
 export const dynamic = 'force-dynamic';
@@ -174,14 +188,22 @@ const CHECKLIST_ITEMS = [
 ] as const;
 
 export default async function AdminDashboard() {
-  const [stats, sections, growth, distribution, skillsCategories, activity] = await Promise.all([
-    getStats(),
-    getSectionCounts(),
-    getPortfolioGrowth(),
-    getContentDistribution(),
-    getSkillsByCategory(),
-    getActivityTimeline(),
-  ]);
+  const [stats, sections, growth, distribution, skillsCategories, activity, progress, health, user] =
+    await Promise.all([
+      getStats(),
+      getSectionCounts(),
+      getPortfolioGrowth(),
+      getContentDistribution(),
+      getSkillsByCategory(),
+      getActivityTimeline(),
+      getPortfolioProgress(),
+      getHealthScore(),
+      getUser(),
+    ]);
+
+  // Storage is "configured" iff the Vercel Blob token is present — the only
+  // real signal available without a usage/quota API.
+  const storageConfigured = !!process.env.BLOB_READ_WRITE_TOKEN;
 
   // Phase 4.3 — 8 spec categories, mapped from real counts only.
   const primaryStats: PrimaryStatDef[] = [
@@ -219,6 +241,14 @@ export default async function AdminDashboard() {
   const completionItems = CHECKLIST_ITEMS.map(({ key, label }) => ({
     key,
     label,
+    done: completion[key] ?? false,
+  }));
+
+  // Same data, with href — for the denser CompletionCard widget (4.6)
+  const completionCardItems = CHECKLIST_ITEMS.map(({ key, label, href }) => ({
+    key,
+    label,
+    href,
     done: completion[key] ?? false,
   }));
 
@@ -280,6 +310,26 @@ export default async function AdminDashboard() {
               <ActivityChart data={activity} />
             </AnalyticsCard>
           </DashboardGrid>
+        </DashboardSection>
+
+        {/* ── Dashboard widgets (Phase 4.6) ───────────────────────
+            All figures come from real DB reads or real env/session state.
+            SystemStatus/StorageWidget/SessionWidget label unknowable facts
+            (last login, backups, quota) plainly instead of faking them.
+            InsightsPanel does no new fetching — it reuses progress data
+            already loaded above and applies simple UI-layer rules. */}
+        <DashboardSection title="Workspace" description="Progress, system state, and quick insights.">
+          <DashboardGrid cols={3} gap="md">
+            <PortfolioProgress data={progress} />
+            <HealthScore data={health} />
+            <CompletionCard items={completionCardItems} />
+            <SystemStatus email={user?.email ?? null} storageConfigured={storageConfigured} />
+            <StorageWidget storageConfigured={storageConfigured} uploads={progress.uploads} />
+            <SessionWidget email={user?.email ?? null} maxAgeSeconds={SESSION_MAX_AGE} />
+          </DashboardGrid>
+          <div className="mt-4">
+            <InsightsPanel missingSections={progress.missingSections} uploads={progress.uploads} />
+          </div>
         </DashboardSection>
 
         {/* ── Getting started checklist ────────────────────────── */}
