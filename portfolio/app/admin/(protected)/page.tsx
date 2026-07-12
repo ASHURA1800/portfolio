@@ -319,14 +319,12 @@ export default async function AdminDashboard() {
           >
             <MotionSection>
               <DashboardGrid cols={2} gap="md">
-                {(
-                  [
-                    ['growth', <PortfolioGrowthChart data={growth} />],
-                    ['distribution', <ContentDistributionChart data={distribution} />],
-                    ['skills', <SkillsChart data={skillsCategories} />],
-                    ['activity', <ActivityChart data={activity} />],
-                  ] as const
-                ).map(([id, chart], i) => (
+                {[
+                  { id: 'growth', chart: <PortfolioGrowthChart key="growth" data={growth} /> },
+                  { id: 'distribution', chart: <ContentDistributionChart key="distribution" data={distribution} /> },
+                  { id: 'skills', chart: <SkillsChart key="skills" data={skillsCategories} /> },
+                  { id: 'activity', chart: <ActivityChart key="activity" data={activity} /> },
+                ].map(({ id, chart }, i) => (
                   <MotionGridItem key={id} index={i}>
                     <AnalyticsCard>{chart}</AnalyticsCard>
                   </MotionGridItem>
@@ -382,16 +380,14 @@ export default async function AdminDashboard() {
 
               <div className="mt-4">
                 <DashboardGrid cols={3} gap="md">
-                  {(
-                    [
-                      ['progress', <PortfolioProgress data={progress} />],
-                      ['health', <HealthScore data={health} />],
-                      ['completion', <CompletionCard items={completionCardItems} />],
-                      ['system', <SystemStatus email={user?.email ?? null} storageConfigured={storageConfigured} />],
-                      ['storage', <StorageWidget storageConfigured={storageConfigured} uploads={progress.uploads} />],
-                      ['session', <SessionWidget email={user?.email ?? null} maxAgeSeconds={SESSION_MAX_AGE} />],
-                    ] as const
-                  ).map(([id, widget], i) => (
+                  {[
+                    { id: 'progress', widget: <PortfolioProgress key="progress" data={progress} /> },
+                    { id: 'health', widget: <HealthScore key="health" data={health} /> },
+                    { id: 'completion', widget: <CompletionCard key="completion" items={completionCardItems} /> },
+                    { id: 'system', widget: <SystemStatus key="system" email={user?.email ?? null} storageConfigured={storageConfigured} /> },
+                    { id: 'storage', widget: <StorageWidget key="storage" storageConfigured={storageConfigured} uploads={progress.uploads} /> },
+                    { id: 'session', widget: <SessionWidget key="session" email={user?.email ?? null} maxAgeSeconds={SESSION_MAX_AGE} /> },
+                  ].map(({ id, widget }, i) => (
                     <MotionGridItem key={id} index={i}>
                       {widget}
                     </MotionGridItem>
