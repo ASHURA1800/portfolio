@@ -30,7 +30,12 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
     <label
       htmlFor={fieldId}
       className={cn(
-        'inline-flex items-start gap-2.5 select-none',
+        // p-1 -m-1 expands the real click/tap target beyond the visible box
+        // toward WCAG's 24x24 minimum, offset by negative margin so it
+        // doesn't shift surrounding layout (safe here since this is always
+        // a leaf element, never adjacent to a sibling that margin would
+        // collide with).
+        'inline-flex items-start gap-2.5 select-none p-1 -m-1',
         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
       )}
     >
