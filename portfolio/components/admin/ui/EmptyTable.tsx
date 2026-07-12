@@ -24,7 +24,7 @@ export function EmptyTable({
       icon={<FileX2 size={20} strokeWidth={1.5} />}
       title={`No ${itemLabel} yet`}
       description={`Once you add ${itemLabel}, they'll show up here.`}
-      primaryAction={
+      action={
         onCreate && (
           <Button size="sm" onClick={onCreate}>
             {createLabel ?? `Add ${itemLabel.replace(/s$/, '')}`}
