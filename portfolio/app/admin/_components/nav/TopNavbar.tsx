@@ -1,28 +1,16 @@
 'use client';
 
-import dynamic from 'next/dynamic';
+import { useCallback, useState } from 'react';
+import { motion } from 'motion/react';
 import { PanelLeft } from 'lucide-react';
 import { useSidebar } from './SidebarContext';
 import Breadcrumb from './Breadcrumb';
 import ProfileDropdown from './ProfileDropdown';
 import NotificationMenu, { type Notification } from './NotificationMenu';
+import CommandPalette from './CommandPalette';
 import QuickActions from './QuickActions';
-import { useState } from 'react';
-
-// Code-split: the palette overlay (search, keyboard nav, results list) is
-// real weight that isn't needed until the user opens it — only the trigger
-// button needs to be in the initial admin bundle. ssr:false because this
-// is a client-only interactive overlay with no meaningful server-rendered
-// state.
-const CommandPalette = dynamic(() => import('./CommandPalette'), {
-  ssr: false,
-  loading: () => (
-    <div
-      aria-hidden="true"
-      style={{ width: '9rem', height: '2.25rem', borderRadius: 'var(--radius-md)', background: 'var(--color-surface)' }}
-    />
-  ),
-});
+import { ThemeToggle } from './ThemeToggle';
+import { useScrolled } from './useScrolled';
 
 interface TopNavbarProps {
   userEmail: string;
@@ -59,43 +47,56 @@ const DEMO_NOTIFICATIONS: Notification[] = [
 export default function TopNavbar({ userEmail }: TopNavbarProps) {
   const { openMobile } = useSidebar();
   const [notifications, setNotifications] = useState(DEMO_NOTIFICATIONS);
+  const scrolled = useScrolled('main-content');
 
-  const dismiss = (id: string) =>
-    setNotifications((n) => n.filter((x) => x.id !== id));
+  const dismiss = useCallback(
+    (id: string) => setNotifications((n) => n.filter((x) => x.id !== id)),
+    []
+  );
 
-  const markAllRead = () =>
-    setNotifications((n) => n.map((x) => ({ ...x, read: true })));
+  const markAllRead = useCallback(
+    () => setNotifications((n) => n.map((x) => ({ ...x, read: true }))),
+    []
+  );
 
   return (
     <header
       className="admin-topbar"
+      data-scrolled={scrolled}
       style={{ justifyContent: 'space-between' }}
       aria-label="Admin top navigation"
     >
       {/* Left: hamburger (mobile) + breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
-        {/* Mobile hamburger */}
-        <button
+        {/* Mobile hamburger — 44px hit target (WCAG 2.5.5 / iOS HIG minimum),
+            even though the visible icon stays compact via padding rather
+            than icon size, so it doesn't look oversized next to the other
+            2.25rem topbar icon buttons. */}
+        <motion.button
           type="button"
           onClick={openMobile}
           aria-label="Open navigation"
           className="md:hidden"
+          whileTap={{ scale: 0.9 }}
+          transition={{ duration: 0.1 }}
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '2rem',
-            height: '2rem',
+            width: '2.75rem',
+            height: '2.75rem',
+            margin: '-0.375rem',
             borderRadius: 'var(--radius-sm)',
             border: 'none',
             background: 'none',
             color: 'var(--color-muted)',
             cursor: 'pointer',
             flexShrink: 0,
+            WebkitTapHighlightColor: 'transparent',
           }}
         >
           <PanelLeft size={18} />
-        </button>
+        </motion.button>
 
         <Breadcrumb />
       </div>
@@ -108,6 +109,8 @@ export default function TopNavbar({ userEmail }: TopNavbarProps) {
         </div>
 
         <QuickActions />
+
+        <ThemeToggle />
 
         <NotificationMenu
           notifications={notifications}
