@@ -1,3 +1,5 @@
+'use client';
+
 import {
   FolderPlus,
   Wrench,
@@ -85,8 +87,9 @@ const QUICK_ACTIONS = [
 
 /**
  * QuickActions
- * 2×4 responsive grid of ActionCard tiles. RSC — no interactivity at this
- * level, animation lives inside ActionCard (client).
+ * 2×4 responsive grid of ActionCard tiles. Client component — icon
+ * component references (FolderPlus, Wrench, etc.) can't cross the
+ * server→client boundary as props, so this whole tree renders client-side.
  */
 export default function QuickActions() {
   return (
