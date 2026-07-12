@@ -132,9 +132,10 @@ export default function QuickActions() {
             .quick-actions-grid { grid-template-columns: repeat(4, 1fr) !important; }
           }
         `}</style>
-        {QUICK_ACTIONS.map((action, i) => (
-          <ActionCard key={action.key} {...action} index={i} />
-        ))}
+        {QUICK_ACTIONS.map((action, i) => {
+          const { key, ...rest } = action;
+          return <ActionCard key={key} {...rest} index={i} />;
+        })}
       </div>
     </div>
   );
