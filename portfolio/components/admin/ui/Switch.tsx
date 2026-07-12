@@ -25,7 +25,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
     <label
       htmlFor={fieldId}
       className={cn(
-        'inline-flex items-center gap-2.5 select-none',
+        'inline-flex items-center gap-2.5 select-none p-1 -m-1',
         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
       )}
     >
@@ -44,7 +44,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
           id={fieldId}
           disabled={disabled}
           checked={checked}
-          className="absolute inset-0 opacity-0 cursor-[inherit] focus-visible:outline-none"
+          className={cn('absolute inset-0 opacity-0 cursor-[inherit] focus-visible:outline-none', className)}
           {...rest}
         />
         <motion.span
