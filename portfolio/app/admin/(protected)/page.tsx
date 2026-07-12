@@ -27,9 +27,14 @@ import {
 } from '@/components/admin/dashboard/layout';
 import { DashboardHero } from '@/components/admin/dashboard/hero';
 
+// Phase 4.8 — motion wrappers (client components; live in components/ui,
+// NOT components/admin/ui — server page stays async, wrappers stay 'use client')
+import { MotionSection } from '@/components/ui/MotionSection';
+import { MotionGridItem } from '@/components/ui/MotionGridItem';
+
 // Phase 4.3 — stats grid
 import { StatsGrid } from '@/components/admin/ui/StatsGrid';
-import { StatCardV2 } from '@/components/admin/ui/StatCardV2';
+import { StatCardV2 } from '@/components/admin/ui/StatCard';
 import {
   Rocket,
   Wrench,
@@ -56,6 +61,10 @@ import {
   getActivityTimeline,
 } from '@/lib/analytics/queries';
 
+// Phase 4.5 — activity feed & quick actions
+import { RecentUpdates, QuickActions } from '@/components/admin/dashboard/activity';
+import { getRecentActivity } from '@/lib/analytics/activity';
+
 // Phase 4.6 — dashboard widgets
 import {
   PortfolioProgress,
@@ -73,6 +82,8 @@ import { SESSION_MAX_AGE } from '@/lib/auth/constants';
 // Admin dashboard is auth-gated and shows live counts — render per request,
 // never statically prerendered at build time.
 export const dynamic = 'force-dynamic';
+
+// ── data fetchers ─────────────────────────────────────────────────────────
 
 const EMPTY_STATS = {
   projects: 0,
@@ -101,7 +112,14 @@ async function getStats() {
       db.$count(contacts),
       db.$count(analytics, gte(analytics.created_at, since)),
     ]);
-    return { projects: projectsCount, blogs: blogsCount, certifications: certsCount, testimonials: testimonialsCount, contacts: contactsCount, analytics30d };
+    return {
+      projects: projectsCount,
+      blogs: blogsCount,
+      certifications: certsCount,
+      testimonials: testimonialsCount,
+      contacts: contactsCount,
+      analytics30d,
+    };
   } catch {
     console.error('[Admin Dashboard] Failed to load stats');
     return EMPTY_STATS;
@@ -132,23 +150,18 @@ const EMPTY_SECTION_COUNTS: SectionCounts = {
 
 async function getSectionCounts(): Promise<SectionCounts> {
   try {
-    const [
-      skillsCount,
-      expCount,
-      buildLogCount,
-      learningsCount,
-      roadmapCount,
-      profileRows,
-    ] = await Promise.all([
-      db.$count(skills),
-      db.$count(experience),
-      db.$count(buildLog),
-      db.$count(learnings),
-      db.$count(roadmap),
-      db.select({ name: profileTable.name, title: profileTable.title, email: profileTable.email })
-        .from(profileTable)
-        .limit(1),
-    ]);
+    const [skillsCount, expCount, buildLogCount, learningsCount, roadmapCount, profileRows] =
+      await Promise.all([
+        db.$count(skills),
+        db.$count(experience),
+        db.$count(buildLog),
+        db.$count(learnings),
+        db.$count(roadmap),
+        db
+          .select({ name: profileTable.name, title: profileTable.title, email: profileTable.email })
+          .from(profileTable)
+          .limit(1),
+      ]);
     const p = profileRows[0];
     return {
       skills: skillsCount,
@@ -166,8 +179,8 @@ async function getSectionCounts(): Promise<SectionCounts> {
   }
 }
 
-// Phase 4.3 — the 8 categories from spec, each backed by a real count
-// already fetched in getStats()/getSectionCounts(). No invented fields.
+// ── types ────────────────────────────────────────────────────────────────
+
 interface PrimaryStatDef {
   key: string;
   label: string;
@@ -177,18 +190,20 @@ interface PrimaryStatDef {
 }
 
 const CHECKLIST_ITEMS = [
-  { key: 'profile',       label: 'Profile',         href: '/admin/profile',        desc: 'Name and title' },
-  { key: 'skills',        label: 'Skills',          href: '/admin/skills',         desc: 'Your tech stack' },
-  { key: 'projects',      label: 'Projects',        href: '/admin/projects',       desc: 'Featured work' },
-  { key: 'experience',    label: 'Experience',      href: '/admin/experience',     desc: 'Work history' },
-  { key: 'certifications',label: 'Certifications',  href: '/admin/certifications', desc: 'Credentials' },
-  { key: 'buildlog',      label: 'Build Log',       href: '/admin/buildlog',       desc: 'What you\'re building' },
-  { key: 'learnings',     label: 'Learnings',       href: '/admin/learnings',      desc: 'Things you\'ve learned' },
-  { key: 'roadmap',       label: 'Roadmap',         href: '/admin/roadmap',        desc: 'What\'s next' },
+  { key: 'profile', label: 'Profile', href: '/admin/profile', desc: 'Name and title' },
+  { key: 'skills', label: 'Skills', href: '/admin/skills', desc: 'Your tech stack' },
+  { key: 'projects', label: 'Projects', href: '/admin/projects', desc: 'Featured work' },
+  { key: 'experience', label: 'Experience', href: '/admin/experience', desc: 'Work history' },
+  { key: 'certifications', label: 'Certifications', href: '/admin/certifications', desc: 'Credentials' },
+  { key: 'buildlog', label: 'Build Log', href: '/admin/buildlog', desc: "What you're building" },
+  { key: 'learnings', label: 'Learnings', href: '/admin/learnings', desc: "Things you've learned" },
+  { key: 'roadmap', label: 'Roadmap', href: '/admin/roadmap', desc: "What's next" },
 ] as const;
 
+// ── page ─────────────────────────────────────────────────────────────────
+
 export default async function AdminDashboard() {
-  const [stats, sections, growth, distribution, skillsCategories, activity, progress, health, user] =
+  const [stats, sections, growth, distribution, skillsCategories, activity, recentActivity, progress, health, user] =
     await Promise.all([
       getStats(),
       getSectionCounts(),
@@ -196,6 +211,7 @@ export default async function AdminDashboard() {
       getContentDistribution(),
       getSkillsByCategory(),
       getActivityTimeline(),
+      getRecentActivity(10),
       getPortfolioProgress(),
       getHealthScore(),
       getUser(),
@@ -205,28 +221,26 @@ export default async function AdminDashboard() {
   // real signal available without a usage/quota API.
   const storageConfigured = !!process.env.BLOB_READ_WRITE_TOKEN;
 
-  // Phase 4.3 — 8 spec categories, mapped from real counts only.
   const primaryStats: PrimaryStatDef[] = [
-    { key: 'projects',       label: 'Projects',        value: stats.projects,          icon: <Rocket size={18} />,    href: '/admin/projects' },
-    { key: 'skills',         label: 'Skills',          value: sections.skills,         icon: <Wrench size={18} />,    href: '/admin/skills' },
-    { key: 'experience',     label: 'Experience',      value: sections.experience,     icon: <Briefcase size={18} />, href: '/admin/experience' },
-    { key: 'certifications', label: 'Certifications',  value: stats.certifications,    icon: <Award size={18} />,     href: '/admin/certifications' },
-    { key: 'buildLog',       label: 'Build Logs',      value: sections.buildLog,       icon: <Hammer size={18} />,    href: '/admin/buildlog' },
-    { key: 'learnings',      label: 'Learnings',       value: sections.learnings,      icon: <BookOpen size={18} />,  href: '/admin/learnings' },
-    { key: 'roadmap',        label: 'Roadmap',         value: sections.roadmap,        icon: <Map size={18} />,       href: '/admin/roadmap' },
-    { key: 'messages',       label: 'Messages',        value: stats.contacts,          icon: <Mail size={18} />,      href: null },
+    { key: 'projects', label: 'Projects', value: stats.projects, icon: <Rocket size={18} aria-hidden="true" />, href: '/admin/projects' },
+    { key: 'skills', label: 'Skills', value: sections.skills, icon: <Wrench size={18} aria-hidden="true" />, href: '/admin/skills' },
+    { key: 'experience', label: 'Experience', value: sections.experience, icon: <Briefcase size={18} aria-hidden="true" />, href: '/admin/experience' },
+    { key: 'certifications', label: 'Certifications', value: stats.certifications, icon: <Award size={18} aria-hidden="true" />, href: '/admin/certifications' },
+    { key: 'buildLog', label: 'Build Logs', value: sections.buildLog, icon: <Hammer size={18} aria-hidden="true" />, href: '/admin/buildlog' },
+    { key: 'learnings', label: 'Learnings', value: sections.learnings, icon: <BookOpen size={18} aria-hidden="true" />, href: '/admin/learnings' },
+    { key: 'roadmap', label: 'Roadmap', value: sections.roadmap, icon: <Map size={18} aria-hidden="true" />, href: '/admin/roadmap' },
+    { key: 'messages', label: 'Messages', value: stats.contacts, icon: <Mail size={18} aria-hidden="true" />, href: null },
   ];
 
-  // Completion state — identical logic to before
   const completion: Record<string, boolean> = {
-    profile:        !!(sections.profileName.trim() && sections.profileTitle.trim()),
-    skills:         sections.skills > 0,
-    projects:       stats.projects > 0,
-    experience:     sections.experience > 0,
+    profile: !!(sections.profileName.trim() && sections.profileTitle.trim()),
+    skills: sections.skills > 0,
+    projects: stats.projects > 0,
+    experience: sections.experience > 0,
     certifications: stats.certifications > 0,
-    buildlog:       sections.buildLog > 0,
-    learnings:      sections.learnings > 0,
-    roadmap:        sections.roadmap > 0,
+    buildlog: sections.buildLog > 0,
+    learnings: sections.learnings > 0,
+    roadmap: sections.roadmap > 0,
   };
   const showChecklist = Object.values(completion).some((v) => !v);
 
@@ -237,14 +251,12 @@ export default async function AdminDashboard() {
   ].filter(Boolean) as string[];
   const showProfileNotice = profileMissingFields.length > 0;
 
-  // Build completion items array for the hero ring
   const completionItems = CHECKLIST_ITEMS.map(({ key, label }) => ({
     key,
     label,
     done: completion[key] ?? false,
   }));
 
-  // Same data, with href — for the denser CompletionCard widget (4.6)
   const completionCardItems = CHECKLIST_ITEMS.map(({ key, label, href }) => ({
     key,
     label,
@@ -262,112 +274,185 @@ export default async function AdminDashboard() {
       />
 
       <DashboardContent>
-        {/* ── Profile notice ───────────────────────────────────── */}
-        {showProfileNotice && (
-          <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/8 px-4 py-3">
-            <span className="mt-0.5 text-amber-400">⚠</span>
-            <div className="text-sm">
-              <span className="text-amber-300 font-medium">Profile incomplete — </span>
-              <span className="text-amber-500/80">
-                Missing: {profileMissingFields.join(', ')}.{' '}
-              </span>
-              <Link href="/admin/profile" className="text-amber-400 underline hover:text-amber-300 transition-colors">
-                Fill it in →
-              </Link>
+        <main aria-label="Admin dashboard">
+          {/* ── Profile notice ───────────────────────────────────── */}
+          {showProfileNotice && (
+            <div
+              role="alert"
+              className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/8 px-4 py-3"
+            >
+              <span className="mt-0.5 text-amber-400" aria-hidden="true">⚠</span>
+              <div className="text-sm">
+                <span className="text-amber-300 font-medium">Profile incomplete — </span>
+                <span className="text-amber-500/80">
+                  Missing: {profileMissingFields.join(', ')}.{' '}
+                </span>
+                <Link
+                  href="/admin/profile"
+                  className="text-amber-400 underline hover:text-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400 focus-visible:outline-offset-2 rounded transition-colors"
+                >
+                  Fill it in →
+                </Link>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* ── Stat cards (Phase 4.3) ──────────────────────────────
-            No trend/progress data exists yet (would need historical
-            snapshots), so those props are simply omitted rather than
-            faked — StatCardV2 renders fine without them. */}
-        <DashboardSection first>
-          <StatsGrid cols={4}>
-            {primaryStats.map(({ key, label, value, icon, href }) => (
-              <StatCardV2 key={key} label={label} value={value} icon={icon} href={href} />
-            ))}
-          </StatsGrid>
-        </DashboardSection>
-
-        {/* ── Analytics & charts (Phase 4.4) ──────────────────────
-            Real queries only: monthly created_at aggregates, live table
-            counts, skills.category/proficiency, and analytics.event_type
-            daily counts. Empty datasets render ChartContainer's built-in
-            placeholder rather than a fake chart. */}
-        <DashboardSection title="Analytics" description="How your portfolio content has grown.">
-          <DashboardGrid cols={2} gap="md">
-            <AnalyticsCard>
-              <PortfolioGrowthChart data={growth} />
-            </AnalyticsCard>
-            <AnalyticsCard>
-              <ContentDistributionChart data={distribution} />
-            </AnalyticsCard>
-            <AnalyticsCard>
-              <SkillsChart data={skillsCategories} />
-            </AnalyticsCard>
-            <AnalyticsCard>
-              <ActivityChart data={activity} />
-            </AnalyticsCard>
-          </DashboardGrid>
-        </DashboardSection>
-
-        {/* ── Dashboard widgets (Phase 4.6) ───────────────────────
-            All figures come from real DB reads or real env/session state.
-            SystemStatus/StorageWidget/SessionWidget label unknowable facts
-            (last login, backups, quota) plainly instead of faking them.
-            InsightsPanel does no new fetching — it reuses progress data
-            already loaded above and applies simple UI-layer rules. */}
-        <DashboardSection title="Workspace" description="Progress, system state, and quick insights.">
-          <DashboardGrid cols={3} gap="md">
-            <PortfolioProgress data={progress} />
-            <HealthScore data={health} />
-            <CompletionCard items={completionCardItems} />
-            <SystemStatus email={user?.email ?? null} storageConfigured={storageConfigured} />
-            <StorageWidget storageConfigured={storageConfigured} uploads={progress.uploads} />
-            <SessionWidget email={user?.email ?? null} maxAgeSeconds={SESSION_MAX_AGE} />
-          </DashboardGrid>
-          <div className="mt-4">
-            <InsightsPanel missingSections={progress.missingSections} uploads={progress.uploads} />
-          </div>
-        </DashboardSection>
-
-        {/* ── Getting started checklist ────────────────────────── */}
-        {showChecklist && (
-          <DashboardSection
-            title="Getting started"
-            description="Add content to populate your public portfolio."
-          >
-            <DashboardWidget glass>
-              <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-                {CHECKLIST_ITEMS.map(({ key, label, href, desc }) => {
-                  const done = completion[key];
-                  return (
-                    <li key={key}>
-                      <Link href={href} className="flex items-center gap-3 group">
-                        <span
-                          className={`w-5 h-5 flex-shrink-0 flex items-center justify-center rounded-full text-xs font-bold transition-colors ${
-                            done
-                              ? 'bg-emerald-500/15 text-emerald-400'
-                              : 'bg-white/8 text-gray-600 group-hover:text-gray-400'
-                          }`}
-                        >
-                          {done ? '✓' : '○'}
-                        </span>
-                        <span className={`text-sm transition-colors ${done ? 'text-gray-500 line-through' : 'text-gray-300 group-hover:text-white'}`}>
-                          {label}
-                        </span>
-                        <span className="text-xs text-gray-600 group-hover:text-gray-500 transition-colors">
-                          {desc}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </DashboardWidget>
+          {/* ── Stat cards (Phase 4.3) ─────────────────────────────
+              Cards cascade in via MotionGridItem (Phase 4.8). */}
+          <DashboardSection first>
+            <h2 className="sr-only">Portfolio statistics</h2>
+            <StatsGrid cols={4}>
+              {primaryStats.map(({ key, label, value, icon, href }, i) => (
+                <MotionGridItem key={key} index={i}>
+                  <StatCardV2 label={label} value={value} icon={icon} href={href} />
+                </MotionGridItem>
+              ))}
+            </StatsGrid>
           </DashboardSection>
-        )}
+
+          {/* ── Analytics & charts (Phase 4.4) ─────────────────────
+              Real queries only. Section fades/rises into view on scroll
+              (Phase 4.8); each chart card also cascades. */}
+          <DashboardSection
+            title="Analytics"
+            description="How your portfolio content has grown."
+          >
+            <MotionSection>
+              <DashboardGrid cols={2} gap="md">
+                {(
+                  [
+                    ['growth', <PortfolioGrowthChart data={growth} />],
+                    ['distribution', <ContentDistributionChart data={distribution} />],
+                    ['skills', <SkillsChart data={skillsCategories} />],
+                    ['activity', <ActivityChart data={activity} />],
+                  ] as const
+                ).map(([id, chart], i) => (
+                  <MotionGridItem key={id} index={i}>
+                    <AnalyticsCard>{chart}</AnalyticsCard>
+                  </MotionGridItem>
+                ))}
+              </DashboardGrid>
+            </MotionSection>
+          </DashboardSection>
+
+          {/* ── Workspace (Phase 4.5 + 4.6 merged) ─────────────────
+              Recent activity feed + quick actions, plus progress/health/
+              completion/system/storage/session widgets. All figures come
+              from real DB reads or real env/session state — nothing faked.
+              InsightsPanel reuses progress data already loaded above. */}
+          <DashboardSection
+            title="Workspace"
+            description="Recent changes, quick actions, and system state."
+          >
+            <MotionSection>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr',
+                  gap: 'var(--admin-space-card)',
+                }}
+              >
+                <style>{`
+                  @media (min-width: 900px) {
+                    .workspace-grid { grid-template-columns: 1fr 1fr !important; }
+                  }
+                `}</style>
+
+                {/* Activity feed panel */}
+                <DashboardWidget
+                  glass
+                  className="workspace-grid"
+                  style={{ padding: 'var(--admin-space-card)' }}
+                  as="article"
+                >
+                  <h3 className="sr-only">Recent activity</h3>
+                  <RecentUpdates events={recentActivity} />
+                </DashboardWidget>
+
+                {/* Quick actions panel */}
+                <DashboardWidget
+                  glass
+                  style={{ padding: 'var(--admin-space-card)' }}
+                  as="article"
+                >
+                  <h3 className="sr-only">Quick actions</h3>
+                  <QuickActions />
+                </DashboardWidget>
+              </div>
+
+              <div className="mt-4">
+                <DashboardGrid cols={3} gap="md">
+                  {(
+                    [
+                      ['progress', <PortfolioProgress data={progress} />],
+                      ['health', <HealthScore data={health} />],
+                      ['completion', <CompletionCard items={completionCardItems} />],
+                      ['system', <SystemStatus email={user?.email ?? null} storageConfigured={storageConfigured} />],
+                      ['storage', <StorageWidget storageConfigured={storageConfigured} uploads={progress.uploads} />],
+                      ['session', <SessionWidget email={user?.email ?? null} maxAgeSeconds={SESSION_MAX_AGE} />],
+                    ] as const
+                  ).map(([id, widget], i) => (
+                    <MotionGridItem key={id} index={i}>
+                      {widget}
+                    </MotionGridItem>
+                  ))}
+                </DashboardGrid>
+                <div className="mt-4">
+                  <InsightsPanel missingSections={progress.missingSections} uploads={progress.uploads} />
+                </div>
+              </div>
+            </MotionSection>
+          </DashboardSection>
+
+          {/* ── Getting started checklist ────────────────────────── */}
+          {showChecklist && (
+            <DashboardSection
+              title="Getting started"
+              description="Add content to populate your public portfolio."
+            >
+              <DashboardWidget glass>
+                <ul
+                  style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}
+                  aria-label="Content completion checklist"
+                >
+                  {CHECKLIST_ITEMS.map(({ key, label, href, desc }) => {
+                    const done = completion[key];
+                    return (
+                      <li key={key}>
+                        <Link
+                          href={href}
+                          className="flex items-center gap-3 group rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
+                          aria-label={`${label}: ${desc}${done ? ' — complete' : ' — incomplete'}`}
+                        >
+                          <span
+                            aria-hidden="true"
+                            className={`w-5 h-5 flex-shrink-0 flex items-center justify-center rounded-full text-xs font-bold transition-colors ${
+                              done
+                                ? 'bg-emerald-500/15 text-emerald-400'
+                                : 'bg-white/8 text-gray-600 group-hover:text-gray-400'
+                            }`}
+                          >
+                            {done ? '✓' : '○'}
+                          </span>
+                          <span
+                            className={`text-sm transition-colors ${
+                              done ? 'text-gray-500 line-through' : 'text-gray-300 group-hover:text-white'
+                            }`}
+                          >
+                            {label}
+                          </span>
+                          <span className="text-xs text-gray-600 group-hover:text-gray-500 transition-colors">
+                            {desc}
+                          </span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </DashboardWidget>
+            </DashboardSection>
+          )}
+        </main>
       </DashboardContent>
     </DashboardLayout>
   );
