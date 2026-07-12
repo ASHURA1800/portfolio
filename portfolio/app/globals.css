@@ -64,6 +64,10 @@
   --color-error-bg: rgba(255, 92, 113, 0.12);
   --color-warning: #FFB020;
   --color-warning-bg: rgba(255, 176, 32, 0.12);
+  --color-info: #4DD8FF;
+  --color-info-bg: rgba(77, 216, 255, 0.12);
+  --color-neutral: #A0A6B5;
+  --color-neutral-bg: rgba(160, 166, 181, 0.12);
 
   /* ---------------------------------------------------------------- */
   /* TYPOGRAPHY SCALE                                                   */
