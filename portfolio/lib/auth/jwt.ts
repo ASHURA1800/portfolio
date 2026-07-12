@@ -6,6 +6,7 @@ import { jwtVerify } from "jose/jwt/verify";
 import {
   SESSION_COOKIE,
   SESSION_MAX_AGE,
+  SESSION_MAX_AGE_EXTENDED,
   JWT_ISSUER,
   JWT_AUDIENCE,
 } from "./constants";
@@ -24,8 +25,13 @@ function getSecret(): Uint8Array | null {
   return encoded;
 }
 
-/** Sign a session JWT (HS256). Throws if JWT_SECRET is not configured. */
-export async function signToken(payload: SessionPayload): Promise<string> {
+/** Sign a session JWT (HS256). Throws if JWT_SECRET is not configured.
+ *  maxAgeSeconds defaults to SESSION_MAX_AGE; pass SESSION_MAX_AGE_EXTENDED
+ *  for a "Remember me" long-lived session. */
+export async function signToken(
+  payload: SessionPayload,
+  maxAgeSeconds: number = SESSION_MAX_AGE
+): Promise<string> {
   const secret = getSecret();
   if (!secret) {
     throw new Error("JWT_SECRET is not set or is shorter than 32 bytes");
@@ -33,7 +39,7 @@ export async function signToken(payload: SessionPayload): Promise<string> {
   return new SignJWT({ email: payload.email })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(`${SESSION_MAX_AGE}s`)
+    .setExpirationTime(`${maxAgeSeconds}s`)
     .setIssuer(JWT_ISSUER)
     .setAudience(JWT_AUDIENCE)
     .sign(secret);
@@ -73,4 +79,4 @@ export function sessionCookieOptions(maxAge: number) {
 }
 
 // Re-export from constants for backward compatibility
-export { SESSION_COOKIE, SESSION_MAX_AGE };
+export { SESSION_COOKIE, SESSION_MAX_AGE, SESSION_MAX_AGE_EXTENDED };
