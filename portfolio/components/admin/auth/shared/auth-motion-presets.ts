@@ -55,5 +55,5 @@ export const authBlobFloat = (duration = 10, delay = 0) => ({
     delay,
     repeat: Infinity,
     ease: 'easeInOut',
-  },
+  } as const,
 });
