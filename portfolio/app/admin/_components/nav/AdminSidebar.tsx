@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   LayoutDashboard, User, FolderOpen, Wrench, Briefcase,
-  Award, Blocks, BookOpen, Map, PanelLeft,
+  Award, Blocks, BookOpen, Map,
 } from 'lucide-react';
 import { useSidebar } from './SidebarContext';
 import { SidebarGroup, SidebarItem } from './SidebarParts';
