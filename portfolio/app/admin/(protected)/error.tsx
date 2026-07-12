@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { ErrorDashboard } from "@/components/admin/dashboard/states";
 
 export default function AdminError({
   error,
@@ -13,19 +14,5 @@ export default function AdminError({
     console.error("[Admin Error]", error);
   }, [error]);
 
-  return (
-    <div className="flex items-center justify-center h-64">
-      <div className="text-center">
-        <p className="text-red-400 text-sm mb-4">
-          {error.message || "An unexpected error occurred"}
-        </p>
-        <button
-          onClick={reset}
-          className="px-4 py-2 rounded-lg bg-violet-600 text-white text-sm hover:bg-violet-700 transition-colors"
-        >
-          Try again
-        </button>
-      </div>
-    </div>
-  );
+  return <ErrorDashboard error={error} onRetry={reset} />;
 }
