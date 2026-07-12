@@ -3,20 +3,26 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { User, KeyRound, LogOut, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { ChevronDown, LogOut } from 'lucide-react';
+import { findRouteConfig } from '@/lib/admin/route-helpers';
 
 interface ProfileDropdownProps {
   userEmail: string;
 }
 
-const MENU_ITEMS = [
-  { href: '/admin/profile', label: 'Edit profile', icon: User },
-  { href: '/admin/change-password', label: 'Change password', icon: KeyRound },
-];
+// Labels/icons for these two links come from NavigationConfig — the '!'
+// is safe here since both paths are always-registered routes (see
+// lib/admin/navigation.config.ts); if either is ever removed from the
+// config this becomes a compile-time-safe but runtime-obvious break
+// rather than a silently-wrong hardcoded label.
+const MENU_ITEMS = [findRouteConfig('/admin/profile')!, findRouteConfig('/admin/change-password')!].map(
+  (route) => ({ href: route.path, label: route.label, icon: route.icon })
+);
 
 export default function ProfileDropdown({ userEmail }: ProfileDropdownProps) {
   const [open, setOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
   const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);
   const initials = userEmail.slice(0, 2).toUpperCase();
@@ -101,7 +107,7 @@ export default function ProfileDropdown({ userEmail }: ProfileDropdownProps) {
           {userEmail}
         </span>
 
-        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.18 }}>
+        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: reduceMotion ? 0 : 0.18 }}>
           <ChevronDown size={13} style={{ color: 'var(--color-faint)' }} />
         </motion.span>
       </button>
@@ -109,10 +115,10 @@ export default function ProfileDropdown({ userEmail }: ProfileDropdownProps) {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, scale: 0.97 }}
-            transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.97 }}
+            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.97 }}
+            transition={{ duration: reduceMotion ? 0.1 : 0.16, ease: [0.22, 1, 0.36, 1] }}
             role="menu"
             aria-label="User menu"
             style={{
