@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, type ReactNode, type ElementType } from 'react';
+import { useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, type LucideIcon } from 'lucide-react';
 import { useSidebar } from './SidebarContext';
 
 // ─── SidebarGroup ─────────────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ export function SidebarGroup({ label, children }: SidebarGroupProps) {
 interface SidebarItemProps {
   href: string;
   label: string;
-  icon: ElementType;
+  icon: LucideIcon;
   badge?: string | number;
   /** Exact match only (for dashboard) */
   exact?: boolean;
@@ -162,7 +162,7 @@ export function SidebarItem({ href, label, icon: Icon, badge, exact = false }: S
 
 interface SidebarCollapseProps {
   label: string;
-  icon: ElementType;
+  icon: LucideIcon;
   children: ReactNode;
   defaultOpen?: boolean;
 }
