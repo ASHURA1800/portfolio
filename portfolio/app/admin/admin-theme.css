@@ -28,6 +28,20 @@
   --admin-content-max-w: 72rem;
 
   /* -------------------------------------------------------------- */
+  /* SAFE-AREA INSETS                                                  */
+  /* Zero on most devices; non-zero on notched/rounded-corner phones  */
+  /* and tablets in landscape (iPhone notch/Dynamic Island, Android   */
+  /* gesture nav). Falls back to 0px on browsers without env()        */
+  /* support via the second argument. Requires viewport-fit: cover on */
+  /* the <meta name="viewport"> tag (set in app/layout.tsx) — without */
+  /* it these env() calls always resolve to 0 regardless of device.   */
+  /* -------------------------------------------------------------- */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /* -------------------------------------------------------------- */
   /* DENSITY-TUNED SPACING                                            */
   /* Public --space-* tokens are built for editorial section rhythm   */
   /* (5.5–10rem). Admin is a working surface: tables, forms, toolbars */
@@ -112,10 +126,20 @@
   max-width: var(--admin-content-max-w);
   margin-inline: auto;
   padding: var(--admin-space-page-sm);
+  padding-bottom: calc(var(--admin-space-page-sm) + var(--safe-bottom));
 }
+/* Tablet and up (>=768px): standard page padding. */
 @media (min-width: 768px) {
   .admin-page {
     padding: var(--admin-space-page);
+    padding-bottom: calc(var(--admin-space-page) + var(--safe-bottom));
+  }
+}
+/* Desktop-wide (>=1280px): a touch more breathing room now that the
+   sidebar is no longer auto-collapsed and there's real width to spend. */
+@media (min-width: 1280px) {
+  .admin-page {
+    padding-inline: calc(var(--admin-space-page) * 1.5);
   }
 }
 
@@ -290,18 +314,38 @@
   background: var(--color-bg-elevated);
   border-right: 1px solid var(--color-border);
   z-index: var(--z-admin-sidebar);
+  padding-top: var(--safe-top);
+  padding-left: var(--safe-left);
+  padding-bottom: var(--safe-bottom);
 }
 .admin-topbar {
-  height: var(--admin-topbar-h);
+  height: calc(var(--admin-topbar-h) + var(--safe-top));
   display: flex;
   align-items: center;
   gap: var(--admin-space-toolbar);
-  padding-inline: var(--admin-space-page-sm);
-  border-bottom: 1px solid var(--color-border);
+  padding-top: var(--safe-top);
+  padding-left: calc(var(--admin-space-page-sm) + var(--safe-left));
+  padding-right: calc(var(--admin-space-page-sm) + var(--safe-right));
+  border-bottom: 1px solid transparent;
   background: var(--color-bg);
   position: sticky;
   top: 0;
   z-index: var(--z-admin-sticky);
+  transition: background-color var(--admin-duration-base) var(--admin-ease-out),
+              border-color var(--admin-duration-base) var(--admin-ease-out),
+              box-shadow var(--admin-duration-base) var(--admin-ease-out),
+              backdrop-filter var(--admin-duration-base) var(--admin-ease-out);
+}
+/* Applied via a scroll listener (see TopNavbar.tsx) once the page has
+   scrolled past a small threshold — the topbar starts flush with the
+   page background (no visible seam at scrollTop 0) and only becomes a
+   glass surface once there's content sliding underneath it to blur. */
+.admin-topbar[data-scrolled="true"] {
+  background: rgba(10, 11, 16, 0.72);
+  backdrop-filter: blur(var(--blur-md)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--blur-md)) saturate(140%);
+  border-bottom-color: var(--color-border);
+  box-shadow: var(--shadow-sm);
 }
 .admin-sidebar-overlay {
   position: fixed;
@@ -333,6 +377,25 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-pop);
   padding: var(--admin-space-card);
+}
+
+/* Command palette search row — glows on focus via :focus-within so the
+   "search focus" animation needs no extra JS state; the browser's own
+   focus tracking on the <input> drives the parent row's appearance. */
+.admin-command-search-row {
+  border-bottom-color: var(--color-border);
+  transition: border-color var(--admin-duration-fast) var(--admin-ease-out),
+              background-color var(--admin-duration-fast) var(--admin-ease-out);
+}
+.admin-command-search-row:focus-within {
+  border-bottom-color: var(--color-accent-500);
+  background: rgba(124, 77, 255, 0.04);
+}
+.admin-command-search-icon {
+  transition: color var(--admin-duration-fast) var(--admin-ease-out);
+}
+.admin-command-search-row:focus-within .admin-command-search-icon {
+  color: var(--color-accent-400) !important;
 }
 
 /* ====================================================================== */
