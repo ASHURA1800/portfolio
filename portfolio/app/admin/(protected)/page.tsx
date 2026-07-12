@@ -207,14 +207,23 @@ export default async function AdminDashboard() {
     await Promise.all([
       getStats(),
       getSectionCounts(),
-      getPortfolioGrowth(),
-      getContentDistribution(),
-      getSkillsByCategory(),
-      getActivityTimeline(),
-      getRecentActivity(10),
-      getPortfolioProgress(),
-      getHealthScore(),
-      getUser(),
+      getPortfolioGrowth().catch(() => []),
+      getContentDistribution().catch(() => []),
+      getSkillsByCategory().catch(() => []),
+      getActivityTimeline().catch(() => []),
+      getRecentActivity(10).catch(() => []),
+      getPortfolioProgress().catch(() => ({
+        score: 0,
+        profileFieldsDone: 0,
+        profileFieldsTotal: 0,
+        missingSections: [] as { key: string; label: string; href: string }[],
+        uploads: [] as { key: string; label: string; done: boolean }[],
+      })),
+      getHealthScore().catch(() => ({
+        score: 0,
+        breakdown: [] as { label: string; value: number; max: number }[],
+      })),
+      getUser().catch(() => null),
     ]);
 
   // Storage is "configured" iff the Vercel Blob token is present — the only
