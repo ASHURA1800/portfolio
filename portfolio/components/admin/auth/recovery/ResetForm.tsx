@@ -229,7 +229,7 @@ export function ResetForm() {
                   marginTop: '-0.5rem',
                 }}
               >
-                Passwords don't match
+                Passwords don&apos;t match
               </motion.p>
             )}
           </AnimatePresence>
