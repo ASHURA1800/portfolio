@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Bell, CheckCheck, X } from 'lucide-react';
 
 export interface Notification {
@@ -32,6 +32,7 @@ export default function NotificationMenu({
   onMarkAllRead,
 }: NotificationMenuProps) {
   const [open, setOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const unread = notifications.filter((n) => !n.read).length;
 
@@ -90,9 +91,9 @@ export default function NotificationMenu({
           {unread > 0 && (
             <motion.span
               key="badge"
-              initial={{ scale: 0 }}
+              initial={reduceMotion ? { scale: 1 } : { scale: 0 }}
               animate={{ scale: 1 }}
-              exit={{ scale: 0 }}
+              exit={reduceMotion ? { scale: 1 } : { scale: 0 }}
               style={{
                 position: 'absolute',
                 top: '4px',
@@ -119,10 +120,10 @@ export default function NotificationMenu({
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, scale: 0.97 }}
-            transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.97 }}
+            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.97 }}
+            transition={{ duration: reduceMotion ? 0.1 : 0.16, ease: [0.22, 1, 0.36, 1] }}
             role="dialog"
             aria-label="Notifications"
             style={{
@@ -210,9 +211,9 @@ export default function NotificationMenu({
                   {notifications.map((n) => (
                     <motion.div
                       key={n.id}
-                      layout
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.18 }}
+                      layout={!reduceMotion}
+                      exit={reduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
+                      transition={{ duration: reduceMotion ? 0.1 : 0.18 }}
                       style={{
                         display: 'flex',
                         gap: '0.75rem',
