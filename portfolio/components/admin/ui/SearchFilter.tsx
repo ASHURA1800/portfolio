@@ -1,7 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { Search } from './Search';
+import { SearchInput } from './SearchInput';
 
 export interface ActiveFilter {
   key: string;
@@ -25,7 +25,13 @@ export function SearchFilter({
 }) {
   return (
     <div className="flex flex-1 flex-wrap items-center gap-2">
-      <Search value={searchValue} onChange={onSearchChange} placeholder={searchPlaceholder} className="w-full max-w-xs" />
+      <SearchInput
+        value={searchValue}
+        onChange={(e) => onSearchChange(e.target.value)}
+        onClear={() => onSearchChange('')}
+        placeholder={searchPlaceholder}
+        containerClassName="w-full max-w-xs"
+      />
 
       {filters.map((f) => (
         <span
