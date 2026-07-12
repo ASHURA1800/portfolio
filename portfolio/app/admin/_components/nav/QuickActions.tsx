@@ -2,14 +2,15 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'motion/react';
-import { Plus, FolderPlus, UserRoundPlus, Blocks } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { Plus } from 'lucide-react';
+import { getQuickActionRoutes } from '@/lib/admin/route-helpers';
 
-const ACTIONS = [
-  { label: 'New project',    href: '/admin/projects',       icon: FolderPlus },
-  { label: 'New build log',  href: '/admin/buildlog',       icon: Blocks },
-  { label: 'Edit profile',   href: '/admin/profile',        icon: UserRoundPlus },
-];
+// Quick-add shortcuts are derived from any route in NavigationConfig that
+// declares a `quickAction` — not a separate hardcoded list. Adding a
+// `quickAction` to a route in navigation.config.ts is enough to surface
+// it here.
+const ACTION_ROUTES = getQuickActionRoutes();
 
 /**
  * QuickActions
@@ -17,6 +18,7 @@ const ACTIONS = [
  */
 export default function QuickActions() {
   const [open, setOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,13 +31,15 @@ export default function QuickActions() {
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
-      <button
+      <motion.button
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Quick actions"
         title="Quick actions"
+        whileTap={{ scale: 0.92 }}
+        transition={{ duration: 0.1 }}
         style={{
           width: '2.25rem',
           height: '2.25rem',
@@ -64,18 +68,18 @@ export default function QuickActions() {
           }
         }}
       >
-        <motion.div animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.18 }}>
+        <motion.div animate={{ rotate: open ? 45 : 0 }} transition={{ duration: reduceMotion ? 0 : 0.18 }}>
           <Plus size={16} />
         </motion.div>
-      </button>
+      </motion.button>
 
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, scale: 0.96 }}
-            transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.96 }}
+            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.96 }}
+            transition={{ duration: reduceMotion ? 0.1 : 0.16, ease: [0.22, 1, 0.36, 1] }}
             role="menu"
             aria-label="Quick actions"
             style={{
@@ -104,37 +108,40 @@ export default function QuickActions() {
               Quick add
             </p>
 
-            {ACTIONS.map(({ label, href, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                role="menuitem"
-                onClick={() => setOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.625rem',
-                  padding: '0.5rem 0.875rem',
-                  fontSize: 'var(--text-sm)',
-                  color: 'var(--color-muted)',
-                  textDecoration: 'none',
-                  transition: 'background 0.12s, color 0.12s',
-                }}
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget as HTMLAnchorElement;
-                  el.style.background = 'rgba(255,255,255,0.04)';
-                  el.style.color = 'var(--color-ink)';
-                }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget as HTMLAnchorElement;
-                  el.style.background = 'transparent';
-                  el.style.color = 'var(--color-muted)';
-                }}
-              >
-                <Icon size={14} style={{ color: 'var(--color-faint)', flexShrink: 0 }} />
-                {label}
-              </Link>
-            ))}
+            {ACTION_ROUTES.map((route) => {
+              const Icon = route.quickAction?.icon ?? route.icon;
+              return (
+                <Link
+                  key={route.path}
+                  href={route.path}
+                  role="menuitem"
+                  onClick={() => setOpen(false)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.625rem',
+                    padding: '0.5rem 0.875rem',
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--color-muted)',
+                    textDecoration: 'none',
+                    transition: 'background 0.12s, color 0.12s',
+                  }}
+                  onMouseEnter={(e) => {
+                    const el = e.currentTarget as HTMLAnchorElement;
+                    el.style.background = 'rgba(255,255,255,0.04)';
+                    el.style.color = 'var(--color-ink)';
+                  }}
+                  onMouseLeave={(e) => {
+                    const el = e.currentTarget as HTMLAnchorElement;
+                    el.style.background = 'transparent';
+                    el.style.color = 'var(--color-muted)';
+                  }}
+                >
+                  <Icon size={14} style={{ color: 'var(--color-faint)', flexShrink: 0 }} />
+                  {route.quickAction?.label}
+                </Link>
+              );
+            })}
           </motion.div>
         )}
       </AnimatePresence>
