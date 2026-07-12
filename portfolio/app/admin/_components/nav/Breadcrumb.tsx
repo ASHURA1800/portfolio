@@ -1,41 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ChevronRight, Home } from 'lucide-react';
-
-/** Maps path segments to human-readable labels. */
-const LABELS: Record<string, string> = {
-  admin: 'Admin',
-  profile: 'Profile',
-  projects: 'Projects',
-  skills: 'Skills',
-  experience: 'Experience',
-  certifications: 'Certifications',
-  buildlog: 'Build Log',
-  learnings: 'Learnings',
-  roadmap: 'Roadmap',
-  'change-password': 'Change Password',
-  new: 'New',
-  edit: 'Edit',
-};
-
-function toLabel(segment: string) {
-  return LABELS[segment] ?? segment.charAt(0).toUpperCase() + segment.slice(1);
-}
+import { useNavigation } from './NavigationContext';
 
 export default function Breadcrumb() {
-  const pathname = usePathname();
-
-  // /admin/projects/edit → ['admin','projects','edit']
-  const segments = pathname.split('/').filter(Boolean);
-
-  const crumbs = segments.map((seg, i) => ({
-    label: toLabel(seg),
-    href: '/' + segments.slice(0, i + 1).join('/'),
-    isLast: i === segments.length - 1,
-  }));
+  const { breadcrumbs: crumbs } = useNavigation();
+  const reduceMotion = useReducedMotion();
 
   // Don't render on /admin root
   if (crumbs.length <= 1) return null;
@@ -71,43 +43,47 @@ export default function Breadcrumb() {
           </Link>
         </li>
 
-        {crumbs.slice(1).map(({ label, href, isLast }, i) => (
-          <motion.li
-            key={href}
-            initial={{ opacity: 0, x: -4 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.18, delay: i * 0.04 }}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-          >
-            <ChevronRight size={12} style={{ color: 'var(--color-disabled)' }} aria-hidden="true" />
-            {isLast ? (
-              <span
-                style={{
-                  fontSize: 'var(--text-xs)',
-                  fontWeight: 500,
-                  color: 'var(--color-ink)',
-                }}
-                aria-current="page"
-              >
-                {label}
-              </span>
-            ) : (
-              <Link
-                href={href}
-                style={{
-                  fontSize: 'var(--text-xs)',
-                  color: 'var(--color-faint)',
-                  textDecoration: 'none',
-                  transition: 'color 0.15s',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-muted)')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-faint)')}
-              >
-                {label}
-              </Link>
-            )}
-          </motion.li>
-        ))}
+        <AnimatePresence initial={false} mode="popLayout">
+          {crumbs.slice(1).map(({ label, href, isLast }, i) => (
+            <motion.li
+              key={href}
+              layout={!reduceMotion}
+              initial={reduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: -4 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={reduceMotion ? { opacity: 1 } : { opacity: 0, x: 4 }}
+              transition={reduceMotion ? { duration: 0 } : { duration: 0.18, delay: i * 0.04 }}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+            >
+              <ChevronRight size={12} style={{ color: 'var(--color-disabled)' }} aria-hidden="true" />
+              {isLast ? (
+                <span
+                  style={{
+                    fontSize: 'var(--text-xs)',
+                    fontWeight: 500,
+                    color: 'var(--color-ink)',
+                  }}
+                  aria-current="page"
+                >
+                  {label}
+                </span>
+              ) : (
+                <Link
+                  href={href}
+                  style={{
+                    fontSize: 'var(--text-xs)',
+                    color: 'var(--color-faint)',
+                    textDecoration: 'none',
+                    transition: 'color 0.15s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-muted)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-faint)')}
+                >
+                  {label}
+                </Link>
+              )}
+            </motion.li>
+          ))}
+        </AnimatePresence>
       </ol>
     </nav>
   );
