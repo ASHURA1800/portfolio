@@ -12,6 +12,7 @@ import {
   Quote,
   Eye,
   Edit3,
+  type LucideIcon,
 } from 'lucide-react';
 import { CharacterCounter } from './FormStates';
 
@@ -29,7 +30,7 @@ interface RichTextEditorProps {
 }
 
 type ToolItem =
-  | { type: 'button'; icon: React.ElementType; label: string; action: () => void }
+  | { type: 'button'; icon: LucideIcon; label: string; action: () => void }
   | { type: 'separator' };
 
 /**
@@ -144,7 +145,6 @@ export default function RichTextEditor({
       .replace(/\n/g, '<br>');
   };
 
-  const floated = focused || Boolean(value);
   const borderColor = focused ? 'rgba(124,77,255,0.5)' : 'var(--color-border)';
 
   return (
@@ -222,18 +222,23 @@ export default function RichTextEditor({
               background: 'rgba(255,255,255,0.02)',
             }}
           >
-            {tools.map((tool, i) =>
-              tool.type === 'separator' ? (
-                <span
-                  key={i}
-                  style={{
-                    width: '1px',
-                    height: '1.25rem',
-                    background: 'var(--color-border)',
-                    margin: '0 0.25rem',
-                  }}
-                />
-              ) : (
+            {tools.map((tool, i) => {
+              if (tool.type === 'separator') {
+                return (
+                  <span
+                    key={i}
+                    style={{
+                      width: '1px',
+                      height: '1.25rem',
+                      background: 'var(--color-border)',
+                      margin: '0 0.25rem',
+                    }}
+                  />
+                );
+              }
+
+              const Icon = tool.icon;
+              return (
                 <button
                   key={tool.label}
                   type="button"
@@ -265,10 +270,10 @@ export default function RichTextEditor({
                     (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-muted)';
                   }}
                 >
-                  <tool.icon size={14} />
+                  <Icon size={14} />
                 </button>
-              )
-            )}
+              );
+            })}
           </div>
         )}
 
