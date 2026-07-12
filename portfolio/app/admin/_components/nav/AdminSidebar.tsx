@@ -1,38 +1,26 @@
 'use client';
 
+import { memo } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'motion/react';
-import {
-  LayoutDashboard, User, FolderOpen, Wrench, Briefcase,
-  Award, Blocks, BookOpen, Map,
-} from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion, type PanInfo } from 'motion/react';
 import { useSidebar } from './SidebarContext';
 import { SidebarGroup, SidebarItem } from './SidebarParts';
 import SidebarFooter from './SidebarFooter';
+import { NAV_GROUPS, type NavGroupId } from '@/lib/admin/navigation.config';
+import { getGroupedNavRoutes } from '@/lib/admin/route-helpers';
+import { drawerBackdropAnimation } from '@/lib/motion';
 
-const NAV_MAIN = [
-  { href: '/admin',                label: 'Dashboard',       icon: LayoutDashboard, exact: true },
-  { href: '/admin/profile',        label: 'Profile',         icon: User },
-];
-
-const NAV_CONTENT = [
-  { href: '/admin/projects',       label: 'Projects',        icon: FolderOpen },
-  { href: '/admin/skills',         label: 'Skills',          icon: Wrench },
-  { href: '/admin/experience',     label: 'Experience',      icon: Briefcase },
-  { href: '/admin/certifications', label: 'Certifications',  icon: Award },
-];
-
-const NAV_WRITING = [
-  { href: '/admin/buildlog',       label: 'Build Log',       icon: Blocks },
-  { href: '/admin/learnings',      label: 'Learnings',       icon: BookOpen },
-  { href: '/admin/roadmap',        label: 'Roadmap',         icon: Map },
-];
+// Nav items are no longer hardcoded here — every sidebar entry, its icon,
+// label, and grouping comes from lib/admin/navigation.config.ts. Adding or
+// renaming a route only requires editing that one file.
+const GROUPED_ROUTES = getGroupedNavRoutes();
+const GROUP_ORDER: NavGroupId[] = ['main', 'content', 'writing'];
 
 interface AdminSidebarProps {
   userEmail: string;
 }
 
-function SidebarContent({ userEmail }: AdminSidebarProps) {
+const SidebarContent = memo(function SidebarContent({ userEmail }: AdminSidebarProps) {
   const { collapsed } = useSidebar();
 
   return (
@@ -112,32 +100,42 @@ function SidebarContent({ userEmail }: AdminSidebarProps) {
           padding: '0 0.5rem',
         }}
       >
-        <SidebarGroup>
-          {NAV_MAIN.map((item) => (
-            <SidebarItem key={item.href} {...item} />
-          ))}
-        </SidebarGroup>
-
-        <SidebarGroup label="Content">
-          {NAV_CONTENT.map((item) => (
-            <SidebarItem key={item.href} {...item} />
-          ))}
-        </SidebarGroup>
-
-        <SidebarGroup label="Writing">
-          {NAV_WRITING.map((item) => (
-            <SidebarItem key={item.href} {...item} />
-          ))}
-        </SidebarGroup>
+        {GROUP_ORDER.map((groupId) => {
+          const routes = GROUPED_ROUTES[groupId];
+          if (!routes?.length) return null;
+          return (
+            <SidebarGroup key={groupId} label={NAV_GROUPS[groupId] || undefined}>
+              {routes.map((route) => (
+                <SidebarItem
+                  key={route.path}
+                  href={route.path}
+                  label={route.label}
+                  icon={route.icon}
+                  exact={route.exact}
+                />
+              ))}
+            </SidebarGroup>
+          );
+        })}
       </nav>
 
       <SidebarFooter userEmail={userEmail} />
     </div>
   );
-}
+});
 
 export default function AdminSidebar({ userEmail }: AdminSidebarProps) {
   const { mobileOpen, closeMobile } = useSidebar();
+  const reduceMotion = useReducedMotion();
+
+  // Swipe-to-close: a left-drag past ~80px, or a fast leftward flick,
+  // dismisses the drawer — mirrors the native iOS/Android edge-drawer
+  // gesture users already expect from any app with a slide-out nav.
+  const handleDragEnd = (_e: PointerEvent, info: PanInfo) => {
+    const draggedFarEnough = info.offset.x < -80;
+    const flickedFast = info.velocity.x < -400;
+    if (draggedFarEnough || flickedFast) closeMobile();
+  };
 
   return (
     <>
@@ -153,22 +151,29 @@ export default function AdminSidebar({ userEmail }: AdminSidebarProps) {
             {/* Backdrop */}
             <motion.div
               key="backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              variants={reduceMotion ? { initial: { opacity: 1 }, animate: { opacity: 1 }, exit: { opacity: 1 } } : drawerBackdropAnimation}
+              initial="initial"
+              animate="animate"
+              exit="exit"
               className="admin-sidebar-overlay md:hidden"
               onClick={closeMobile}
               aria-hidden="true"
             />
 
-            {/* Drawer */}
+            {/* Drawer — draggable for swipe-to-close. When reduced motion is
+                on, both the entrance/exit and the drag gesture are disabled:
+                a user who has asked for less motion also shouldn't have the
+                drawer chase their finger around. It simply appears/disappears. */}
             <motion.div
               key="drawer"
-              initial={{ x: '-100%' }}
+              initial={reduceMotion ? { x: 0 } : { x: '-100%' }}
               animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', stiffness: 400, damping: 38 }}
+              exit={reduceMotion ? { x: 0 } : { x: '-100%' }}
+              transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 38 }}
+              drag={reduceMotion ? false : 'x'}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={{ left: 0.35, right: 0 }}
+              onDragEnd={handleDragEnd}
               className="md:hidden"
               style={{
                 position: 'fixed',
@@ -176,6 +181,10 @@ export default function AdminSidebar({ userEmail }: AdminSidebarProps) {
                 left: 0,
                 bottom: 0,
                 zIndex: 'var(--z-admin-sidebar)' as unknown as number,
+                // GPU-composited transform, not left/width — keeps the drag
+                // and spring animation off the main thread's layout pass.
+                willChange: 'transform',
+                touchAction: 'pan-y',
               }}
             >
               <SidebarContent userEmail={userEmail} />
