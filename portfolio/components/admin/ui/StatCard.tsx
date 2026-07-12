@@ -5,9 +5,13 @@ import Link from 'next/link';
 import { motion, useInView } from 'motion/react';
 import { cn } from '@/lib/utils';
 
-export interface StatCardProps {
+export interface StatCardV2Props {
   label: string;
   value: number;
+  /** Total for the progress bar, e.g. published/total. Omit to hide the bar. */
+  total?: number;
+  /** % change vs previous period. Omit to hide the trend chip. */
+  trendPercent?: number;
   icon?: ReactNode;
   href?: string | null;
   suffix?: string;
@@ -43,11 +47,31 @@ function useCountUp(target: number, active: boolean) {
   return display;
 }
 
-export function StatCard({ label, value, icon, href, suffix = '', className }: StatCardProps) {
+function TrendChip({ percent }: { percent: number }) {
+  const direction = percent > 0 ? 'up' : percent < 0 ? 'down' : 'flat';
+  const arrow = direction === 'up' ? '↑' : direction === 'down' ? '↓' : '→';
+  return (
+    <span className="admin-stat-trend-chip" data-direction={direction}>
+      {arrow} {Math.abs(percent)}%
+    </span>
+  );
+}
+
+export function StatCardV2({
+  label,
+  value,
+  total,
+  trendPercent,
+  icon,
+  href,
+  suffix = '',
+  className,
+}: StatCardV2Props) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-10% 0px' });
   const display = useCountUp(value, inView);
   const linked = Boolean(href);
+  const progressPct = total && total > 0 ? Math.min(100, Math.round((value / total) * 100)) : null;
 
   const content = (
     <motion.div
@@ -55,27 +79,48 @@ export function StatCard({ label, value, icon, href, suffix = '', className }: S
       initial={{ opacity: 0, y: 8 }}
       animate={inView ? { opacity: 1, y: 0 } : undefined}
       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-      className={cn('admin-stat-card', className)}
+      className={cn('admin-stat-card admin-stat-card--v2', className)}
       data-linked={linked}
     >
       <div className="flex items-center justify-between">
         <span className="admin-stat-label">{label}</span>
         {icon && (
-          <span aria-hidden="true" className="text-[var(--color-accent-400)] [&>svg]:w-4 [&>svg]:h-4">
+          <span className="admin-stat-icon-chip" aria-hidden="true">
             {icon}
           </span>
         )}
       </div>
-      <span className="admin-stat-value">
-        {display}
-        {suffix}
-      </span>
+
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="admin-stat-value">
+          {display}
+          {suffix}
+        </span>
+        {typeof trendPercent === 'number' && <TrendChip percent={trendPercent} />}
+      </div>
+
+      {progressPct !== null && (
+        <div
+          className="admin-stat-progress-track"
+          role="progressbar"
+          aria-valuenow={progressPct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`${label} progress`}
+        >
+          <div className="admin-stat-progress-fill" style={{ width: `${progressPct}%` }} />
+        </div>
+      )}
     </motion.div>
   );
 
   if (href) {
     return (
-      <Link href={href} aria-label={`${label}: ${value}${suffix}. View details.`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-500)] rounded-[var(--radius-lg)]">
+      <Link
+        href={href}
+        aria-label={`${label}: ${value}${suffix}. View details.`}
+        className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-500)] rounded-[var(--radius-lg)]"
+      >
         {content}
       </Link>
     );
