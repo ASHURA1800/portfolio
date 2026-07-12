@@ -16,6 +16,16 @@ import {
 } from '@/lib/db';
 import Link from 'next/link';
 
+// Phase 4 layout + hero
+import {
+  DashboardLayout,
+  DashboardContent,
+  DashboardSection,
+  DashboardGrid,
+  DashboardWidget,
+} from '@/components/admin/dashboard/layout';
+import { DashboardHero } from '@/components/admin/dashboard/hero';
+
 // Admin dashboard is auth-gated and shows live counts — render per request,
 // never statically prerendered at build time.
 export const dynamic = 'force-dynamic';
@@ -135,7 +145,7 @@ const CHECKLIST_ITEMS = [
 export default async function AdminDashboard() {
   const [stats, sections] = await Promise.all([getStats(), getSectionCounts()]);
 
-  // Checklist completion state
+  // Completion state — identical logic to before
   const completion: Record<string, boolean> = {
     profile:        !!(sections.profileName.trim() && sections.profileTitle.trim()),
     skills:         sections.skills > 0,
@@ -148,7 +158,6 @@ export default async function AdminDashboard() {
   };
   const showChecklist = Object.values(completion).some((v) => !v);
 
-  // Profile notice: missing name, email, or title
   const profileMissingFields = [
     !sections.profileName.trim() && 'name',
     !sections.profileTitle.trim() && 'title',
@@ -156,93 +165,112 @@ export default async function AdminDashboard() {
   ].filter(Boolean) as string[];
   const showProfileNotice = profileMissingFields.length > 0;
 
+  // Build completion items array for the hero ring
+  const completionItems = CHECKLIST_ITEMS.map(({ key, label }) => ({
+    key,
+    label,
+    done: completion[key] ?? false,
+  }));
+
   return (
-    <div>
-      {/* Profile notice — subtle amber banner */}
-      {showProfileNotice && (
-        <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/8 px-4 py-3">
-          <span className="mt-0.5 text-amber-400">⚠</span>
-          <div className="text-sm">
-            <span className="text-amber-300 font-medium">Profile incomplete — </span>
-            <span className="text-amber-500/80">
-              Missing: {profileMissingFields.join(', ')}.{' '}
-            </span>
-            <Link href="/admin/profile" className="text-amber-400 underline hover:text-amber-300 transition-colors">
-              Fill it in →
-            </Link>
-          </div>
-        </div>
-      )}
+    <DashboardLayout>
+      {/* ── Hero ─────────────────────────────────────────────────── */}
+      <DashboardHero
+        name={sections.profileName}
+        title={sections.profileTitle}
+        completionItems={completionItems}
+      />
 
-      <h1 className="text-2xl font-bold text-white mb-2">Dashboard</h1>
-      <p className="text-gray-500 text-sm mb-8">Portfolio content overview</p>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {STAT_CARDS.map(({ key, label, icon, href }) =>
-          href ? (
-            <Link
-              key={key}
-              href={href}
-              className="bg-white/5 border border-white/8 rounded-2xl p-5 hover:border-violet-500/30 hover:bg-white/6 transition-all group"
-            >
-              <div className="text-2xl mb-3">{icon}</div>
-              <div className="text-3xl font-bold text-white mb-1">
-                {stats[key].toLocaleString()}
-              </div>
-              <div className="text-gray-500 text-sm group-hover:text-gray-400 transition-colors">
-                {label}
-              </div>
-            </Link>
-          ) : (
-            <div key={key} className="bg-white/5 border border-white/8 rounded-2xl p-5">
-              <div className="text-2xl mb-3">{icon}</div>
-              <div className="text-3xl font-bold text-white mb-1">
-                {stats[key].toLocaleString()}
-              </div>
-              <div className="text-gray-500 text-sm">{label}</div>
+      <DashboardContent>
+        {/* ── Profile notice ───────────────────────────────────── */}
+        {showProfileNotice && (
+          <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/8 px-4 py-3">
+            <span className="mt-0.5 text-amber-400">⚠</span>
+            <div className="text-sm">
+              <span className="text-amber-300 font-medium">Profile incomplete — </span>
+              <span className="text-amber-500/80">
+                Missing: {profileMissingFields.join(', ')}.{' '}
+              </span>
+              <Link href="/admin/profile" className="text-amber-400 underline hover:text-amber-300 transition-colors">
+                Fill it in →
+              </Link>
             </div>
-          )
+          </div>
         )}
-      </div>
 
-      {/* Content checklist — only shown when sections are incomplete */}
-      {showChecklist && (
-        <div className="mt-8 p-5 bg-white/5 border border-white/8 rounded-2xl">
-          <h2 className="text-white font-semibold mb-1">Getting started</h2>
-          <p className="text-gray-500 text-xs mb-4">
-            Add content to populate your public portfolio.
-          </p>
-          <ul className="space-y-2.5">
-            {CHECKLIST_ITEMS.map(({ key, label, href, desc }) => {
-              const done = completion[key];
-              return (
-                <li key={key}>
-                  <Link
-                    href={href}
-                    className="flex items-center gap-3 group"
+        {/* ── Stat cards ───────────────────────────────────────── */}
+        <DashboardSection first>
+          <DashboardGrid cols={3} mobileHalf>
+            {STAT_CARDS.map(({ key, label, icon, href }) =>
+              href ? (
+                <Link key={key} href={href} style={{ display: 'contents' }}>
+                  <DashboardWidget
+                    interactive
+                    glass
+                    style={{ cursor: 'pointer' }}
+                    className="hover:border-violet-500/30 hover:bg-white/6 group"
                   >
-                    <span
-                      className={`w-5 h-5 flex-shrink-0 flex items-center justify-center rounded-full text-xs font-bold transition-colors ${
-                        done
-                          ? 'bg-emerald-500/15 text-emerald-400'
-                          : 'bg-white/8 text-gray-600 group-hover:text-gray-400'
-                      }`}
-                    >
-                      {done ? '✓' : '○'}
-                    </span>
-                    <span className={`text-sm transition-colors ${done ? 'text-gray-500 line-through' : 'text-gray-300 group-hover:text-white'}`}>
+                    <div style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>{icon}</div>
+                    <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--color-ink)', marginBottom: '0.25rem', fontVariantNumeric: 'tabular-nums' }}>
+                      {stats[key].toLocaleString()}
+                    </div>
+                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-faint)' }}>
                       {label}
-                    </span>
-                    <span className="text-xs text-gray-600 group-hover:text-gray-500 transition-colors">
-                      {desc}
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-    </div>
+                    </div>
+                  </DashboardWidget>
+                </Link>
+              ) : (
+                <DashboardWidget key={key} glass>
+                  <div style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>{icon}</div>
+                  <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--color-ink)', marginBottom: '0.25rem', fontVariantNumeric: 'tabular-nums' }}>
+                    {stats[key].toLocaleString()}
+                  </div>
+                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-faint)' }}>
+                    {label}
+                  </div>
+                </DashboardWidget>
+              )
+            )}
+          </DashboardGrid>
+        </DashboardSection>
+
+        {/* ── Getting started checklist ────────────────────────── */}
+        {showChecklist && (
+          <DashboardSection
+            title="Getting started"
+            description="Add content to populate your public portfolio."
+          >
+            <DashboardWidget glass>
+              <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+                {CHECKLIST_ITEMS.map(({ key, label, href, desc }) => {
+                  const done = completion[key];
+                  return (
+                    <li key={key}>
+                      <Link href={href} className="flex items-center gap-3 group">
+                        <span
+                          className={`w-5 h-5 flex-shrink-0 flex items-center justify-center rounded-full text-xs font-bold transition-colors ${
+                            done
+                              ? 'bg-emerald-500/15 text-emerald-400'
+                              : 'bg-white/8 text-gray-600 group-hover:text-gray-400'
+                          }`}
+                        >
+                          {done ? '✓' : '○'}
+                        </span>
+                        <span className={`text-sm transition-colors ${done ? 'text-gray-500 line-through' : 'text-gray-300 group-hover:text-white'}`}>
+                          {label}
+                        </span>
+                        <span className="text-xs text-gray-600 group-hover:text-gray-500 transition-colors">
+                          {desc}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </DashboardWidget>
+          </DashboardSection>
+        )}
+      </DashboardContent>
+    </DashboardLayout>
   );
 }
