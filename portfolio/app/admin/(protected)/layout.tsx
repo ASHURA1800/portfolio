@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { getAdminUser } from '@/lib/auth/session';
 import { ownerExists } from '@/lib/auth/owner';
 import { SidebarProvider } from '../_components/nav/SidebarContext';
+import { NavigationProvider } from '../_components/nav/NavigationContext';
 import AdminSidebar from '../_components/nav/AdminSidebar';
 import TopNavbar from '../_components/nav/TopNavbar';
 
@@ -22,31 +23,33 @@ export default async function AdminLayout({
   if (!user) redirect('/admin/login');
 
   return (
-    <SidebarProvider>
-      <div
-        className="admin-shell"
-        style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}
-      >
-        <AdminSidebar userEmail={user.email} />
+    <NavigationProvider>
+      <SidebarProvider>
         <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            minWidth: 0,
-          }}
+          className="admin-shell"
+          style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}
         >
-          <TopNavbar userEmail={user.email} />
-          <main
-            id="main-content"
-            className="admin-page admin-scroll-thin"
-            style={{ flex: 1, overflowY: 'auto' }}
+          <AdminSidebar userEmail={user.email} />
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              minWidth: 0,
+            }}
           >
-            {children}
-          </main>
+            <TopNavbar userEmail={user.email} />
+            <main
+              id="main-content"
+              className="admin-page admin-scroll-thin"
+              style={{ flex: 1, overflowY: 'auto' }}
+            >
+              {children}
+            </main>
+          </div>
         </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </NavigationProvider>
   );
 }
