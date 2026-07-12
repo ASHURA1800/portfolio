@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   Search, LayoutDashboard, User, FolderOpen, Wrench,
   Briefcase, Award, Blocks, BookOpen, Map, KeyRound, X,
-  ArrowUpRight,
+  ArrowUpRight, type LucideIcon,
 } from 'lucide-react';
 
 interface CmdItem {
@@ -17,7 +17,7 @@ interface CmdItem {
   label: string;
   group: string;
   href: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   keywords?: string[];
   shortcut?: string;
 }
@@ -263,7 +263,7 @@ export default function CommandPalette() {
                         color: 'var(--color-faint)',
                       }}
                     >
-                      No results for "{query}"
+                      No results for &quot;{query}&quot;
                     </p>
                   ) : (
                     Object.entries(groups).map(([group, items]) => (
@@ -283,6 +283,7 @@ export default function CommandPalette() {
                         {items.map((item) => {
                           const idx = flatList.indexOf(item);
                           const active = idx === cursor;
+                          const Icon = item.icon;
                           return (
                             <button
                               key={item.id}
@@ -309,7 +310,7 @@ export default function CommandPalette() {
                                 transition: 'background 0.1s',
                               }}
                             >
-                              <item.icon
+                              <Icon
                                 size={15}
                                 style={{ color: active ? 'var(--color-accent-400)' : 'var(--color-faint)', flexShrink: 0 }}
                               />
