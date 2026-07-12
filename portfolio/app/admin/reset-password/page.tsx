@@ -1,13 +1,20 @@
 import { Suspense } from 'react';
-import { ResetPasswordForm } from './ResetPasswordForm';
+import type { Metadata } from 'next';
+import { PasswordRecoveryLayout, ResetForm } from '@/components/admin/auth/recovery';
 import { AuthLoader } from '@/components/admin/auth/shared';
 
 export const dynamic = 'force-dynamic';
 
+export const metadata: Metadata = {
+  title: 'Reset Password',
+};
+
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<AuthLoader />}>
-      <ResetPasswordForm />
-    </Suspense>
+    <PasswordRecoveryLayout>
+      <Suspense fallback={<AuthLoader />}>
+        <ResetForm />
+      </Suspense>
+    </PasswordRecoveryLayout>
   );
 }
