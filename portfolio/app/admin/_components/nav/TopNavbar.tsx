@@ -1,13 +1,28 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { PanelLeft } from 'lucide-react';
 import { useSidebar } from './SidebarContext';
 import Breadcrumb from './Breadcrumb';
 import ProfileDropdown from './ProfileDropdown';
 import NotificationMenu, { type Notification } from './NotificationMenu';
-import CommandPalette from './CommandPalette';
 import QuickActions from './QuickActions';
 import { useState } from 'react';
+
+// Code-split: the palette overlay (search, keyboard nav, results list) is
+// real weight that isn't needed until the user opens it — only the trigger
+// button needs to be in the initial admin bundle. ssr:false because this
+// is a client-only interactive overlay with no meaningful server-rendered
+// state.
+const CommandPalette = dynamic(() => import('./CommandPalette'), {
+  ssr: false,
+  loading: () => (
+    <div
+      aria-hidden="true"
+      style={{ width: '9rem', height: '2.25rem', borderRadius: 'var(--radius-md)', background: 'var(--color-surface)' }}
+    />
+  ),
+});
 
 interface TopNavbarProps {
   userEmail: string;
