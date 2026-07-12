@@ -1,15 +1,26 @@
-import { Badge } from './Badge';
+import { Badge, type BadgeTone } from './Badge';
 
-export type ContentStatus = 'published' | 'draft' | 'archived' | 'pending' | 'live' | 'in-progress' | 'concept';
+export type ContentStatus =
+  | 'published'
+  | 'draft'
+  | 'archived'
+  | 'pending'
+  | 'live'
+  | 'in-progress'
+  | 'concept';
 
-const STATUS_VARIANT: Record<ContentStatus, 'published' | 'draft' | 'archived' | 'pending' | 'success' | 'accent'> = {
-  published: 'published',
+// Maps every content-status string used across the CMS (Project.status,
+// BuildLogEntry.status, blogs.published, etc.) onto Badge's real tone
+// vocabulary — success/error/warning/info/neutral — rather than inventing
+// per-status colors that don't exist in admin-theme.css.
+const STATUS_TONE: Record<ContentStatus, BadgeTone> = {
+  published: 'success',
   live: 'success',
-  draft: 'draft',
-  archived: 'archived',
-  pending: 'pending',
-  'in-progress': 'accent',
-  concept: 'draft',
+  'in-progress': 'info',
+  pending: 'warning',
+  draft: 'neutral',
+  concept: 'neutral',
+  archived: 'error',
 };
 
 const STATUS_LABEL: Record<ContentStatus, string> = {
@@ -23,14 +34,19 @@ const STATUS_LABEL: Record<ContentStatus, string> = {
 };
 
 /**
- * Maps the content-status strings already used across the CMS
- * (Project.status, BuildLogEntry.status, blogs.published, etc.) to a
- * consistent Badge variant + dot, so every manager renders status the
- * same way without redefining its own color mapping.
+ * Maps the content-status strings already used across the CMS to a
+ * consistent Badge tone + dot, so every manager renders status the same
+ * way without redefining its own color mapping.
  */
-export function StatusBadge({ status, size = 'md' }: { status: ContentStatus; size?: 'sm' | 'md' | 'lg' }) {
+export function StatusBadge({
+  status,
+  size = 'md',
+}: {
+  status: ContentStatus;
+  size?: 'sm' | 'md' | 'lg';
+}) {
   return (
-    <Badge variant={STATUS_VARIANT[status]} size={size} dot>
+    <Badge tone={STATUS_TONE[status]} size={size} dot>
       {STATUS_LABEL[status]}
     </Badge>
   );
