@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useReducedMotion } from 'motion/react';
+import { motion, useReducedMotion, type Variants } from 'motion/react';
 
 interface WelcomeBannerProps {
   /** Admin's display name, e.g. "Sigríður" */
@@ -18,14 +18,14 @@ function getGreeting(): string {
   return 'Good night';
 }
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: {},
   visible: {
     transition: { staggerChildren: 0.09, delayChildren: 0.1 },
   },
 };
 
-const lineVariants = {
+const lineVariants: Variants = {
   hidden: { opacity: 0, y: 14 },
   visible: {
     opacity: 1,
