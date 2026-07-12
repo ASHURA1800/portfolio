@@ -22,10 +22,9 @@ export function LoadingOverlay({ active, label = 'Loading' }: { active: boolean;
           exit="exit"
           role="status"
           aria-live="polite"
-          className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-2 rounded-[inherit] bg-bg-elevated/80 backdrop-blur-sm"
+          className="absolute inset-0 z-30 flex items-center justify-center rounded-[inherit] bg-bg-elevated/80 backdrop-blur-sm"
         >
-          <Loader size={22} />
-          <span className="text-xs text-faint">{label}…</span>
+          <Loader label={label} />
         </motion.div>
       )}
     </AnimatePresence>
