@@ -23,7 +23,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
     <label
       htmlFor={fieldId}
       className={cn(
-        'inline-flex items-start gap-2.5 select-none',
+        'inline-flex items-start gap-2.5 select-none p-1 -m-1',
         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
       )}
     >
