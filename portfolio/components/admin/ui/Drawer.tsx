@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
@@ -23,6 +23,7 @@ const WIDTH_CLASSES = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-lg' };
 export function Drawer({ open, onClose, title, children, footer, width = 'md' }: DrawerProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+  const titleId = useId();
 
   const handleClose = useCallback(() => onClose(), [onClose]);
   const containerRef = useFocusTrap<HTMLDivElement>(open, handleClose);
@@ -46,6 +47,7 @@ export function Drawer({ open, onClose, title, children, footer, width = 'md' }:
             ref={containerRef}
             role="dialog"
             aria-modal="true"
+            aria-labelledby={title ? titleId : undefined}
             tabIndex={-1}
             variants={drawerSlide}
             initial="hidden"
@@ -57,7 +59,7 @@ export function Drawer({ open, onClose, title, children, footer, width = 'md' }:
             )}
           >
             <div className="flex items-center justify-between border-b border-border p-5">
-              {title && <h2 className="text-base font-semibold text-ink">{title}</h2>}
+              {title && <h2 id={titleId} className="text-base font-semibold text-ink">{title}</h2>}
               <button
                 type="button"
                 onClick={handleClose}
