@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { gte } from 'drizzle-orm';
 import {
   db,
@@ -25,6 +26,35 @@ import {
   DashboardWidget,
 } from '@/components/admin/dashboard/layout';
 import { DashboardHero } from '@/components/admin/dashboard/hero';
+
+// Phase 4.3 — stats grid
+import { StatsGrid } from '@/components/admin/ui/StatsGrid';
+import { StatCardV2 } from '@/components/admin/ui/StatCardV2';
+import {
+  Rocket,
+  Wrench,
+  Briefcase,
+  Award,
+  Hammer,
+  BookOpen,
+  Map,
+  Mail,
+} from 'lucide-react';
+
+// Phase 4.4 — analytics & charts
+import {
+  AnalyticsCard,
+  PortfolioGrowthChart,
+  ContentDistributionChart,
+  SkillsChart,
+  ActivityChart,
+} from '@/components/admin/analytics';
+import {
+  getPortfolioGrowth,
+  getContentDistribution,
+  getSkillsByCategory,
+  getActivityTimeline,
+} from '@/lib/analytics/queries';
 
 // Admin dashboard is auth-gated and shows live counts — render per request,
 // never statically prerendered at build time.
@@ -122,14 +152,15 @@ async function getSectionCounts(): Promise<SectionCounts> {
   }
 }
 
-const STAT_CARDS: Array<{ key: keyof typeof EMPTY_STATS; label: string; icon: string; href: string | null }> = [
-  { key: 'projects',        label: 'Projects',          icon: '🚀', href: '/admin/projects' },
-  { key: 'blogs',           label: 'Blog Posts',        icon: '✍️', href: null },
-  { key: 'certifications',  label: 'Certifications',    icon: '🏆', href: '/admin/certifications' },
-  { key: 'testimonials',    label: 'Testimonials',      icon: '💬', href: null },
-  { key: 'contacts',        label: 'Contact Messages',  icon: '📬', href: null },
-  { key: 'analytics30d',    label: 'Events (30d)',       icon: '📈', href: null },
-];
+// Phase 4.3 — the 8 categories from spec, each backed by a real count
+// already fetched in getStats()/getSectionCounts(). No invented fields.
+interface PrimaryStatDef {
+  key: string;
+  label: string;
+  value: number;
+  icon: ReactNode;
+  href: string | null;
+}
 
 const CHECKLIST_ITEMS = [
   { key: 'profile',       label: 'Profile',         href: '/admin/profile',        desc: 'Name and title' },
@@ -143,7 +174,26 @@ const CHECKLIST_ITEMS = [
 ] as const;
 
 export default async function AdminDashboard() {
-  const [stats, sections] = await Promise.all([getStats(), getSectionCounts()]);
+  const [stats, sections, growth, distribution, skillsCategories, activity] = await Promise.all([
+    getStats(),
+    getSectionCounts(),
+    getPortfolioGrowth(),
+    getContentDistribution(),
+    getSkillsByCategory(),
+    getActivityTimeline(),
+  ]);
+
+  // Phase 4.3 — 8 spec categories, mapped from real counts only.
+  const primaryStats: PrimaryStatDef[] = [
+    { key: 'projects',       label: 'Projects',        value: stats.projects,          icon: <Rocket size={18} />,    href: '/admin/projects' },
+    { key: 'skills',         label: 'Skills',          value: sections.skills,         icon: <Wrench size={18} />,    href: '/admin/skills' },
+    { key: 'experience',     label: 'Experience',      value: sections.experience,     icon: <Briefcase size={18} />, href: '/admin/experience' },
+    { key: 'certifications', label: 'Certifications',  value: stats.certifications,    icon: <Award size={18} />,     href: '/admin/certifications' },
+    { key: 'buildLog',       label: 'Build Logs',      value: sections.buildLog,       icon: <Hammer size={18} />,    href: '/admin/buildlog' },
+    { key: 'learnings',      label: 'Learnings',       value: sections.learnings,      icon: <BookOpen size={18} />,  href: '/admin/learnings' },
+    { key: 'roadmap',        label: 'Roadmap',         value: sections.roadmap,        icon: <Map size={18} />,       href: '/admin/roadmap' },
+    { key: 'messages',       label: 'Messages',        value: stats.contacts,          icon: <Mail size={18} />,      href: null },
+  ];
 
   // Completion state — identical logic to before
   const completion: Record<string, boolean> = {
@@ -198,39 +248,37 @@ export default async function AdminDashboard() {
           </div>
         )}
 
-        {/* ── Stat cards ───────────────────────────────────────── */}
+        {/* ── Stat cards (Phase 4.3) ──────────────────────────────
+            No trend/progress data exists yet (would need historical
+            snapshots), so those props are simply omitted rather than
+            faked — StatCardV2 renders fine without them. */}
         <DashboardSection first>
-          <DashboardGrid cols={3} mobileHalf>
-            {STAT_CARDS.map(({ key, label, icon, href }) =>
-              href ? (
-                <Link key={key} href={href} style={{ display: 'contents' }}>
-                  <DashboardWidget
-                    interactive
-                    glass
-                    style={{ cursor: 'pointer' }}
-                    className="hover:border-violet-500/30 hover:bg-white/6 group"
-                  >
-                    <div style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>{icon}</div>
-                    <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--color-ink)', marginBottom: '0.25rem', fontVariantNumeric: 'tabular-nums' }}>
-                      {stats[key].toLocaleString()}
-                    </div>
-                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-faint)' }}>
-                      {label}
-                    </div>
-                  </DashboardWidget>
-                </Link>
-              ) : (
-                <DashboardWidget key={key} glass>
-                  <div style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>{icon}</div>
-                  <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--color-ink)', marginBottom: '0.25rem', fontVariantNumeric: 'tabular-nums' }}>
-                    {stats[key].toLocaleString()}
-                  </div>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-faint)' }}>
-                    {label}
-                  </div>
-                </DashboardWidget>
-              )
-            )}
+          <StatsGrid cols={4}>
+            {primaryStats.map(({ key, label, value, icon, href }) => (
+              <StatCardV2 key={key} label={label} value={value} icon={icon} href={href} />
+            ))}
+          </StatsGrid>
+        </DashboardSection>
+
+        {/* ── Analytics & charts (Phase 4.4) ──────────────────────
+            Real queries only: monthly created_at aggregates, live table
+            counts, skills.category/proficiency, and analytics.event_type
+            daily counts. Empty datasets render ChartContainer's built-in
+            placeholder rather than a fake chart. */}
+        <DashboardSection title="Analytics" description="How your portfolio content has grown.">
+          <DashboardGrid cols={2} gap="md">
+            <AnalyticsCard>
+              <PortfolioGrowthChart data={growth} />
+            </AnalyticsCard>
+            <AnalyticsCard>
+              <ContentDistributionChart data={distribution} />
+            </AnalyticsCard>
+            <AnalyticsCard>
+              <SkillsChart data={skillsCategories} />
+            </AnalyticsCard>
+            <AnalyticsCard>
+              <ActivityChart data={activity} />
+            </AnalyticsCard>
           </DashboardGrid>
         </DashboardSection>
 
