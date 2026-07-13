@@ -258,6 +258,7 @@ export const buildLog = pgTable(
     title: text('title').notNull(),
     summary: text('summary').notNull().default(''),
     status: text('status').notNull().default('shipped'),
+    tags: text('tags').array().notNull().default(sql`'{}'`),
     created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
       .$onUpdate(() => new Date()),
@@ -272,6 +273,9 @@ export const learnings = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     title: text('title').notNull(),
     description: text('description').notNull().default(''),
+    category: text('category').notNull().default('general'),
+    difficulty: text('difficulty').notNull().default('beginner'),
+    resources: jsonb('resources').$type<{ label: string; url: string }[]>().notNull().default(sql`'[]'`),
     order_index: integer('order_index').notNull().default(0),
     created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
@@ -287,6 +291,11 @@ export const roadmap = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     task: text('task').notNull(),
     status: text('status').notNull().default('planned'),
+    priority: text('priority').notNull().default('medium'),
+    milestone: text('milestone').notNull().default(''),
+    target_date: text('target_date').notNull().default(''),
+    deliverables: text('deliverables').array().notNull().default(sql`'{}'`),
+    progress: integer('progress').notNull().default(0),
     order_index: integer('order_index').notNull().default(0),
     created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
