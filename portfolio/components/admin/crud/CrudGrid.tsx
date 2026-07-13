@@ -1,5 +1,9 @@
+'use client';
+
 import type { ReactNode } from 'react';
+import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
+import { staggerContainer } from '@/components/admin/ui/motion-presets';
 
 export interface CrudGridProps {
   children: ReactNode;
@@ -15,8 +19,18 @@ const COLS: Record<NonNullable<CrudGridProps['cols']>, string> = {
 };
 
 /** Card-grid layout for CRUD items — one column on mobile, `cols` columns
- *  from md up. Matches the existing grid pattern used by Skills and
- *  Certifications managers. */
+ *  from md up. Children stagger in on mount/filter-change; wrap each card
+ *  in a `motion.div` using the `staggerItem` variant (or CrudCard, which
+ *  already does) to participate. */
 export function CrudGrid({ children, cols = 3, className }: CrudGridProps) {
-  return <div className={cn('grid grid-cols-1 gap-4', COLS[cols], className)}>{children}</div>;
+  return (
+    <motion.div
+      variants={staggerContainer}
+      initial="hidden"
+      animate="show"
+      className={cn('grid grid-cols-1 gap-4', COLS[cols], className)}
+    >
+      {children}
+    </motion.div>
+  );
 }
