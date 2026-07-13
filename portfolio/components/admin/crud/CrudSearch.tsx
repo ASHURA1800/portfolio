@@ -2,7 +2,7 @@
 
 import { SearchInput, type SearchInputProps } from '@/components/admin/ui/SearchInput';
 
-export interface CrudSearchProps extends SearchInputProps {}
+export type CrudSearchProps = SearchInputProps;
 
 /** Search field for a CRUD toolbar. Thin re-export of the existing
  *  SearchInput so managers don't reach into components/admin/ui directly —
