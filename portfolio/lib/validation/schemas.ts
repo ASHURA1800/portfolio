@@ -220,8 +220,9 @@ export const buildLogSchema = z.object({
   // Accept YYYY-MM or YYYY-MM-DD so entries stay sortable as strings
   date: z.string().regex(/^\d{4}-\d{2}(-\d{2})?$/, 'Date must be YYYY-MM or YYYY-MM-DD'),
   title: z.string().trim().min(1, 'Title is required').max(200),
-  summary: z.string().trim().max(1000).default(''),
+  summary: z.string().trim().max(4000).default(''),
   status: z.enum(['shipped', 'in-progress', 'planned']).default('shipped'),
+  tags: z.array(z.string().trim().min(1).max(40)).max(15).default([]),
 });
 
 export type BuildLogInput = z.infer<typeof buildLogSchema>;
@@ -230,7 +231,18 @@ export type BuildLogInput = z.infer<typeof buildLogSchema>;
 
 export const learningSchema = z.object({
   title: z.string().trim().min(1, 'Title is required').max(200),
-  description: z.string().trim().max(1000).default(''),
+  description: z.string().trim().max(4000).default(''),
+  category: z.string().trim().min(1).max(60).default('general'),
+  difficulty: z.enum(['beginner', 'intermediate', 'advanced']).default('beginner'),
+  resources: z
+    .array(
+      z.object({
+        label: z.string().trim().min(1).max(120),
+        url: z.string().trim().url('Invalid resource URL'),
+      })
+    )
+    .max(20)
+    .default([]),
   order_index: z.number().int().default(0),
 });
 
@@ -241,6 +253,15 @@ export type LearningInput = z.infer<typeof learningSchema>;
 export const roadmapSchema = z.object({
   task: z.string().trim().min(1, 'Task is required').max(300),
   status: z.enum(['planned', 'in-progress', 'done']).default('planned'),
+  priority: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
+  milestone: z.string().trim().max(200).default(''),
+  target_date: z
+    .string()
+    .trim()
+    .regex(/^(\d{4}-\d{2}(-\d{2})?)?$/, 'Date must be YYYY-MM or YYYY-MM-DD')
+    .default(''),
+  deliverables: z.array(z.string().trim().min(1).max(200)).max(30).default([]),
+  progress: z.number().int().min(0).max(100).default(0),
   order_index: z.number().int().default(0),
 });
 
