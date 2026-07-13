@@ -1,8 +1,21 @@
 'use client';
 
 import { useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import type { Skill } from '@/types';
+import { CrudPage, CrudHeader } from '@/components/admin/crud';
+import { GlassCard } from '@/components/admin/ui/GlassCard';
+import { Button } from '@/components/admin/ui/Button';
+import { Alert } from '@/components/admin/ui/Alert';
+import { FloatingField } from '@/components/admin/profile/FloatingField';
+import { FloatingTextarea } from '@/components/admin/profile/FloatingTextarea';
+import { AvatarUploader } from '@/components/admin/profile/AvatarUploader';
+import { AutosaveIndicator, type AutosaveState } from '@/components/admin/profile/AutosaveIndicator';
+import { SkillsPreview } from '@/components/admin/profile/SkillsPreview';
+import { PortfolioLinks } from '@/components/admin/profile/PortfolioLinks';
 
 // Snake_case, matching profileSchema / the DB row. `initial` is the raw row or null.
+// Unchanged from the audited original.
 interface ProfileForm {
   name: string; username: string; github: string; email: string; bio: string; title: string;
   current_work: string; location: string; avatar: string; resume: string; linkedin: string;
@@ -23,61 +36,55 @@ function toForm(initial: Partial<ProfileForm> | null): ProfileForm {
   return f;
 }
 
-const inputClass =
-  'w-full bg-white/5 border border-white/8 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-violet-500/50 transition-all disabled:opacity-50';
-const labelClass = 'block text-xs text-gray-500 mb-1.5 font-medium';
-
-// Module-scoped so they keep a stable identity across renders (defining them
-// inside the component would remount on every keystroke and drop input focus).
-function Field({ id, label, value, onChange, placeholder }: {
-  id: string; label: string; value: string; onChange: (v: string) => void; placeholder?: string;
-}) {
-  return (
-    <div>
-      <label htmlFor={id} className={labelClass}>{label}</label>
-      <input id={id} value={value} onChange={(e) => onChange(e.target.value)} className={inputClass} placeholder={placeholder} />
-    </div>
-  );
-}
-function AreaField({ id, label, value, onChange, placeholder }: {
-  id: string; label: string; value: string; onChange: (v: string) => void; placeholder?: string;
-}) {
-  return (
-    <div>
-      <label htmlFor={id} className={labelClass}>{label}</label>
-      <textarea id={id} rows={3} value={value} onChange={(e) => onChange(e.target.value)} className={inputClass} placeholder={placeholder} />
-    </div>
-  );
+interface ProfileManagerProps {
+  initial: Partial<ProfileForm> | null;
+  skills: Skill[];
 }
 
-export default function ProfileManager({ initial }: { initial: Partial<ProfileForm> | null }) {
+export default function ProfileManager({ initial, skills }: ProfileManagerProps) {
   const [form, setForm] = useState<ProfileForm>(toForm(initial));
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState<'avatar' | 'resume' | null>(null);
+  const [dirty, setDirty] = useState(false);
 
   const set = (key: keyof ProfileForm, value: string) => {
     setForm((f) => ({ ...f, [key]: value }));
     setSaved(false);
+    setDirty(true);
   };
 
+  // Upload logic unchanged from the audited original — same endpoint,
+  // same FormData shape, same error handling.
   const upload = async (file: File, bucket: 'avatars' | 'resume', field: 'avatar' | 'resume') => {
-    setUploading(field); setError('');
+    setUploading(field);
+    setError('');
     try {
       const fd = new FormData();
       fd.append('file', file);
       const res = await fetch(`/api/storage/${bucket}`, { method: 'POST', body: fd });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.success) { setError(data.error ?? 'Upload failed'); return; }
+      if (!res.ok || !data.success) {
+        setError(data.error ?? 'Upload failed');
+        return;
+      }
       set(field, data.data.url as string);
-    } catch { setError('Upload failed.'); } finally { setUploading(null); }
+    } catch {
+      setError('Upload failed.');
+    } finally {
+      setUploading(null);
+    }
   };
 
+  // Save logic unchanged from the audited original — same endpoint,
+  // method, and payload shape.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (saving) return;
-    setSaving(true); setError(''); setSaved(false);
+    setSaving(true);
+    setError('');
+    setSaved(false);
     try {
       const res = await fetch('/api/profile', {
         method: 'PATCH',
@@ -85,95 +92,155 @@ export default function ProfileManager({ initial }: { initial: Partial<ProfileFo
         body: JSON.stringify(Object.fromEntries(FIELDS.map((k) => [k, form[k].trim()]))),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.success) { setError(data.error ?? 'Save failed'); setSaving(false); return; }
+      if (!res.ok || !data.success) {
+        setError(data.error ?? 'Save failed');
+        setSaving(false);
+        return;
+      }
       setSaved(true);
-    } catch { setError('Save failed.'); } finally { setSaving(false); }
+      setDirty(false);
+    } catch {
+      setError('Save failed.');
+    } finally {
+      setSaving(false);
+    }
   };
 
+  const autosaveState: AutosaveState = saving ? 'saving' : saved ? 'saved' : dirty ? 'dirty' : 'idle';
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-white mb-2">Profile</h1>
-      <p className="text-gray-500 text-sm mb-8">Single source of identity — drives the navbar, hero, about, footer, and SEO metadata.</p>
+    <CrudPage>
+      <CrudHeader
+        title="Profile"
+        description="Single source of identity — drives the navbar, hero, about, footer, and SEO metadata."
+        actions={<AutosaveIndicator state={autosaveState} />}
+      />
 
-      {error && <div role="alert" className="mb-6 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{error}</div>}
-      {saved && <div role="status" className="mb-6 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">Profile saved.</div>}
+      <AnimatePresence mode="wait">
+        {error && (
+          <Alert variant="error" key="profile-error" className="mb-6">
+            {error}
+          </Alert>
+        )}
+        {saved && !error && (
+          <Alert variant="success" key="profile-saved" className="mb-6">
+            Profile saved.
+          </Alert>
+        )}
+      </AnimatePresence>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <section className="bg-white/5 border border-white/8 rounded-2xl p-6 space-y-4">
-          <h2 className="text-white font-semibold">Identity</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field id="name" label="Name" value={form.name} onChange={(v) => set('name', v)} placeholder="Your name" />
-            <Field id="username" label="Username / handle" value={form.username} onChange={(v) => set('username', v)} placeholder="handle (no @)" />
-            <Field id="title" label="Title" value={form.title} onChange={(v) => set('title', v)} placeholder="Full-stack developer" />
-            <Field id="current_work" label="Current work" value={form.current_work} onChange={(v) => set('current_work', v)} placeholder="Building independently" />
-            <Field id="location" label="Location" value={form.location} onChange={(v) => set('location', v)} placeholder="City, Country" />
-            <Field id="email" label="Email" value={form.email} onChange={(v) => set('email', v)} placeholder="you@example.com" />
-          </div>
-          <AreaField id="bio" label="Bio" value={form.bio} onChange={(v) => set('bio', v)} placeholder="2–4 sentences, human voice." />
-        </section>
-
-        <section className="bg-white/5 border border-white/8 rounded-2xl p-6 space-y-4">
-          <h2 className="text-white font-semibold">Links</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field id="github" label="GitHub URL" value={form.github} onChange={(v) => set('github', v)} placeholder="https://github.com/…" />
-            <Field id="linkedin" label="LinkedIn URL" value={form.linkedin} onChange={(v) => set('linkedin', v)} placeholder="https://linkedin.com/in/…" />
-            <Field id="twitter" label="Twitter URL" value={form.twitter} onChange={(v) => set('twitter', v)} placeholder="https://twitter.com/…" />
-            <Field id="website" label="Website URL" value={form.website} onChange={(v) => set('website', v)} placeholder="https://…" />
-          </div>
-        </section>
-
-        <section className="bg-white/5 border border-white/8 rounded-2xl p-6 space-y-4">
-          <h2 className="text-white font-semibold">Media</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="avatar-file" className={labelClass}>Avatar</label>
-              <div className="flex items-center gap-4">
-                {form.avatar && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={form.avatar} alt="Avatar" className="h-14 w-14 rounded-full object-cover border border-white/8" />
-                )}
-                <input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading === 'avatar'}
-                  onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f, 'avatars', 'avatar'); }}
-                  className="block w-full text-sm text-gray-400 file:mr-3 file:rounded-lg file:border-0 file:bg-violet-600/20 file:px-3 file:py-2 file:text-sm file:text-violet-300 hover:file:bg-violet-600/30 disabled:opacity-50" />
-              </div>
-              {form.avatar && <button type="button" onClick={() => set('avatar', '')} className="text-xs text-gray-500 hover:text-red-400 mt-1 transition-colors">Remove avatar</button>}
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+          <GlassCard className="flex flex-col gap-4">
+            <h2 className="text-[var(--color-ink)] font-semibold">Identity</h2>
+            <div className="flex items-center gap-4">
+              <AvatarUploader
+                value={form.avatar}
+                uploading={uploading === 'avatar'}
+                onFile={(f) => upload(f, 'avatars', 'avatar')}
+                onRemove={() => set('avatar', '')}
+                name={form.name}
+              />
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FloatingField label="Name" value={form.name} onChange={(e) => set('name', e.target.value)} maxLength={80} showCount />
+              <FloatingField label="Username / handle" value={form.username} onChange={(e) => set('username', e.target.value)} />
+              <FloatingField label="Title" value={form.title} onChange={(e) => set('title', e.target.value)} maxLength={100} showCount />
+              <FloatingField label="Current work" value={form.current_work} onChange={(e) => set('current_work', e.target.value)} />
+              <FloatingField label="Location" value={form.location} onChange={(e) => set('location', e.target.value)} />
+              <FloatingField label="Email" type="email" value={form.email} onChange={(e) => set('email', e.target.value)} />
+            </div>
+            <FloatingTextarea
+              label="Bio"
+              value={form.bio}
+              onChange={(e) => set('bio', e.target.value)}
+              hint="2–4 sentences, human voice."
+              maxLength={280}
+              showCount
+            />
+          </GlassCard>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.05 }}>
+          <GlassCard className="flex flex-col gap-4">
+            <h2 className="text-[var(--color-ink)] font-semibold">Social links</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FloatingField label="GitHub URL" type="url" value={form.github} onChange={(e) => set('github', e.target.value)} />
+              <FloatingField label="LinkedIn URL" type="url" value={form.linkedin} onChange={(e) => set('linkedin', e.target.value)} />
+              <FloatingField label="Twitter URL" type="url" value={form.twitter} onChange={(e) => set('twitter', e.target.value)} />
+              <FloatingField label="Website URL" type="url" value={form.website} onChange={(e) => set('website', e.target.value)} />
+            </div>
+          </GlassCard>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}>
+          <GlassCard className="flex flex-col gap-4">
+            <h2 className="text-[var(--color-ink)] font-semibold">Résumé</h2>
             <div>
-              <label htmlFor="resume-file" className={labelClass}>Résumé (PDF)</label>
-              <input id="resume-file" type="file" accept="application/pdf" disabled={uploading === 'resume'}
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f, 'resume', 'resume'); }}
-                className="block w-full text-sm text-gray-400 file:mr-3 file:rounded-lg file:border-0 file:bg-violet-600/20 file:px-3 file:py-2 file:text-sm file:text-violet-300 hover:file:bg-violet-600/30 disabled:opacity-50" />
-              {form.resume && (
-                <p className="text-xs text-gray-500 mt-1 truncate">
-                  Uploaded · <button type="button" onClick={() => set('resume', '')} className="text-gray-500 hover:text-red-400">remove</button>
+              <input
+                id="resume-file"
+                type="file"
+                accept="application/pdf"
+                disabled={uploading === 'resume'}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) upload(f, 'resume', 'resume');
+                }}
+                className="block w-full text-sm text-[var(--color-faint)] file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--color-accent-500)]/20 file:px-3 file:py-2 file:text-sm file:text-[var(--color-accent-300)] hover:file:bg-[var(--color-accent-500)]/30 disabled:opacity-50"
+              />
+              {uploading === 'resume' && <p className="text-xs text-[var(--color-faint)] mt-2">Uploading…</p>}
+              {form.resume && uploading !== 'resume' && (
+                <p className="text-xs text-[var(--color-faint)] mt-2 truncate">
+                  Uploaded ·{' '}
+                  <button type="button" onClick={() => set('resume', '')} className="text-[var(--color-faint)] hover:text-[var(--color-error)]">
+                    remove
+                  </button>
                 </p>
               )}
             </div>
-          </div>
-        </section>
+          </GlassCard>
+        </motion.div>
 
-        <section className="bg-white/5 border border-white/8 rounded-2xl p-6 space-y-4">
-          <h2 className="text-white font-semibold">About narrative</h2>
-          <AreaField id="about_journey" label="Journey" value={form.about_journey} onChange={(v) => set('about_journey', v)} placeholder="How you got into building software." />
-          <AreaField id="about_current_focus" label="Current focus" value={form.about_current_focus} onChange={(v) => set('about_current_focus', v)} placeholder="What you're focused on right now." />
-          <AreaField id="about_philosophy" label="Philosophy" value={form.about_philosophy} onChange={(v) => set('about_philosophy', v)} placeholder="How you think about building." />
-          <AreaField id="about_learning" label="Learning" value={form.about_learning} onChange={(v) => set('about_learning', v)} placeholder="What you're learning or heading toward." />
-        </section>
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.15 }}>
+          <GlassCard className="flex flex-col gap-4">
+            <h2 className="text-[var(--color-ink)] font-semibold">About narrative</h2>
+            <FloatingTextarea label="Journey" value={form.about_journey} onChange={(e) => set('about_journey', e.target.value)} hint="How you got into building software." />
+            <FloatingTextarea label="Current focus" value={form.about_current_focus} onChange={(e) => set('about_current_focus', e.target.value)} hint="What you're focused on right now." />
+            <FloatingTextarea label="Philosophy" value={form.about_philosophy} onChange={(e) => set('about_philosophy', e.target.value)} hint="How you think about building." />
+            <FloatingTextarea label="Learning" value={form.about_learning} onChange={(e) => set('about_learning', e.target.value)} hint="What you're learning or heading toward." />
+          </GlassCard>
+        </motion.div>
 
-        <section className="bg-white/5 border border-white/8 rounded-2xl p-6 space-y-4">
-          <h2 className="text-white font-semibold">Section copy</h2>
-          <Field id="note" label="Footer note" value={form.note} onChange={(v) => set('note', v)} placeholder="Built to track what I'm making and how I'm improving." />
-          <Field id="contact_note" label="Contact note" value={form.contact_note} onChange={(v) => set('contact_note', v)} placeholder="One line under the Contact heading." />
-          <Field id="skills_note" label="Skills note" value={form.skills_note} onChange={(v) => set('skills_note', v)} placeholder="One line under the Skills heading." />
-          <Field id="blog_intro" label="Blog intro" value={form.blog_intro} onChange={(v) => set('blog_intro', v)} placeholder="Blog page lead + meta description." />
-        </section>
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
+          <GlassCard className="flex flex-col gap-4">
+            <h2 className="text-[var(--color-ink)] font-semibold">Section copy</h2>
+            <FloatingField label="Footer note" value={form.note} onChange={(e) => set('note', e.target.value)} />
+            <FloatingField label="Contact note" value={form.contact_note} onChange={(e) => set('contact_note', e.target.value)} />
+            <FloatingField label="Skills note" value={form.skills_note} onChange={(e) => set('skills_note', e.target.value)} />
+            <FloatingField label="Blog intro" value={form.blog_intro} onChange={(e) => set('blog_intro', e.target.value)} />
+          </GlassCard>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.25 }}>
+          <GlassCard className="flex flex-col gap-4">
+            <h2 className="text-[var(--color-ink)] font-semibold">Skills preview</h2>
+            <SkillsPreview skills={skills} />
+          </GlassCard>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.3 }}>
+          <GlassCard className="flex flex-col gap-4">
+            <h2 className="text-[var(--color-ink)] font-semibold">View live</h2>
+            <PortfolioLinks />
+          </GlassCard>
+        </motion.div>
 
         <div className="flex gap-3">
-          <button type="submit" disabled={saving || uploading !== null} className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm font-semibold disabled:opacity-70 hover:opacity-90 transition-opacity">
+          <Button type="submit" variant="primary" loading={saving} disabled={uploading !== null}>
             {saving ? 'Saving…' : 'Save profile'}
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+    </CrudPage>
   );
 }
