@@ -55,3 +55,18 @@ export const drawerSlide: Variants = {
   show: { opacity: 1, x: 0, transition: { duration: 0.32, ease: EASE } },
   exit: { opacity: 0, x: 24, transition: { duration: 0.2, ease: EASE } },
 };
+
+
+/** Stagger wrapper for card/list grids — each child using `staggerItem`
+ *  fades/rises in sequence on mount instead of popping in as a block. */
+export const staggerContainer: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.045, delayChildren: 0.02 } },
+};
+
+/** Individual item within a `staggerContainer` — pairs with CrudGrid/CrudList. */
+export const staggerItem: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.28, ease: EASE } },
+  exit: { opacity: 0, y: -6, transition: { duration: 0.15, ease: EASE } },
+};
