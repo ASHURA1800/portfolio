@@ -29,6 +29,13 @@
       "when": 1783150536728,
       "tag": "0003_concerned_matthew_murdock",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783300000000,
+      "tag": "0004_content_managers_v2",
+      "breakpoints": true
     }
   ]
 }
