@@ -11,6 +11,8 @@ import { CrudSearch } from '@/components/admin/crud/CrudSearch';
 import { CrudFilters } from '@/components/admin/crud/CrudFilters';
 import { CrudEmptyState } from '@/components/admin/crud/CrudEmptyState';
 import { TagListInput } from '@/components/admin/crud/TagListInput';
+import { CrudListItem } from '@/components/admin/crud/CrudListItem';
+import { FilterChip } from '@/components/admin/crud/FilterChip';
 import { Button } from '@/components/admin/ui/Button';
 import { IconButton } from '@/components/admin/ui/IconButton';
 import { Input } from '@/components/admin/ui/Input';
@@ -18,7 +20,7 @@ import { Select } from '@/components/admin/ui/Select';
 import { Badge, type BadgeTone } from '@/components/admin/ui/Badge';
 import { Alert } from '@/components/admin/ui/Alert';
 import { Progress } from '@/components/admin/ui/Progress';
-import { fadeIn } from '@/components/admin/ui/motion-presets';
+import { fadeIn, staggerContainer } from '@/components/admin/ui/motion-presets';
 
 const STATUSES: RoadmapStatus[] = ['planned', 'in-progress', 'done'];
 const PRIORITIES: RoadmapPriority[] = ['low', 'medium', 'high', 'critical'];
@@ -175,17 +177,9 @@ export default function RoadmapManager({ initial }: { initial: RoadmapItem[] }) 
         filters={
           <CrudFilters>
             {(['all', ...STATUSES] as const).map((s) => (
-              <button
-                key={s}
-                onClick={() => setStatusFilter(s)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${
-                  statusFilter === s
-                    ? 'bg-[var(--color-accent-500)] text-white border-[var(--color-accent-500)]'
-                    : 'bg-[var(--color-surface)] text-[var(--color-muted)] border-[var(--color-border)] hover:border-[var(--color-border-hover)]'
-                }`}
-              >
+              <FilterChip key={s} active={statusFilter === s} onClick={() => setStatusFilter(s)}>
                 {s === 'all' ? 'All' : s}
-              </button>
+              </FilterChip>
             ))}
           </CrudFilters>
         }
@@ -203,9 +197,9 @@ export default function RoadmapManager({ initial }: { initial: RoadmapItem[] }) 
                   {rItems.filter((i) => i.status === 'done').length}/{rItems.length} done
                 </span>
               </h2>
-              <ul className="flex flex-col gap-3">
+              <motion.ul variants={staggerContainer} initial="hidden" animate="show" className="flex flex-col gap-3">
                 {rItems.map((r) => (
-                  <li key={r.id} className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4 hover:border-[var(--color-border-hover)] transition-colors">
+                  <CrudListItem key={r.id} layoutId={r.id} className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4 hover:border-[var(--color-border-hover)] transition-colors">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap mb-1.5">
@@ -232,9 +226,9 @@ export default function RoadmapManager({ initial }: { initial: RoadmapItem[] }) 
                         <IconButton label="Delete" icon={<Trash2 size={15} />} variant="danger" onClick={() => handleDelete(r)} />
                       </div>
                     </div>
-                  </li>
+                  </CrudListItem>
                 ))}
-              </ul>
+              </motion.ul>
             </div>
           ))}
         </div>
