@@ -228,21 +228,38 @@ export interface BuildLogEntry {
   title: string;
   summary: string;
   status: BuildStatus;
+  tags: string[];
+}
+
+export type LearningDifficulty = 'beginner' | 'intermediate' | 'advanced';
+
+export interface LearningResource {
+  label: string;
+  url: string;
 }
 
 export interface Learning {
   id: string;
   title: string;
   description: string;
+  category: string;
+  difficulty: LearningDifficulty;
+  resources: LearningResource[];
   order_index: number;
 }
 
 export type RoadmapStatus = 'planned' | 'in-progress' | 'done';
+export type RoadmapPriority = 'low' | 'medium' | 'high' | 'critical';
 
 export interface RoadmapItem {
   id: string;
   task: string;
   status: RoadmapStatus;
+  priority: RoadmapPriority;
+  milestone: string;
+  target_date: string;
+  deliverables: string[];
+  progress: number;
   order_index: number;
 }
 
