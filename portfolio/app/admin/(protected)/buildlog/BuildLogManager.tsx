@@ -10,6 +10,8 @@ import { CrudToolbar } from '@/components/admin/crud/CrudToolbar';
 import { CrudSearch } from '@/components/admin/crud/CrudSearch';
 import { CrudFilters } from '@/components/admin/crud/CrudFilters';
 import { CrudEmptyState } from '@/components/admin/crud/CrudEmptyState';
+import { CrudListItem } from '@/components/admin/crud/CrudListItem';
+import { FilterChip } from '@/components/admin/crud/FilterChip';
 import { MarkdownLite } from '@/components/admin/crud/MarkdownLite';
 import { TagListInput } from '@/components/admin/crud/TagListInput';
 import { Button } from '@/components/admin/ui/Button';
@@ -20,7 +22,7 @@ import { Select } from '@/components/admin/ui/Select';
 import { Badge, type BadgeTone } from '@/components/admin/ui/Badge';
 import { Alert } from '@/components/admin/ui/Alert';
 import { Chip } from '@/components/admin/ui/Chip';
-import { fadeIn } from '@/components/admin/ui/motion-presets';
+import { fadeIn, staggerContainer } from '@/components/admin/ui/motion-presets';
 
 const STATUSES: BuildStatus[] = ['shipped', 'in-progress', 'planned'];
 const STATUS_TONE: Record<BuildStatus, BadgeTone> = {
@@ -172,17 +174,9 @@ export default function BuildLogManager({ initial }: { initial: BuildLogEntry[] 
         filters={
           <CrudFilters>
             {(['all', ...STATUSES] as const).map((s) => (
-              <button
-                key={s}
-                onClick={() => setStatusFilter(s)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${
-                  statusFilter === s
-                    ? 'bg-[var(--color-accent-500)] text-white border-[var(--color-accent-500)]'
-                    : 'bg-[var(--color-surface)] text-[var(--color-muted)] border-[var(--color-border)] hover:border-[var(--color-border-hover)]'
-                }`}
-              >
+              <FilterChip key={s} active={statusFilter === s} onClick={() => setStatusFilter(s)}>
                 {s === 'all' ? 'All' : s}
-              </button>
+              </FilterChip>
             ))}
           </CrudFilters>
         }
@@ -191,10 +185,10 @@ export default function BuildLogManager({ initial }: { initial: BuildLogEntry[] 
       {filtered.length === 0 ? (
         <CrudEmptyState icon={<Hammer />} title="No build log entries" description={query || statusFilter !== 'all' ? 'No entries match your filters.' : 'Create your first entry to start the timeline.'} action={!showForm ? <Button size="sm" icon={<Plus size={14} />} onClick={startCreate}>New Entry</Button> : undefined} />
       ) : (
-        <ol className="relative pl-6 sm:pl-8">
+        <motion.ol variants={staggerContainer} initial="hidden" animate="show" className="relative pl-6 sm:pl-8">
           <div aria-hidden="true" className="absolute left-[7px] sm:left-[11px] top-2 bottom-2 w-px bg-[var(--color-border)]" />
           {filtered.map((b) => (
-            <li key={b.id} className="relative pb-6 last:pb-0">
+            <CrudListItem key={b.id} layoutId={b.id} className="relative pb-6 last:pb-0">
               <span
                 aria-hidden="true"
                 className="absolute -left-6 sm:-left-8 top-1.5 w-3.5 h-3.5 rounded-full border-2 border-[var(--color-bg)] ring-2 ring-[var(--color-border)]"
@@ -221,9 +215,9 @@ export default function BuildLogManager({ initial }: { initial: BuildLogEntry[] 
                   </div>
                 )}
               </div>
-            </li>
+            </CrudListItem>
           ))}
-        </ol>
+        </motion.ol>
       )}
     </CrudPage>
   );
