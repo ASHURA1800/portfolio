@@ -10,6 +10,8 @@ import { CrudToolbar } from '@/components/admin/crud/CrudToolbar';
 import { CrudSearch } from '@/components/admin/crud/CrudSearch';
 import { CrudFilters } from '@/components/admin/crud/CrudFilters';
 import { CrudGrid } from '@/components/admin/crud/CrudGrid';
+import { CrudCard } from '@/components/admin/crud/CrudCard';
+import { FilterChip } from '@/components/admin/crud/FilterChip';
 import { CrudEmptyState } from '@/components/admin/crud/CrudEmptyState';
 import { MarkdownLite } from '@/components/admin/crud/MarkdownLite';
 import { Button } from '@/components/admin/ui/Button';
@@ -197,17 +199,9 @@ export default function LearningsManager({ initial }: { initial: Learning[] }) {
         filters={
           <CrudFilters>
             {categories.map((c) => (
-              <button
-                key={c}
-                onClick={() => setCategoryFilter(c)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${
-                  categoryFilter === c
-                    ? 'bg-[var(--color-accent-500)] text-white border-[var(--color-accent-500)]'
-                    : 'bg-[var(--color-surface)] text-[var(--color-muted)] border-[var(--color-border)] hover:border-[var(--color-border-hover)]'
-                }`}
-              >
+              <FilterChip key={c} active={categoryFilter === c} onClick={() => setCategoryFilter(c)}>
                 {c === 'all' ? 'All' : c}
-              </button>
+              </FilterChip>
             ))}
           </CrudFilters>
         }
@@ -218,7 +212,7 @@ export default function LearningsManager({ initial }: { initial: Learning[] }) {
       ) : (
         <CrudGrid cols={3}>
           {filtered.map((l) => (
-            <div key={l.id} className="flex flex-col bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4 hover:border-[var(--color-border-hover)] transition-colors">
+            <CrudCard key={l.id} layoutId={l.id} className="flex flex-col bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4 hover:border-[var(--color-border-hover)] transition-colors">
               <div className="flex items-start justify-between gap-2 mb-2">
                 <Badge tone="neutral" size="sm">{l.category}</Badge>
                 <Badge tone={DIFFICULTY_TONE[l.difficulty]} size="sm">{l.difficulty}</Badge>
@@ -240,7 +234,7 @@ export default function LearningsManager({ initial }: { initial: Learning[] }) {
                 <IconButton label="Edit" icon={<Pencil size={14} />} size="sm" variant="ghost" onClick={() => startEdit(l)} />
                 <IconButton label="Delete" icon={<Trash2 size={14} />} size="sm" variant="danger" onClick={() => handleDelete(l)} />
               </div>
-            </div>
+            </CrudCard>
           ))}
         </CrudGrid>
       )}
