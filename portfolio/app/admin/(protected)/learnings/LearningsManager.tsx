@@ -1,14 +1,42 @@
 'use client';
 
-import { useState } from 'react';
-import type { Learning } from '@/types';
+import { useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { BookOpen, Eye, ExternalLink, Pencil, Plus, Trash2, X } from 'lucide-react';
+import type { Learning, LearningDifficulty, LearningResource } from '@/types';
+import { CrudPage } from '@/components/admin/crud/CrudPage';
+import { CrudHeader } from '@/components/admin/crud/CrudHeader';
+import { CrudToolbar } from '@/components/admin/crud/CrudToolbar';
+import { CrudSearch } from '@/components/admin/crud/CrudSearch';
+import { CrudFilters } from '@/components/admin/crud/CrudFilters';
+import { CrudGrid } from '@/components/admin/crud/CrudGrid';
+import { CrudEmptyState } from '@/components/admin/crud/CrudEmptyState';
+import { MarkdownLite } from '@/components/admin/crud/MarkdownLite';
+import { Button } from '@/components/admin/ui/Button';
+import { IconButton } from '@/components/admin/ui/IconButton';
+import { Input } from '@/components/admin/ui/Input';
+import { Textarea } from '@/components/admin/ui/Textarea';
+import { Select } from '@/components/admin/ui/Select';
+import { Badge, type BadgeTone } from '@/components/admin/ui/Badge';
+import { Alert } from '@/components/admin/ui/Alert';
+import { fadeIn } from '@/components/admin/ui/motion-presets';
 
-interface FormState { title: string; description: string; order_index: number }
-const EMPTY_FORM: FormState = { title: '', description: '', order_index: 0 };
+const DIFFICULTIES: LearningDifficulty[] = ['beginner', 'intermediate', 'advanced'];
+const DIFFICULTY_TONE: Record<LearningDifficulty, BadgeTone> = {
+  beginner: 'success',
+  intermediate: 'warning',
+  advanced: 'error',
+};
 
-const inputClass =
-  'w-full bg-white/5 border border-white/8 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-violet-500/50 transition-all disabled:opacity-50';
-const labelClass = 'block text-xs text-gray-500 mb-1.5 font-medium';
+interface FormState {
+  title: string;
+  description: string;
+  category: string;
+  difficulty: LearningDifficulty;
+  resources: LearningResource[];
+  order_index: number;
+}
+const EMPTY_FORM: FormState = { title: '', description: '', category: 'general', difficulty: 'beginner', resources: [], order_index: 0 };
 
 export default function LearningsManager({ initial }: { initial: Learning[] }) {
   const [items, setItems] = useState<Learning[]>(initial);
@@ -17,15 +45,39 @@ export default function LearningsManager({ initial }: { initial: Learning[] }) {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [preview, setPreview] = useState(false);
+  const [query, setQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [resourceDraft, setResourceDraft] = useState({ label: '', url: '' });
+
+  const categories = useMemo(() => ['all', ...Array.from(new Set(items.map((i) => i.category)))], [items]);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
-  const resetForm = () => { setForm(EMPTY_FORM); setEditingId(null); setError(''); setShowForm(false); };
-  const startCreate = () => { setForm(EMPTY_FORM); setEditingId(null); setError(''); setShowForm(true); };
+  const resetForm = () => { setForm(EMPTY_FORM); setEditingId(null); setError(''); setShowForm(false); setPreview(false); setResourceDraft({ label: '', url: '' }); };
+  const startCreate = () => { setForm({ ...EMPTY_FORM, order_index: items.length }); setEditingId(null); setError(''); setShowForm(true); setPreview(false); };
   const startEdit = (l: Learning) => {
-    setForm({ title: l.title, description: l.description, order_index: l.order_index });
-    setEditingId(l.id); setError(''); setShowForm(true);
+    setForm({ title: l.title, description: l.description, category: l.category, difficulty: l.difficulty, resources: l.resources ?? [], order_index: l.order_index });
+    setEditingId(l.id); setError(''); setShowForm(true); setPreview(false);
   };
+
+  const addResource = () => {
+    const label = resourceDraft.label.trim();
+    const url = resourceDraft.url.trim();
+    if (!label || !url) return;
+    set('resources', [...form.resources, { label, url }]);
+    setResourceDraft({ label: '', url: '' });
+  };
+
+  const filtered = useMemo(() => {
+    return items
+      .filter((l) => categoryFilter === 'all' || l.category === categoryFilter)
+      .filter((l) => {
+        if (!query.trim()) return true;
+        const q = query.toLowerCase();
+        return l.title.toLowerCase().includes(q) || l.description.toLowerCase().includes(q);
+      });
+  }, [items, query, categoryFilter]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,15 +89,18 @@ export default function LearningsManager({ initial }: { initial: Learning[] }) {
         method: editingId ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: form.title.trim(),
-          description: form.description.trim(),
-          order_index: Number(form.order_index) || 0,
+          title: form.title.trim(), description: form.description.trim(),
+          category: form.category.trim() || 'general', difficulty: form.difficulty,
+          resources: form.resources, order_index: form.order_index,
         }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success) { setError(data.error ?? 'Save failed'); setSaving(false); return; }
       const saved = data.data as Learning;
-      setItems((prev) => (editingId ? prev.map((x) => (x.id === saved.id ? saved : x)) : [...prev, saved]));
+      setItems((prev) => {
+        const next = editingId ? prev.map((x) => (x.id === saved.id ? saved : x)) : [...prev, saved];
+        return [...next].sort((a, b) => a.order_index - b.order_index);
+      });
       resetForm();
     } catch { setError('Save failed.'); } finally { setSaving(false); }
   };
@@ -62,57 +117,133 @@ export default function LearningsManager({ initial }: { initial: Learning[] }) {
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-2">
-        <h1 className="text-2xl font-bold text-white">Learnings</h1>
-        <button onClick={showForm ? resetForm : startCreate} className="px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm font-semibold hover:opacity-90 transition-opacity">
-          {showForm ? 'Close' : '+ New Learning'}
-        </button>
-      </div>
-      <p className="text-gray-500 text-sm mb-8">{items.length} {items.length === 1 ? 'entry' : 'entries'} · shows only when non-empty</p>
+    <CrudPage>
+      <CrudHeader
+        title="Learnings"
+        description={`${items.length} ${items.length === 1 ? 'card' : 'cards'}`}
+        actions={
+          <Button variant={showForm ? 'secondary' : 'primary'} icon={<Plus size={16} />} onClick={showForm ? resetForm : startCreate}>
+            {showForm ? 'Close' : 'New Learning'}
+          </Button>
+        }
+      />
 
-      {error && <div role="alert" className="mb-6 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{error}</div>}
+      {error && <Alert variant="error" className="mb-6">{error}</Alert>}
 
-      {showForm && (
-        <form onSubmit={handleSubmit} className="mb-8 bg-white/5 border border-white/8 rounded-2xl p-6 space-y-4">
-          <h2 className="text-white font-semibold">{editingId ? 'Edit learning' : 'New learning'}</h2>
-          <div>
-            <label htmlFor="title" className={labelClass}>Title</label>
-            <input id="title" required value={form.title} onChange={(e) => set('title', e.target.value)} className={inputClass} placeholder="What you figured out" />
-          </div>
-          <div>
-            <label htmlFor="description" className={labelClass}>Description</label>
-            <textarea id="description" rows={3} value={form.description} onChange={(e) => set('description', e.target.value)} className={inputClass} placeholder="The concrete lesson, in your words." />
-          </div>
-          <div>
-            <label htmlFor="order_index" className={labelClass}>Order</label>
-            <input id="order_index" type="number" value={form.order_index} onChange={(e) => set('order_index', Number(e.target.value))} className={inputClass} />
-          </div>
-          <div className="flex gap-3 pt-2">
-            <button type="submit" disabled={saving} className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm font-semibold disabled:opacity-70 hover:opacity-90 transition-opacity">{saving ? 'Saving…' : editingId ? 'Save changes' : 'Create'}</button>
-            <button type="button" onClick={resetForm} className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/8 text-sm text-gray-300 hover:text-white transition-all">Cancel</button>
-          </div>
-        </form>
-      )}
+      <AnimatePresence>
+        {showForm && (
+          <motion.form
+            initial="hidden" animate="show" exit="exit" variants={fadeIn}
+            onSubmit={handleSubmit}
+            className="mb-8 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-6 space-y-4"
+          >
+            <h2 className="text-[var(--color-ink)] font-semibold">{editingId ? 'Edit learning' : 'New learning'}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Input label="Title" required value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Streaming SSR with React 19" />
+              <Input label="Category" required value={form.category} onChange={(e) => set('category', e.target.value)} placeholder="frontend" />
+              <Select
+                label="Difficulty"
+                value={form.difficulty}
+                onChange={(e) => set('difficulty', e.target.value as LearningDifficulty)}
+                options={DIFFICULTIES.map((d) => ({ value: d, label: d }))}
+              />
+            </div>
 
-      {items.length === 0 ? (
-        <div className="p-8 text-center bg-white/5 border border-white/8 rounded-2xl text-gray-500 text-sm">No learnings yet.</div>
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="description" className="text-sm font-medium text-[var(--color-ink)]">Description</label>
+                <button type="button" onClick={() => setPreview((p) => !p)} className="inline-flex items-center gap-1.5 text-xs text-[var(--color-accent-400)] hover:text-[var(--color-accent-300)] transition-colors">
+                  <Eye size={13} /> {preview ? 'Edit' : 'Preview'}
+                </button>
+              </div>
+              {preview ? (
+                <div className="min-h-[6rem] rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-hover)] px-3.5 py-3">
+                  <MarkdownLite text={form.description} />
+                </div>
+              ) : (
+                <Textarea id="description" rows={4} value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="What you learned. Supports **bold**, *italic*, `code`, lists, and [links](url)." />
+              )}
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-[var(--color-ink)] mb-1.5 block">Resources</label>
+              <div className="flex flex-col gap-2">
+                {form.resources.map((r, i) => (
+                  <div key={i} className="flex items-center gap-2 bg-[var(--color-surface-hover)] border border-[var(--color-border)] rounded-[var(--radius-md)] px-3 py-2">
+                    <ExternalLink size={13} className="text-[var(--color-faint)] shrink-0" />
+                    <span className="text-sm text-[var(--color-ink)] truncate">{r.label}</span>
+                    <span className="text-xs text-[var(--color-faint)] truncate flex-1">{r.url}</span>
+                    <IconButton label="Remove resource" icon={<X size={13} />} size="sm" variant="ghost" onClick={() => set('resources', form.resources.filter((_, idx) => idx !== i))} />
+                  </div>
+                ))}
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Input size="sm" value={resourceDraft.label} onChange={(e) => setResourceDraft((d) => ({ ...d, label: e.target.value }))} placeholder="Label" containerClassName="flex-1" />
+                  <Input size="sm" value={resourceDraft.url} onChange={(e) => setResourceDraft((d) => ({ ...d, url: e.target.value }))} placeholder="https://…" containerClassName="flex-1" />
+                  <Button type="button" size="sm" variant="secondary" onClick={addResource}>Add</Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <Button type="submit" loading={saving}>{editingId ? 'Save changes' : 'Create'}</Button>
+              <Button type="button" variant="secondary" onClick={resetForm}>Cancel</Button>
+            </div>
+          </motion.form>
+        )}
+      </AnimatePresence>
+
+      <CrudToolbar
+        search={<CrudSearch value={query} onChange={(e) => setQuery(e.target.value)} onClear={() => setQuery('')} placeholder="Search learnings…" />}
+        filters={
+          <CrudFilters>
+            {categories.map((c) => (
+              <button
+                key={c}
+                onClick={() => setCategoryFilter(c)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${
+                  categoryFilter === c
+                    ? 'bg-[var(--color-accent-500)] text-white border-[var(--color-accent-500)]'
+                    : 'bg-[var(--color-surface)] text-[var(--color-muted)] border-[var(--color-border)] hover:border-[var(--color-border-hover)]'
+                }`}
+              >
+                {c === 'all' ? 'All' : c}
+              </button>
+            ))}
+          </CrudFilters>
+        }
+      />
+
+      {filtered.length === 0 ? (
+        <CrudEmptyState icon={<BookOpen />} title="No learnings" description={query || categoryFilter !== 'all' ? 'No cards match your filters.' : 'Add your first learning card.'} action={!showForm ? <Button size="sm" icon={<Plus size={14} />} onClick={startCreate}>New Learning</Button> : undefined} />
       ) : (
-        <ul className="space-y-3">
-          {items.map((l) => (
-            <li key={l.id} className="flex items-start gap-4 bg-white/5 border border-white/8 rounded-2xl p-4">
-              <div className="min-w-0 flex-1">
-                <div className="text-white font-medium">{l.title}</div>
-                {l.description && <div className="text-gray-500 text-sm mt-0.5">{l.description}</div>}
+        <CrudGrid cols={3}>
+          {filtered.map((l) => (
+            <div key={l.id} className="flex flex-col bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4 hover:border-[var(--color-border-hover)] transition-colors">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <Badge tone="neutral" size="sm">{l.category}</Badge>
+                <Badge tone={DIFFICULTY_TONE[l.difficulty]} size="sm">{l.difficulty}</Badge>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <button onClick={() => startEdit(l)} className="px-3 py-1.5 rounded-lg bg-white/5 text-gray-300 text-sm hover:text-white hover:bg-white/8 transition-all">Edit</button>
-                <button onClick={() => handleDelete(l)} className="px-3 py-1.5 rounded-lg bg-white/5 text-gray-500 text-sm hover:text-red-400 hover:bg-red-500/10 transition-all">Delete</button>
+              <h3 className="text-[var(--color-ink)] font-medium mb-1.5">{l.title}</h3>
+              <div className="flex-1">
+                <MarkdownLite text={l.description} />
               </div>
-            </li>
+              {l.resources?.length > 0 && (
+                <div className="flex flex-col gap-1 mt-3 pt-3 border-t border-[var(--color-border)]">
+                  {l.resources.map((r, i) => (
+                    <a key={i} href={r.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-[var(--color-accent-400)] hover:text-[var(--color-accent-300)] transition-colors truncate">
+                      <ExternalLink size={11} className="shrink-0" /> {r.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+              <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-[var(--color-border)] justify-end">
+                <IconButton label="Edit" icon={<Pencil size={14} />} size="sm" variant="ghost" onClick={() => startEdit(l)} />
+                <IconButton label="Delete" icon={<Trash2 size={14} />} size="sm" variant="danger" onClick={() => handleDelete(l)} />
+              </div>
+            </div>
           ))}
-        </ul>
+        </CrudGrid>
       )}
-    </div>
+    </CrudPage>
   );
 }
