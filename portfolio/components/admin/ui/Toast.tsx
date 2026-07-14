@@ -6,6 +6,8 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { CheckCircle2, XCircle, AlertTriangle, Info, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toastSlide } from './motion-presets';
+import { useMotionVariants } from '@/lib/motion/use-motion-variants';
 
 type ToastVariant = 'success' | 'error' | 'warning' | 'info';
 
@@ -60,6 +62,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     [dismiss],
   );
 
+  const toastVariants = useMotionVariants(toastSlide);
+
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
@@ -73,10 +77,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   <motion.div
                     key={t.id}
                     layout
-                    initial={{ opacity: 0, y: 16, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, x: 40, transition: { duration: 0.2 } }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                    variants={toastVariants}
+                    initial="hidden"
+                    animate="show"
+                    exit="exit"
                     role="status"
                     className={cn(
                       'pointer-events-auto flex items-start gap-3 rounded-[var(--radius-md)] border bg-bg-elevated p-3.5 shadow-lg',
