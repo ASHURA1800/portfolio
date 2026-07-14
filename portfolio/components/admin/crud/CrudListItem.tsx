@@ -3,7 +3,8 @@
 import { memo, type ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
-import { staggerItem } from '@/components/admin/ui/motion-presets';
+import { staggerItem, EASE } from '@/components/admin/ui/motion-presets';
+import { useMotionVariants } from '@/lib/motion/use-motion-variants';
 
 export interface CrudListItemProps {
   children: ReactNode;
@@ -15,12 +16,13 @@ export interface CrudListItemProps {
  *  stagger/layout behavior as CrudCard, rendered as <motion.li> since
  *  CrudList renders a real <ul>. */
 function CrudListItemImpl({ children, className, layoutId }: CrudListItemProps) {
+  const variants = useMotionVariants(staggerItem);
   return (
     <motion.li
       layout={!!layoutId}
       layoutId={layoutId}
-      variants={staggerItem}
-      transition={{ layout: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }}
+      variants={variants}
+      transition={{ layout: { duration: 0.25, ease: EASE } }}
       className={cn(className)}
     >
       {children}
