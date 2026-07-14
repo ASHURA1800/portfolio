@@ -20,7 +20,7 @@ export function CrudPage({ children }: CrudPageProps) {
       initial={reduceMotion ? false : 'hidden'}
       animate="show"
       variants={reduceMotion ? undefined : fadeIn}
-      className="px-4 py-6 sm:px-6 sm:py-8 lg:px-8"
+      className="px-4 py-6 sm:px-6 sm:py-8 lg:px-8 max-w-[1600px] mx-auto"
     >
       {children}
     </motion.div>
