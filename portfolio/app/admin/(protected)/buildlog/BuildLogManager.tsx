@@ -23,6 +23,7 @@ import { Badge, type BadgeTone } from '@/components/admin/ui/Badge';
 import { Alert } from '@/components/admin/ui/Alert';
 import { Chip } from '@/components/admin/ui/Chip';
 import { fadeIn, staggerContainer } from '@/components/admin/ui/motion-presets';
+import { useToast } from '@/components/admin/ui/Toast';
 
 const STATUSES: BuildStatus[] = ['shipped', 'in-progress', 'planned'];
 const STATUS_TONE: Record<BuildStatus, BadgeTone> = {
@@ -42,6 +43,7 @@ const EMPTY_FORM: FormState = { date: '', title: '', summary: '', status: 'shipp
 
 export default function BuildLogManager({ initial }: { initial: BuildLogEntry[] }) {
   const [items, setItems] = useState<BuildLogEntry[]>(initial);
+  const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [error, setError] = useState('');
@@ -92,7 +94,11 @@ export default function BuildLogManager({ initial }: { initial: BuildLogEntry[] 
         return [...next].sort((a, b) => b.date.localeCompare(a.date));
       });
       resetForm();
-    } catch { setError('Save failed.'); } finally { setSaving(false); }
+      toast({ variant: 'success', title: editingId ? 'Entry updated' : 'Entry created' });
+    } catch {
+      setError('Save failed.');
+      toast({ variant: 'error', title: 'Save failed' });
+    } finally { setSaving(false); }
   };
 
   const handleDelete = async (b: BuildLogEntry) => {
@@ -103,7 +109,12 @@ export default function BuildLogManager({ initial }: { initial: BuildLogEntry[] 
       const res = await fetch(`/api/buildlog/${b.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
       if (editingId === b.id) resetForm();
-    } catch { setItems(prev); setError('Delete failed.'); }
+      toast({ variant: 'success', title: 'Entry deleted' });
+    } catch {
+      setItems(prev);
+      setError('Delete failed.');
+      toast({ variant: 'error', title: 'Delete failed' });
+    }
   };
 
   return (
