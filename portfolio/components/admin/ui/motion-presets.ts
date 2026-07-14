@@ -2,7 +2,13 @@ import type { Variants } from 'motion/react';
 
 // Same easing curve used site-wide (MotionReveal, PageTransition) — kept
 // consistent so admin and public-site motion feel like one product.
-const EASE = [0.22, 1, 0.36, 1] as const;
+/** Single easing curve used across the entire app (admin + public site)
+ *  so every animation — modals, cards, page transitions, hovers — reads
+ *  as one motion language rather than several similar-but-different ones.
+ *  Exported so call sites that build ad-hoc `transition` objects (layout
+ *  animations, one-off delays) can reference the same curve instead of
+ *  re-typing the literal. */
+export const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** Backdrop/scrim fade for modals, drawers, and dropdowns. */
 export const backdropFade: Variants = {
@@ -69,4 +75,27 @@ export const staggerItem: Variants = {
   hidden: { opacity: 0, y: 10 },
   show: { opacity: 1, y: 0, transition: { duration: 0.28, ease: EASE } },
   exit: { opacity: 0, y: -6, transition: { duration: 0.15, ease: EASE } },
+};
+
+
+/** Toast entrance/exit — rises and settles on enter, slides sideways to
+ *  dismiss so it doesn't compete visually with newer toasts stacking
+ *  above it. Kept on the shared EASE curve rather than a spring so it
+ *  reads consistently with every other admin animation. */
+export const toastSlide: Variants = {
+  hidden: { opacity: 0, y: 16, scale: 0.95 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.25, ease: EASE } },
+  exit: { opacity: 0, x: 40, transition: { duration: 0.2, ease: EASE } },
+};
+
+
+/** Reduced-motion counterpart of staggerContainer — same variant shape
+ *  but with stagger/delay collapsed to 0, so children still fade in via
+ *  staggerItem's opacity-only reduced form, just all at once instead of
+ *  sequentially. Exists because toReducedMotion() only strips transforms;
+ *  it can't know that a timing-only variant like staggerContainer should
+ *  also lose its choreography under reduced motion. */
+export const staggerContainerReduced: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0, delayChildren: 0 } },
 };
