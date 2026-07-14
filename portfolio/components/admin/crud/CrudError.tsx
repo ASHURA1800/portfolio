@@ -17,17 +17,19 @@ export interface CrudErrorProps {
  *  a no-op button. */
 export function CrudError({ message, onRetry }: CrudErrorProps) {
   return (
-    <EmptyState
-      icon={<AlertTriangle />}
-      title="Something went wrong"
-      description={message ?? 'This section failed to load. Please try again.'}
-      action={
-        onRetry ? (
-          <Button variant="secondary" onClick={onRetry}>
-            Try again
-          </Button>
-        ) : undefined
-      }
-    />
+    <div role="alert">
+      <EmptyState
+        icon={<AlertTriangle />}
+        title="Something went wrong"
+        description={message ?? 'This section failed to load. Please try again.'}
+        action={
+          onRetry ? (
+            <Button variant="secondary" onClick={onRetry}>
+              Try again
+            </Button>
+          ) : undefined
+        }
+      />
+    </div>
   );
 }
