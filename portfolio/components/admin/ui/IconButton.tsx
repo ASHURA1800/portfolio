@@ -44,12 +44,17 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       aria-busy={loading || undefined}
       title={label}
       className={cn(
-        'inline-flex items-center justify-center shrink-0',
+        'relative inline-flex items-center justify-center shrink-0',
         'transition-all duration-[var(--admin-duration-fast)] ease-[var(--admin-ease-out)]',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg)]',
         'disabled:opacity-40 disabled:pointer-events-none',
         'active:scale-95 motion-reduce:active:scale-100',
         '[&>svg]:w-[1.15em] [&>svg]:h-[1.15em]',
+        // sm is 32px visually (matches dense CRUD card chrome) but that's
+        // under the ~44px touch-target minimum — extend the hit area with
+        // an invisible pseudo-element instead of growing the visible button,
+        // same technique already used for Toast's dismiss button.
+        size === 'sm' && "before:absolute before:-inset-[6px] before:content-['']",
         VARIANTS[variant],
         SIZES[size],
         className
