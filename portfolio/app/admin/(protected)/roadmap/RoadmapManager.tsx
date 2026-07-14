@@ -21,6 +21,7 @@ import { Badge, type BadgeTone } from '@/components/admin/ui/Badge';
 import { Alert } from '@/components/admin/ui/Alert';
 import { Progress } from '@/components/admin/ui/Progress';
 import { fadeIn, staggerContainer } from '@/components/admin/ui/motion-presets';
+import { useToast } from '@/components/admin/ui/Toast';
 
 const STATUSES: RoadmapStatus[] = ['planned', 'in-progress', 'done'];
 const PRIORITIES: RoadmapPriority[] = ['low', 'medium', 'high', 'critical'];
@@ -41,6 +42,7 @@ const EMPTY_FORM: FormState = { task: '', status: 'planned', priority: 'medium',
 
 export default function RoadmapManager({ initial }: { initial: RoadmapItem[] }) {
   const [items, setItems] = useState<RoadmapItem[]>(initial);
+  const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [error, setError] = useState('');
@@ -104,7 +106,11 @@ export default function RoadmapManager({ initial }: { initial: RoadmapItem[] }) 
         return [...next].sort((a, b) => a.order_index - b.order_index);
       });
       resetForm();
-    } catch { setError('Save failed.'); } finally { setSaving(false); }
+      toast({ variant: 'success', title: editingId ? 'Item updated' : 'Item created' });
+    } catch {
+      setError('Save failed.');
+      toast({ variant: 'error', title: 'Save failed' });
+    } finally { setSaving(false); }
   };
 
   const handleDelete = async (r: RoadmapItem) => {
@@ -115,7 +121,12 @@ export default function RoadmapManager({ initial }: { initial: RoadmapItem[] }) 
       const res = await fetch(`/api/roadmap/${r.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
       if (editingId === r.id) resetForm();
-    } catch { setItems(prev); setError('Delete failed.'); }
+      toast({ variant: 'success', title: 'Item deleted' });
+    } catch {
+      setItems(prev);
+      setError('Delete failed.');
+      toast({ variant: 'error', title: 'Delete failed' });
+    }
   };
 
   return (
