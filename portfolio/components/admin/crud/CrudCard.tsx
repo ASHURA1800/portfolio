@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { memo, type ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { staggerItem } from '@/components/admin/ui/motion-presets';
@@ -19,7 +19,7 @@ export interface CrudCardProps {
  * Pass `layoutId` (e.g. the record id) to get a smooth FLIP reorder when
  * sort order changes.
  */
-export function CrudCard({ children, className, layoutId }: CrudCardProps) {
+function CrudCardImpl({ children, className, layoutId }: CrudCardProps) {
   return (
     <motion.div
       layout={!!layoutId}
@@ -33,3 +33,5 @@ export function CrudCard({ children, className, layoutId }: CrudCardProps) {
     </motion.div>
   );
 }
+
+export const CrudCard = memo(CrudCardImpl);
