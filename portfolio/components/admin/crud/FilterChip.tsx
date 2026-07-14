@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { memo, type ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 
@@ -15,7 +15,7 @@ export interface FilterChipProps {
  *  transition. Replaces the raw `<button className="...">` markup that
  *  was copy-pasted across BuildLog/Learnings/Roadmap status filters —
  *  one implementation instead of three. */
-export function FilterChip({ active, onClick, children, className }: FilterChipProps) {
+function FilterChipImpl({ active, onClick, children, className }: FilterChipProps) {
   return (
     <motion.button
       type="button"
@@ -35,3 +35,5 @@ export function FilterChip({ active, onClick, children, className }: FilterChipP
     </motion.button>
   );
 }
+
+export const FilterChip = memo(FilterChipImpl);
