@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { memo, type ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { staggerItem } from '@/components/admin/ui/motion-presets';
@@ -14,7 +14,7 @@ export interface CrudListItemProps {
 /** Drop-in motion wrapper for a single row inside CrudList. Same
  *  stagger/layout behavior as CrudCard, rendered as <motion.li> since
  *  CrudList renders a real <ul>. */
-export function CrudListItem({ children, className, layoutId }: CrudListItemProps) {
+function CrudListItemImpl({ children, className, layoutId }: CrudListItemProps) {
   return (
     <motion.li
       layout={!!layoutId}
@@ -27,3 +27,5 @@ export function CrudListItem({ children, className, layoutId }: CrudListItemProp
     </motion.li>
   );
 }
+
+export const CrudListItem = memo(CrudListItemImpl);
