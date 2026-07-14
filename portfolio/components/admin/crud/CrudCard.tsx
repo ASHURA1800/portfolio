@@ -3,7 +3,9 @@
 import { memo, type ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
-import { staggerItem } from '@/components/admin/ui/motion-presets';
+import { staggerItem, EASE } from '@/components/admin/ui/motion-presets';
+import { useMotionVariants } from '@/lib/motion/use-motion-variants';
+import { useReducedMotion } from 'motion/react';
 
 export interface CrudCardProps {
   children: ReactNode;
@@ -20,13 +22,15 @@ export interface CrudCardProps {
  * sort order changes.
  */
 function CrudCardImpl({ children, className, layoutId }: CrudCardProps) {
+  const variants = useMotionVariants(staggerItem);
+  const reduceMotion = useReducedMotion();
   return (
     <motion.div
       layout={!!layoutId}
       layoutId={layoutId}
-      variants={staggerItem}
-      whileHover={{ y: -2 }}
-      transition={{ layout: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }}
+      variants={variants}
+      whileHover={reduceMotion ? undefined : { y: -2 }}
+      transition={{ layout: { duration: 0.25, ease: EASE } }}
       className={cn('h-full', className)}
     >
       {children}
