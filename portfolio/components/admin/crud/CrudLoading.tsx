@@ -9,5 +9,10 @@ export interface CrudLoadingProps {
  *  (already shaped for admin-list-item rows) rather than a new shimmer
  *  pattern. */
 export function CrudLoading({ count = 4, className }: CrudLoadingProps) {
-  return <SkeletonList count={count} className={className} />;
+  return (
+    <div role="status" aria-live="polite" aria-label="Loading content">
+      <SkeletonList count={count} className={className} />
+      <span className="sr-only">Loading…</span>
+    </div>
+  );
 }
