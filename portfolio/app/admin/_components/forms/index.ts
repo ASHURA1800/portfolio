@@ -7,8 +7,6 @@ export { FloatingInput, FloatingTextarea, FloatingSelect } from './FormField';
 // FieldGroup — responsive grid wrapper with optional legend
 export { default as FieldGroup } from './FieldGroup';
 
-// ImageUploader — drag-drop + preview + progress bar
-export { default as ImageUploader } from './ImageUploader';
 
 // TagInput — keyboard-driven tag entry
 export { default as TagInput } from './TagInput';
