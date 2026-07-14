@@ -22,6 +22,7 @@ import { Select } from '@/components/admin/ui/Select';
 import { Badge, type BadgeTone } from '@/components/admin/ui/Badge';
 import { Alert } from '@/components/admin/ui/Alert';
 import { fadeIn } from '@/components/admin/ui/motion-presets';
+import { useToast } from '@/components/admin/ui/Toast';
 
 const DIFFICULTIES: LearningDifficulty[] = ['beginner', 'intermediate', 'advanced'];
 const DIFFICULTY_TONE: Record<LearningDifficulty, BadgeTone> = {
@@ -42,6 +43,7 @@ const EMPTY_FORM: FormState = { title: '', description: '', category: 'general',
 
 export default function LearningsManager({ initial }: { initial: Learning[] }) {
   const [items, setItems] = useState<Learning[]>(initial);
+  const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [error, setError] = useState('');
@@ -104,7 +106,11 @@ export default function LearningsManager({ initial }: { initial: Learning[] }) {
         return [...next].sort((a, b) => a.order_index - b.order_index);
       });
       resetForm();
-    } catch { setError('Save failed.'); } finally { setSaving(false); }
+      toast({ variant: 'success', title: editingId ? 'Learning updated' : 'Learning created' });
+    } catch {
+      setError('Save failed.');
+      toast({ variant: 'error', title: 'Save failed' });
+    } finally { setSaving(false); }
   };
 
   const handleDelete = async (l: Learning) => {
@@ -115,7 +121,12 @@ export default function LearningsManager({ initial }: { initial: Learning[] }) {
       const res = await fetch(`/api/learnings/${l.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
       if (editingId === l.id) resetForm();
-    } catch { setItems(prev); setError('Delete failed.'); }
+      toast({ variant: 'success', title: 'Learning deleted' });
+    } catch {
+      setItems(prev);
+      setError('Delete failed.');
+      toast({ variant: 'error', title: 'Delete failed' });
+    }
   };
 
   return (
