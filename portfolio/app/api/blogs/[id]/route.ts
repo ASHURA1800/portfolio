@@ -1,17 +1,14 @@
 import { NextRequest } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db, blogs } from '@/lib/db';
-import { blogSchema } from '@/lib/validation/schemas';
+import { blogSchema, isUUID } from '@/lib/validation/schemas';
 import { ok, err, validationError } from '@/lib/services/response';
 import { requireAdmin, isAuthError } from '@/lib/auth/session';
 
 type Params = { params: Promise<{ id: string }> };
 
-const isUUID = (s: string) =>
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
-
 // ── GET /api/blogs/:id  (id = UUID or slug) ───────────────────────────────────
-export async function GET(req: NextRequest, { params }: Params) {
+export async function GET(_req: NextRequest, { params }: Params) {
   const { id } = await params;
 
   try {
@@ -69,7 +66,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 }
 
 // ── DELETE /api/blogs/:id ─────────────────────────────────────────────────────
-export async function DELETE(req: NextRequest, { params }: Params) {
+export async function DELETE(_req: NextRequest, { params }: Params) {
   const auth = await requireAdmin();
   if (isAuthError(auth)) return auth;
 
