@@ -6,6 +6,7 @@ import { CrudPage, CrudHeader, CrudEmptyState } from '@/components/admin/crud';
 import { Button } from '@/components/admin/ui/Button';
 import { DeleteDialog } from '@/components/admin/ui/ConfirmDialog';
 import { ProjectsToolbar, ProjectsGrid, ProjectForm, type FormState } from '@/components/admin/projects';
+import { adminFetch, SessionExpiredError, RequestTimeoutError } from '@/lib/admin/admin-fetch';
 
 const EMPTY_FORM: FormState = {
   title: '', slug: '', description: '', problem: '', solution: '', long_description: '',
@@ -65,10 +66,16 @@ export default function ProjectsManager({ initial }: { initial: Project[] }) {
   const uploadOne = async (file: File): Promise<string | null> => {
     const fd = new FormData();
     fd.append('file', file);
-    const res = await fetch('/api/storage/projects', { method: 'POST', body: fd });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data.success) { setError(data.error ?? 'Upload failed'); return null; }
-    return data.data.url as string;
+    try {
+      const res = await adminFetch('/api/storage/projects', { method: 'POST', body: fd });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) { setError(data.error ?? 'Upload failed'); return null; }
+      return data.data.url as string;
+    } catch (e) {
+      if (e instanceof SessionExpiredError) return null; // redirect already in flight
+      setError(e instanceof RequestTimeoutError ? 'Upload is taking too long. Check your connection and try again.' : 'Upload failed. Check your connection and try again.');
+      return null;
+    }
   };
   const handleCover = async (file: File) => {
     setUploading(true); setError('');
@@ -93,7 +100,7 @@ export default function ProjectsManager({ initial }: { initial: Project[] }) {
     setSaving(true); setError('');
     const url = editingId ? `/api/projects/${editingId}` : '/api/projects';
     try {
-      const res = await fetch(url, {
+      const res = await adminFetch(url, {
         method: editingId ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(toPayload(form)),
@@ -103,21 +110,26 @@ export default function ProjectsManager({ initial }: { initial: Project[] }) {
       const saved = data.data as Project;
       setItems((prev) => (editingId ? prev.map((x) => (x.id === saved.id ? saved : x)) : [...prev, saved]));
       resetForm();
-    } catch { setError('Save failed.'); } finally { setSaving(false); }
+    } catch (e) {
+      if (e instanceof SessionExpiredError) return; // redirect already in flight
+      if (e instanceof RequestTimeoutError) { setError('This is taking too long. Check your connection and try again.'); return; }
+      setError('Save failed.');
+    } finally { setSaving(false); }
   };
 
   const toggleFeatured = async (p: Project) => {
     const next = !p.featured;
     setItems((prev) => prev.map((x) => (x.id === p.id ? { ...x, featured: next } : x)));
     try {
-      const res = await fetch(`/api/projects/${p.id}`, {
+      const res = await adminFetch(`/api/projects/${p.id}`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ featured: next }),
       });
       if (!res.ok) throw new Error();
-    } catch {
+    } catch (e) {
+      if (e instanceof SessionExpiredError) return; // redirect already in flight
       setItems((prev) => prev.map((x) => (x.id === p.id ? { ...x, featured: p.featured } : x)));
-      setError('Could not update featured state.');
+      setError(e instanceof RequestTimeoutError ? 'This is taking too long. Please try again.' : 'Could not update featured state.');
     }
   };
 
@@ -129,12 +141,13 @@ export default function ProjectsManager({ initial }: { initial: Project[] }) {
     const prev = items;
     setItems((list) => list.filter((x) => x.id !== p.id));
     try {
-      const res = await fetch(`/api/projects/${p.id}`, { method: 'DELETE' });
+      const res = await adminFetch(`/api/projects/${p.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
       if (editingId === p.id) resetForm();
-    } catch {
+    } catch (e) {
+      if (e instanceof SessionExpiredError) return; // redirect already in flight
       setItems(prev);
-      setError('Delete failed.');
+      setError(e instanceof RequestTimeoutError ? 'This is taking too long. Please try again.' : 'Delete failed.');
     }
   };
 
