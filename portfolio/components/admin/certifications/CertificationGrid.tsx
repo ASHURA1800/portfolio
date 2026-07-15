@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Award, ExternalLink, Pencil, Star, Trash2 } from 'lucide-react';
 import type { Certification } from '@/types';
 import { CrudGrid } from '@/components/admin/crud/CrudGrid';
@@ -42,8 +43,7 @@ export function CertificationGrid({ certs, onEdit, onDelete, onToggleFeatured, o
                 aria-label="Preview badge"
               >
                 {c.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={c.image} alt={c.title} className="h-full w-full object-cover" />
+                  <Image src={c.image} alt={c.title} width={48} height={48} className="h-full w-full object-cover" />
                 ) : (
                   c.icon
                 )}
