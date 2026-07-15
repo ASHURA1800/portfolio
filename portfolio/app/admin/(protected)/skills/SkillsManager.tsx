@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Plus, X, Search } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence } from 'motion/react';
 import type { Skill, SkillCategory } from '@/types';
 import { skillCategories } from '@/lib/content/skills';
 import { SkillCard } from '@/components/admin/skills/SkillCard';
