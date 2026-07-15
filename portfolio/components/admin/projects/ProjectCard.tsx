@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import type { Project } from '@/types';
 import { Card } from '@/components/admin/ui/Card';
 import { Badge } from '@/components/admin/ui/Badge';
@@ -23,8 +24,7 @@ export function ProjectCard({ project, onEdit, onDelete, onToggleFeatured }: Pro
     <Card padding="none" className="flex flex-col overflow-hidden">
       <div className="aspect-video bg-[var(--color-bg)] relative overflow-hidden">
         {project.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={project.image} alt="" className="w-full h-full object-cover" />
+          <Image src={project.image} alt="" fill sizes="(max-width: 768px) 100vw, 400px" className="object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-[var(--color-faint)] text-xs">No cover</div>
         )}
