@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Link2, Sparkles } from 'lucide-react';
 import type { ProjectStatus } from '@/types';
 
@@ -30,8 +31,7 @@ export function ProjectPreview({ title, description, image, techStack, status, f
     <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] overflow-hidden bg-[var(--color-surface)]">
       <div className="aspect-video bg-[var(--color-bg)] relative overflow-hidden">
         {image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={image} alt="" className="w-full h-full object-cover" />
+          <Image src={image} alt="" fill sizes="(max-width: 768px) 100vw, 500px" className="object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-[var(--color-faint)] text-xs">
             No cover image
