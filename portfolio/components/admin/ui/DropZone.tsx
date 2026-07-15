@@ -25,6 +25,13 @@ export interface DropZoneProps {
 export function DropZone({ accept, multiple = false, disabled, onFiles, compact = false, children, className }: DropZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  // dragDepth IS read — inside the functional setDragDepth(d => ...) updater
+  // in onDragLeave below — but that doesn't count as a "read" to eslint's
+  // static analysis, hence the disable. Verified in Phase 7.6/7.8: this is
+  // a real, working drag-counter that prevents dragging from flickering
+  // false when a nested child element fires its own dragleave. Do not
+  // remove dragDepth to silence this warning — it will reintroduce that bug.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [dragDepth, setDragDepth] = useState(0);
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
