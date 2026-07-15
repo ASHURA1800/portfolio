@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import type { Profile, Social, SocialPlatform } from '@/types';
@@ -25,7 +26,14 @@ function extractGithubUsername(profile: Profile): string {
 export function Footer({ profile, socials: allSocials }: { profile: Profile; socials: Social[] }) {
   const brand = profile.name || profile.username || 'Portfolio';
   const note = profile.note;
-  const year = new Date().getFullYear();
+  // Deferred to useEffect: a render-time new Date().getFullYear() in a
+  // client component still runs during SSR (a lazy useState initializer
+  // does too — same trap, caught while writing this), so it can
+  // theoretically mismatch across a year rollover (server renders Dec 31,
+  // client hydrates Jan 1). Fixed literal SSR fallback, corrected on
+  // mount — same pattern as CurrentDateTime.tsx's null placeholder.
+  const [year, setYear] = useState(2026);
+  useEffect(() => setYear(new Date().getFullYear()), []);
   const socials = allSocials.filter((s) => FOOTER_PLATFORMS.includes(s.platform));
   const githubUsername = extractGithubUsername(profile);
   const reduceMotion = useReducedMotion();
