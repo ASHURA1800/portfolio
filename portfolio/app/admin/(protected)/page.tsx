@@ -47,19 +47,39 @@ import {
 } from 'lucide-react';
 
 // Phase 4.4 — analytics & charts
-import {
-  AnalyticsCard,
-  PortfolioGrowthChart,
-  ContentDistributionChart,
-  SkillsChart,
-  ActivityChart,
-} from '@/components/admin/analytics';
+// Dynamically imported: recharts is a genuinely heavy dependency (~9.4M
+// unpacked) and these 4 components render below the fold on a page that's
+// otherwise mostly static server-rendered content. next/dynamic splits them
+// into a separate chunk loaded after initial paint — same props, same data
+// (still fetched server-side below, same as before), no behavioral change.
+// ChartSkeleton (Phase 4.7) is reused as the loading fallback so this
+// matches what a slow chart-data fetch already looks like elsewhere.
+import nextDynamic from 'next/dynamic';
+import { AnalyticsCard } from '@/components/admin/analytics';
+import { ChartSkeleton } from '@/components/admin/dashboard/states';
 import {
   getPortfolioGrowth,
   getContentDistribution,
   getSkillsByCategory,
   getActivityTimeline,
 } from '@/lib/analytics/queries';
+
+const PortfolioGrowthChart = nextDynamic(
+  () => import('@/components/admin/analytics/PortfolioGrowthChart').then((m) => m.PortfolioGrowthChart),
+  { loading: () => <ChartSkeleton /> }
+);
+const ContentDistributionChart = nextDynamic(
+  () => import('@/components/admin/analytics/ContentDistributionChart').then((m) => m.ContentDistributionChart),
+  { loading: () => <ChartSkeleton /> }
+);
+const SkillsChart = nextDynamic(
+  () => import('@/components/admin/analytics/SkillsChart').then((m) => m.SkillsChart),
+  { loading: () => <ChartSkeleton /> }
+);
+const ActivityChart = nextDynamic(
+  () => import('@/components/admin/analytics/ActivityChart').then((m) => m.ActivityChart),
+  { loading: () => <ChartSkeleton /> }
+);
 
 // Phase 4.5 — activity feed & quick actions
 import { RecentUpdates, QuickActions } from '@/components/admin/dashboard/activity';
