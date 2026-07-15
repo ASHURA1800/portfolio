@@ -2,6 +2,7 @@
 
 import { useRef, useState, type DragEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import Image from 'next/image';
 import { Upload, X, Check } from 'lucide-react';
 import { Progress } from '@/components/admin/ui/Progress';
 import { cn } from '@/lib/utils';
@@ -59,8 +60,7 @@ export function AvatarUploader({ value, uploading, onFile, onRemove, name }: Ava
         )}
       >
         {value ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={value} alt="Avatar preview" className="w-full h-full object-cover" />
+          <Image src={value} alt="Avatar preview" width={80} height={80} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-[var(--color-surface)] text-[var(--color-faint)] text-xl font-semibold">
             {initial}
