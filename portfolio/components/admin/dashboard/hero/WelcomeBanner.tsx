@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { motion, useReducedMotion, type Variants } from 'motion/react';
 
 interface WelcomeBannerProps {
@@ -37,12 +38,21 @@ const lineVariants: Variants = {
 /**
  * WelcomeBanner
  * Staggered entrance animation for the greeting headline + sub-title.
- * Computes greeting on the client to avoid server/client time mismatch.
+ * Greeting is computed post-mount (useEffect), not during initial render —
+ * a client component's first render pass still runs during SSR, so
+ * calling getGreeting() directly in the function body doesn't actually
+ * avoid a server/client clock mismatch (only moving it to useEffect does).
+ * 'Good afternoon' is a neutral SSR/first-paint fallback, swapped for the
+ * real greeting immediately on mount before it's perceptible.
  */
 export default function WelcomeBanner({ name, title }: WelcomeBannerProps) {
   const reduceMotion = useReducedMotion();
+  const [greeting, setGreeting] = useState('Good afternoon');
 
-  const greeting = getGreeting();
+  useEffect(() => {
+    setGreeting(getGreeting());
+  }, []);
+
   const displayName = name?.trim() || 'Admin';
 
   return (
