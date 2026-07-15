@@ -4,7 +4,7 @@ import { useCallback, useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { X } from 'lucide-react';
-import type { Project, ProjectStatus, ProjectMetric } from '@/types';
+import type { ProjectStatus, ProjectMetric } from '@/types';
 import { backdropFade, drawerSlide } from '@/components/admin/ui/motion-presets';
 import { useFocusTrap } from '@/components/admin/ui/useFocusTrap';
 import { FloatingField } from '@/components/admin/profile/FloatingField';
