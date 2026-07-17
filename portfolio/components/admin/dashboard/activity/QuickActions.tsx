@@ -6,8 +6,6 @@ import {
   Briefcase,
   Award,
   UserRoundPen,
-  Hammer,
-  BookOpen,
   Map,
 } from 'lucide-react';
 import ActionCard from './ActionCard';
@@ -58,22 +56,6 @@ const QUICK_ACTIONS = [
     href: '/admin/profile',
     icon: UserRoundPen,
     accent: 'rgba(168,85,247,0.11)',
-  },
-  {
-    key: 'buildlog',
-    label: 'Add build log',
-    description: 'Log what you shipped today',
-    href: '/admin/buildlog',
-    icon: Hammer,
-    accent: 'rgba(249,115,22,0.11)',
-  },
-  {
-    key: 'learning',
-    label: 'Add learning',
-    description: 'Capture a new insight',
-    href: '/admin/learnings',
-    icon: BookOpen,
-    accent: 'rgba(34,197,94,0.11)',
   },
   {
     key: 'roadmap',
