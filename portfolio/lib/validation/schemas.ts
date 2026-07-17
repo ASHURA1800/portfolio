@@ -303,6 +303,13 @@ export const paginationSchema = z.object({
   order: z.enum(['asc', 'desc']).default('desc'),
 });
 
+
+// ─── UUID helper ──────────────────────────────────────────────────────────────
+
+/** Returns true when s matches the standard 8-4-4-4-12 UUID format. */
+export const isUUID = (s: string): boolean =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+
 // ─── Storage upload ───────────────────────────────────────────────────────────
 
 export const ALLOWED_IMAGE_TYPES = [
