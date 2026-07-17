@@ -191,10 +191,12 @@ export function ProjectForm({
                 <label className="text-xs text-[var(--color-faint)] font-medium">Metrics</label>
                 <div className="flex flex-col gap-2">
                   {form.metrics.map((m, i) => (
-                    <div key={i} className="flex gap-2">
+                    <div key={i} className="grid grid-cols-[1fr_1fr_auto] items-end gap-3">
                       <FloatingField label="Label" value={m.label} onChange={(e) => setMetric(i, 'label', e.target.value)} placeholder="Users" />
                       <FloatingField label="Value" value={m.value} onChange={(e) => setMetric(i, 'value', e.target.value)} placeholder="10k" />
-                      <IconButton label="Remove metric" icon={<X size={14} />} variant="ghost" onClick={() => removeMetric(i)} />
+                      <div className="pb-[3px]">
+                        <IconButton label="Remove metric" icon={<X size={14} />} variant="ghost" onClick={() => removeMetric(i)} />
+                      </div>
                     </div>
                   ))}
                   <Button type="button" variant="ghost" size="sm" onClick={addMetric} className="w-fit">
