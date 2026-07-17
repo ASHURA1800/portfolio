@@ -12,8 +12,6 @@ const KIND_META: Record<
 > = {
   project:       { label: 'Project',       icon: '🚀', accent: 'rgba(124,77,255,0.12)', dot: '#7C4DFF' },
   certification: { label: 'Certification', icon: '🏆', accent: 'rgba(251,191,36,0.10)', dot: '#FBBF24' },
-  build_log:     { label: 'Build Log',     icon: '🔨', accent: 'rgba(34,197,245,0.10)', dot: '#22C5F5' },
-  learning:      { label: 'Learning',      icon: '📖', accent: 'rgba(52,211,153,0.10)', dot: '#34D399' },
   roadmap:       { label: 'Roadmap',       icon: '🗺️',  accent: 'rgba(249,115,22,0.10)', dot: '#F97316' },
   profile:       { label: 'Profile',       icon: '👤', accent: 'rgba(168,85,247,0.10)', dot: '#A855F7' },
 };
