@@ -6,8 +6,6 @@ import {
   skills as skillsTable,
   experience as experienceTable,
   projects as projectsTable,
-  buildLog as buildLogTable,
-  learnings as learningsTable,
   roadmap as roadmapTable,
 } from '@/lib/db';
 import type {
@@ -15,8 +13,6 @@ import type {
   Skill,
   Experience,
   Project,
-  BuildLogEntry,
-  Learning,
   RoadmapItem,
 } from '@/types';
 
@@ -149,26 +145,6 @@ export async function getCaseStudySlugs(): Promise<string[]> {
     return rows.map((r) => r.slug).filter((s): s is string => Boolean(s));
   } catch (e) {
     console.error('[content] getCaseStudySlugs failed:', e);
-    return [];
-  }
-}
-
-export async function getBuildLog(): Promise<BuildLogEntry[]> {
-  try {
-    const rows = await db.select().from(buildLogTable).orderBy(desc(buildLogTable.date));
-    return rows as BuildLogEntry[];
-  } catch (e) {
-    console.error('[content] getBuildLog failed:', e);
-    return [];
-  }
-}
-
-export async function getLearnings(): Promise<Learning[]> {
-  try {
-    const rows = await db.select().from(learningsTable).orderBy(asc(learningsTable.order_index));
-    return rows as Learning[];
-  } catch (e) {
-    console.error('[content] getLearnings failed:', e);
     return [];
   }
 }
