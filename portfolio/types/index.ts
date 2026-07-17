@@ -220,34 +220,6 @@ export interface Experience {
   logo?: string;
 }
 
-export type BuildStatus = 'shipped' | 'in-progress' | 'planned';
-
-export interface BuildLogEntry {
-  id: string;
-  date: string;
-  title: string;
-  summary: string;
-  status: BuildStatus;
-  tags: string[];
-}
-
-export type LearningDifficulty = 'beginner' | 'intermediate' | 'advanced';
-
-export interface LearningResource {
-  label: string;
-  url: string;
-}
-
-export interface Learning {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  difficulty: LearningDifficulty;
-  resources: LearningResource[];
-  order_index: number;
-}
-
 export type RoadmapStatus = 'planned' | 'in-progress' | 'done';
 export type RoadmapPriority = 'low' | 'medium' | 'high' | 'critical';
 
