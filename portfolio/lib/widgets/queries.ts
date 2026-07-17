@@ -5,8 +5,6 @@ import {
   skills,
   experience,
   certifications,
-  buildLog,
-  learnings,
   roadmap,
   profile as profileTable,
 } from '@/lib/db';
@@ -39,22 +37,18 @@ const SECTIONS = [
   { key: 'skills', label: 'Skills', href: '/admin/skills' },
   { key: 'experience', label: 'Experience', href: '/admin/experience' },
   { key: 'certifications', label: 'Certifications', href: '/admin/certifications' },
-  { key: 'buildLog', label: 'Build Log', href: '/admin/buildlog' },
-  { key: 'learnings', label: 'Learnings', href: '/admin/learnings' },
   { key: 'roadmap', label: 'Roadmap', href: '/admin/roadmap' },
 ] as const;
 
 async function getSectionCounts() {
-  const [p, s, e, c, b, l, r] = await Promise.all([
+  const [p, s, e, c, r] = await Promise.all([
     db.$count(projects),
     db.$count(skills),
     db.$count(experience),
     db.$count(certifications),
-    db.$count(buildLog),
-    db.$count(learnings),
     db.$count(roadmap),
   ]);
-  return { projects: p, skills: s, experience: e, certifications: c, buildLog: b, learnings: l, roadmap: r };
+  return { projects: p, skills: s, experience: e, certifications: c, roadmap: r };
 }
 
 export async function getPortfolioProgress(): Promise<PortfolioProgressData> {
