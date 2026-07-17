@@ -6,8 +6,6 @@ import {
   skills,
   experience,
   certifications,
-  buildLog,
-  learnings,
   roadmap,
   analytics,
 } from '@/lib/db';
@@ -46,7 +44,7 @@ export async function getPortfolioGrowth(months = 6): Promise<GrowthPoint[]> {
   since.setDate(1);
   since.setHours(0, 0, 0, 0);
 
-  const tables = [projects, skills, experience, certifications, buildLog, learnings, roadmap];
+  const tables = [projects, skills, experience, certifications, roadmap];
 
   try {
     const perTableRows = await Promise.all(
@@ -87,13 +85,11 @@ export async function getPortfolioGrowth(months = 6): Promise<GrowthPoint[]> {
 /** How many rows exist per content type, right now — real counts only. */
 export async function getContentDistribution(): Promise<DistributionSlice[]> {
   try {
-    const [p, s, e, c, b, l, r] = await Promise.all([
+    const [p, s, e, c, r] = await Promise.all([
       db.$count(projects),
       db.$count(skills),
       db.$count(experience),
       db.$count(certifications),
-      db.$count(buildLog),
-      db.$count(learnings),
       db.$count(roadmap),
     ]);
     return [
@@ -101,8 +97,6 @@ export async function getContentDistribution(): Promise<DistributionSlice[]> {
       { name: 'Skills', value: s },
       { name: 'Experience', value: e },
       { name: 'Certifications', value: c },
-      { name: 'Build Logs', value: b },
-      { name: 'Learnings', value: l },
       { name: 'Roadmap', value: r },
     ].filter((slice) => slice.value > 0);
   } catch {
