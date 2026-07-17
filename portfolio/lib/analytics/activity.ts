@@ -4,8 +4,6 @@ import {
   db,
   projects,
   certifications,
-  buildLog,
-  learnings,
   roadmap,
   profile as profileTable,
 } from '@/lib/db';
@@ -13,8 +11,6 @@ import {
 export type ActivityKind =
   | 'project'
   | 'certification'
-  | 'build_log'
-  | 'learning'
   | 'roadmap'
   | 'profile';
 
@@ -47,8 +43,6 @@ export async function getRecentActivity(limit = 10): Promise<ActivityEvent[]> {
     const [
       recentProjects,
       recentCerts,
-      recentBuildLogs,
-      recentLearnings,
       recentRoadmap,
       profileRows,
     ] = await Promise.all([
@@ -62,18 +56,6 @@ export async function getRecentActivity(limit = 10): Promise<ActivityEvent[]> {
         .select({ id: certifications.id, title: certifications.title, issuer: certifications.issuer, updatedAt: certifications.updated_at })
         .from(certifications)
         .orderBy(desc(certifications.updated_at))
-        .limit(LIMIT_PER_TABLE),
-
-      db
-        .select({ id: buildLog.id, title: buildLog.title, status: buildLog.status, updatedAt: buildLog.updated_at })
-        .from(buildLog)
-        .orderBy(desc(buildLog.updated_at))
-        .limit(LIMIT_PER_TABLE),
-
-      db
-        .select({ id: learnings.id, title: learnings.title, updatedAt: learnings.updated_at })
-        .from(learnings)
-        .orderBy(desc(learnings.updated_at))
         .limit(LIMIT_PER_TABLE),
 
       db
@@ -109,27 +91,6 @@ export async function getRecentActivity(limit = 10): Promise<ActivityEvent[]> {
         sublabel: c.issuer,
         updatedAt: c.updatedAt,
         href: '/admin/certifications',
-      });
-    }
-
-    for (const b of recentBuildLogs) {
-      events.push({
-        id: `buildlog-${b.id}`,
-        kind: 'build_log',
-        label: b.title,
-        sublabel: b.status,
-        updatedAt: b.updatedAt,
-        href: '/admin/buildlog',
-      });
-    }
-
-    for (const l of recentLearnings) {
-      events.push({
-        id: `learning-${l.id}`,
-        kind: 'learning',
-        label: l.title,
-        updatedAt: l.updatedAt,
-        href: '/admin/learnings',
       });
     }
 
