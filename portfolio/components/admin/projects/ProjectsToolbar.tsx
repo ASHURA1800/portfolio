@@ -34,7 +34,7 @@ export interface ProjectsToolbarProps {
 }
 
 /** Search + status filter + sort + view toggle, all client-side over the
- *  already-loaded items array — no new fetching. Composes the Phase 6.1
+ *  already-loaded items array — no new fetching. Composes the shared
  *  CRUD toolbar primitives. */
 export function ProjectsToolbar({
   search,
