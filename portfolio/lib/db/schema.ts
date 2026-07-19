@@ -249,41 +249,6 @@ export const experience = pgTable(
   (t) => [index('idx_experience_order').on(t.order_index)]
 );
 
-// ─── build_log ────────────────────────────────────────────────
-export const buildLog = pgTable(
-  'build_log',
-  {
-    id: uuid('id').primaryKey().defaultRandom(),
-    date: text('date').notNull(), // "YYYY-MM" or "YYYY-MM-DD" — sortable
-    title: text('title').notNull(),
-    summary: text('summary').notNull().default(''),
-    status: text('status').notNull().default('shipped'),
-    tags: text('tags').array().notNull().default(sql`'{}'`),
-    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
-      .$onUpdate(() => new Date()),
-  },
-  (t) => [index('idx_build_log_date').on(t.date.desc())]
-);
-
-// ─── learnings ────────────────────────────────────────────────
-export const learnings = pgTable(
-  'learnings',
-  {
-    id: uuid('id').primaryKey().defaultRandom(),
-    title: text('title').notNull(),
-    description: text('description').notNull().default(''),
-    category: text('category').notNull().default('general'),
-    difficulty: text('difficulty').notNull().default('beginner'),
-    resources: jsonb('resources').$type<{ label: string; url: string }[]>().notNull().default(sql`'[]'`),
-    order_index: integer('order_index').notNull().default(0),
-    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
-      .$onUpdate(() => new Date()),
-  },
-  (t) => [index('idx_learnings_order').on(t.order_index)]
-);
-
 // ─── roadmap ──────────────────────────────────────────────────
 export const roadmap = pgTable(
   'roadmap',
