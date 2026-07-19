@@ -10,7 +10,7 @@ export type ContentStatus =
   | 'concept';
 
 // Maps every content-status string used across the CMS (Project.status,
-// BuildLogEntry.status, blogs.published, etc.) onto Badge's real tone
+// RoadmapItem.status, blogs.published, etc.) onto Badge's real tone
 // vocabulary — success/error/warning/info/neutral — rather than inventing
 // per-status colors that don't exist in admin-theme.css.
 const STATUS_TONE: Record<ContentStatus, BadgeTone> = {
