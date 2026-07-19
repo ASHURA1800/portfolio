@@ -56,7 +56,7 @@ export default function DashboardGrid({
           is undesirable in RSC. Instead we use a named CSS class set in
           admin-theme.css (dashboard-grid-2 / -3 / -4 / -6) added at
           runtime, so the media queries live in the stylesheet.
-          For Phase 4 the dashboard uses a 3-col grid; the class is stable. */}
+          The dashboard currently uses a 3-col grid; the class is stable. */}
       <style>{`
         @media (min-width: 640px) {
           .dashboard-grid { grid-template-columns: repeat(${Math.min(cols, 2)}, 1fr); }
