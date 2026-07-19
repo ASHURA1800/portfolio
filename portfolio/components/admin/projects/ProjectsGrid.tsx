@@ -44,7 +44,7 @@ export function ProjectsGrid({ projects, view, onEdit, onDelete, onToggleFeature
         <li key={p.id} className="flex items-center gap-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-4">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-[var(--color-ink)] font-medium truncate">{p.title}</span>
+              <span className="text-[var(--color-ink)] font-medium truncate min-w-0 flex-1">{p.title}</span>
               <Badge tone={STATUS_TONE[p.status]} size="sm">
                 {p.status}
               </Badge>
