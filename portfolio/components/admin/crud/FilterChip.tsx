@@ -14,7 +14,7 @@ export interface FilterChipProps {
 
 /** Single filter pill with press feedback and an animated active-state
  *  transition. Replaces the raw `<button className="...">` markup that
- *  was copy-pasted across BuildLog/Learnings/Roadmap status filters —
+ *  was copy-pasted across Roadmap status filters —
  *  one implementation instead of three. */
 function FilterChipImpl({ active, onClick, children, className }: FilterChipProps) {
   const reduceMotion = useReducedMotion();
