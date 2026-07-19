@@ -20,8 +20,7 @@ const STATUS_TONE: Record<Project['status'], 'success' | 'warning' | 'neutral' |
 };
 
 /** Card/list toggle for the projects collection — same data, two layouts.
- *  Reuses CrudGrid/CrudList from the Phase 6.1 framework rather than a
- *  bespoke grid. */
+ *  Reuses the shared CrudGrid/CrudList framework rather than a bespoke grid. */
 export function ProjectsGrid({ projects, view, onEdit, onDelete, onToggleFeatured }: ProjectsGridProps) {
   if (view === 'grid') {
     return (
