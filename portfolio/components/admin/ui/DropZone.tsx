@@ -27,7 +27,7 @@ export function DropZone({ accept, multiple = false, disabled, onFiles, compact 
   const [dragging, setDragging] = useState(false);
   // dragDepth IS read — inside the functional setDragDepth(d => ...) updater
   // in onDragLeave below — but that doesn't count as a "read" to eslint's
-  // static analysis, hence the disable. Verified in Phase 7.6/7.8: this is
+  // static analysis, hence the disable. This is confirmed to be
   // a real, working drag-counter that prevents dragging from flickering
   // false when a nested child element fires its own dragleave. Do not
   // remove dragDepth to silence this warning — it will reintroduce that bug.
