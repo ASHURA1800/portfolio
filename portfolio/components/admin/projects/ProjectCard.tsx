@@ -31,7 +31,7 @@ export function ProjectCard({ project, onEdit, onDelete, onToggleFeatured }: Pro
       </div>
       <div className="flex flex-col gap-2 p-4">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-sm font-medium text-[var(--color-ink)] truncate">{project.title}</h3>
+          <h3 className="text-sm font-medium text-[var(--color-ink)] truncate min-w-0">{project.title}</h3>
           <Badge tone={STATUS_TONE[project.status]} size="sm">
             {project.status}
           </Badge>
