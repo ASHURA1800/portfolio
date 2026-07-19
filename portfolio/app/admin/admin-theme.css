@@ -13,6 +13,21 @@
 /* Never re-import per-route — this stylesheet is global to /admin.      */
 /* ==================================================================== */
 
+/* Reset native OS-level search-field decorations (WebKit renders its own
+   magnifying-glass affordance and cancel button for type="search") so they
+   don't paint underneath the custom icon + clear button in SearchInput. */
+input[type='search']::-webkit-search-decoration,
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-results-button,
+input[type='search']::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+input[type='search'] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 @import "../globals.css";
 
 @theme {
