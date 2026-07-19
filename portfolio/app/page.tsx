@@ -6,8 +6,6 @@ import { AboutSection } from "@/components/sections/AboutSection";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
 import { SkillsSection } from "@/components/sections/SkillsSection";
 import { ExperienceSection } from "@/components/sections/ExperienceSection";
-import { BuildLogSection } from "@/components/sections/BuildLogSection";
-import { LearningsSection } from "@/components/sections/LearningsSection";
 import { RoadmapSection } from "@/components/sections/RoadmapSection";
 import { CertificationsSection } from "@/components/sections/CertificationsSection";
 import { ContactSection } from "@/components/sections/ContactSection";
@@ -17,8 +15,6 @@ import {
   getSkills,
   getExperience,
   getFeaturedProjects,
-  getBuildLog,
-  getLearnings,
   getRoadmap,
   skillCategories,
   skillsByCategory,
@@ -30,14 +26,12 @@ import { getSocials } from "@/lib/content/socials";
 export const revalidate = 60;
 
 export default async function Home() {
-  const [profile, skills, experience, projects, buildLog, learnings, roadmap] =
+  const [profile, skills, experience, projects, roadmap] =
     await Promise.all([
       getProfile(),
       getSkills(),
       getExperience(),
       getFeaturedProjects(),
-      getBuildLog(),
-      getLearnings(),
       getRoadmap(),
     ]);
 
@@ -105,9 +99,7 @@ export default async function Home() {
         <ProjectsSection projects={projects} githubUrl={profile.github} />
         <SkillsSection skills={skills} skillsNote={profile.skillsNote} />
         <ExperienceSection experience={experience} currentWork={profile.currentWork} />
-        {/* These three render only once their tables have real entries. */}
-        <BuildLogSection entries={buildLog} />
-        <LearningsSection learnings={learnings} />
+        {/* Renders only once the table has real entries. */}
         <RoadmapSection roadmap={roadmap} />
         <CertificationsSection />
         <ContactSection profile={profile} socials={socials} />
