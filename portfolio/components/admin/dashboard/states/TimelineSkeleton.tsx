@@ -7,7 +7,7 @@ export interface TimelineSkeletonProps {
 
 /** Shimmer placeholder for vertical timeline/checklist content — a dot
  *  rail plus a label per row. Matches the shape of things like the
- *  Getting Started checklist or a build-log feed while data loads. */
+ *  Getting Started checklist or a content feed while data loads. */
 export function TimelineSkeleton({ count = 5, className }: TimelineSkeletonProps) {
   return (
     <div className={className} role="status" aria-label="Loading timeline" aria-hidden="true">
