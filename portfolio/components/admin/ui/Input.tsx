@@ -75,7 +75,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
             'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[var(--color-surface)]/50',
             error ? 'border-[var(--color-error)]' : 'border-[var(--color-border)] hover:border-[var(--color-border-hover)]',
             SIZES[size],
-            icon && 'pl-9',
+            icon && 'pl-10',
             trailing && 'pr-9',
             className
           )}
