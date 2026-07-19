@@ -18,10 +18,14 @@ export interface FloatingFieldProps extends InputHTMLAttributes<HTMLInputElement
  *  intentionally keeps its static above-field label so other forms are
  *  unaffected by this. */
 export const FloatingField = forwardRef<HTMLInputElement, FloatingFieldProps>(function FloatingField(
-  { label, hint, error, showCount, maxLength, id, value, required, disabled, className, onFocus, onBlur, ...rest },
+  { label, hint, error, showCount, maxLength, id, value, required, disabled, className, onFocus, onBlur, placeholder: _placeholder, ...rest },
   ref
 ) {
+  // The floating label itself occupies the centered position a native
+  // placeholder would use, so any placeholder passed in is intentionally
+  // dropped — rendering both at once causes them to visually collide.
   const autoId = useId();
+  void _placeholder;
   const fieldId = id ?? autoId;
   const [focused, setFocused] = useState(false);
   const hasValue = typeof value === 'string' && value.length > 0;
@@ -48,7 +52,7 @@ export const FloatingField = forwardRef<HTMLInputElement, FloatingFieldProps>(fu
             onBlur?.(e);
           }}
           className={cn(
-            'peer w-full h-12 bg-[var(--color-surface)] border rounded-[var(--radius-md)] px-3.5 pt-4 text-sm text-[var(--color-ink)]',
+            'peer w-full h-14 bg-[var(--color-surface)] border rounded-[var(--radius-md)] px-3.5 pt-6 pb-2 text-sm text-[var(--color-ink)]',
             'transition-colors duration-[var(--admin-duration-fast)]',
             'focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-500)]/40 focus:border-[var(--color-accent-500)]',
             'disabled:opacity-50 disabled:cursor-not-allowed',
@@ -60,7 +64,7 @@ export const FloatingField = forwardRef<HTMLInputElement, FloatingFieldProps>(fu
         <motion.label
           htmlFor={fieldId}
           className="absolute left-3.5 pointer-events-none text-[var(--color-faint)] origin-left"
-          animate={floated ? { top: '0.4rem', fontSize: '0.6875rem', y: 0 } : { top: '50%', fontSize: '0.875rem', y: '-50%' }}
+          animate={floated ? { top: '0.5rem', fontSize: '0.6875rem', y: 0 } : { top: '50%', fontSize: '0.875rem', y: '-50%' }}
           transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
         >
           {label}
