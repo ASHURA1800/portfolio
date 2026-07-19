@@ -44,7 +44,7 @@ export const FloatingTextarea = forwardRef<HTMLTextAreaElement, FloatingTextarea
             onBlur?.(e);
           }}
           className={cn(
-            'peer w-full bg-[var(--color-surface)] border rounded-[var(--radius-md)] px-3.5 pt-7 pb-2.5 text-sm text-[var(--color-ink)] resize-y',
+            'peer w-full bg-[var(--color-surface)] border rounded-[var(--radius-md)] px-3.5 pt-8 pb-2.5 text-sm text-[var(--color-ink)] leading-snug resize-y',
             'transition-colors duration-[var(--admin-duration-fast)]',
             'focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-500)]/40 focus:border-[var(--color-accent-500)]',
             'disabled:opacity-50 disabled:cursor-not-allowed',
@@ -55,8 +55,8 @@ export const FloatingTextarea = forwardRef<HTMLTextAreaElement, FloatingTextarea
         />
         <motion.label
           htmlFor={fieldId}
-          className="absolute left-3.5 pointer-events-none text-[var(--color-faint)] origin-left"
-          animate={floated ? { top: '0.5rem', fontSize: '0.6875rem' } : { top: '0.875rem', fontSize: '0.875rem' }}
+          className="absolute left-3.5 pointer-events-none text-[var(--color-faint)] origin-left leading-none"
+          animate={floated ? { top: '0.65rem', fontSize: '0.6875rem' } : { top: '0.9rem', fontSize: '0.875rem' }}
           transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
         >
           {label}
