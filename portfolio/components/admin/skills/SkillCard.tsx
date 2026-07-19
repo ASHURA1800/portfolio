@@ -31,7 +31,7 @@ export function SkillCard({ skill, onEdit, onDelete }: SkillCardProps) {
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {skill.icon && <span className="text-lg shrink-0">{skill.icon}</span>}
-          <h3 className="text-[var(--color-ink)] font-medium truncate">{skill.name}</h3>
+          <h3 className="text-[var(--color-ink)] font-medium truncate min-w-0">{skill.name}</h3>
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <IconButton label="Edit" icon={<Pencil size={13} />} size="sm" variant="ghost" onClick={() => onEdit(skill)} />
