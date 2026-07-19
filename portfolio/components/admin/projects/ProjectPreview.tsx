@@ -45,7 +45,7 @@ export function ProjectPreview({ title, description, image, techStack, status, f
       </div>
       <div className="p-4 flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold text-[var(--color-ink)] truncate">{title || 'Untitled project'}</h3>
+          <h3 className="text-sm font-semibold text-[var(--color-ink)] truncate min-w-0">{title || 'Untitled project'}</h3>
           <span className="text-[10px] text-[var(--color-faint)] uppercase tracking-wide shrink-0">
             {STATUS_LABEL[status]}
           </span>
