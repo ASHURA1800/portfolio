@@ -7,7 +7,7 @@ export interface WidgetSkeletonProps {
   className?: string;
 }
 
-/** Generic shimmer shape for the Phase 4.6 widgets (PortfolioProgress,
+/** Generic shimmer shape for the dashboard widgets (PortfolioProgress,
  *  SystemStatus, SessionWidget, etc.) — header row + N label/value rows.
  *  Deliberately generic since those widgets share the same dl-like shape. */
 export function WidgetSkeleton({ rows = 4, className }: WidgetSkeletonProps) {
