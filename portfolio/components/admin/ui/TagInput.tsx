@@ -18,7 +18,7 @@ export interface TagInputProps {
 
 /**
  * Canonical chip-list input for string[] fields (tags, tech stack,
- * deliverables, learnings, challenges). Enter or comma commits the
+ * deliverables, project learnings, challenges). Enter or comma commits the
  * current text as a chip; Backspace on an empty field removes the last
  * chip. This replaces the two near-duplicate implementations that existed
  * before (ProjectTags, crud/TagListInput) — both now wrap this.
