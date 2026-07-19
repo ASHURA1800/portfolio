@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-// AdminTable is the CRUD-facing name for the Table primitive built in
-// Phase 2 — it already covers sticky header, sort, row-select, bulk-action
-// slot, loading skeleton, and empty state, so this file doesn't duplicate
-// that logic. It re-exports under the name this phase's spec asks for, and
-// adds TableRow/TableCell for admin pages that render a custom list (card
-// rows, not a literal <table>) but still want consistent spacing/borders.
+// AdminTable is the CRUD-facing name for the shared Table primitive, which
+// already covers sticky header, sort, row-select, bulk-action slot, loading
+// skeleton, and empty state — this file re-exports it rather than
+// duplicating that logic, and adds TableRow/TableCell for admin pages that
+// render a custom list (card rows, not a literal <table>) but still want
+// consistent spacing/borders.
 export { Table as AdminTable, type TableColumn } from './Table';
 
 /** A single custom list row — for admin pages using card-style rows instead of a <table>. */
