@@ -10,14 +10,12 @@ import {
   analytics,
   skills,
   experience,
-  buildLog,
-  learnings,
   roadmap,
   profile as profileTable,
 } from '@/lib/db';
 import Link from 'next/link';
 
-// Phase 4 layout + hero
+// Dashboard layout + hero
 import {
   DashboardLayout,
   DashboardContent,
@@ -27,12 +25,12 @@ import {
 } from '@/components/admin/dashboard/layout';
 import { DashboardHero } from '@/components/admin/dashboard/hero';
 
-// Phase 4.8 — motion wrappers (client components; live in components/ui,
-// NOT components/admin/ui — server page stays async, wrappers stay 'use client')
+// Motion wrappers are client components and live in components/ui (not
+// components/admin/ui) so this server page stays async while they stay 'use client'.
 import { MotionSection } from '@/components/ui/MotionSection';
 import { MotionGridItem } from '@/components/ui/MotionGridItem';
 
-// Phase 4.3 — stats grid
+// Stats grid
 import { StatsGrid } from '@/components/admin/ui/StatsGrid';
 import { StatCardV2 } from '@/components/admin/ui/StatCard';
 import {
@@ -40,20 +38,18 @@ import {
   Wrench,
   Briefcase,
   Award,
-  Hammer,
-  BookOpen,
   Map,
   Mail,
 } from 'lucide-react';
 
-// Phase 4.4 — analytics & charts
+// Analytics & charts
 // Dynamically imported: recharts is a genuinely heavy dependency (~9.4M
 // unpacked) and these 4 components render below the fold on a page that's
 // otherwise mostly static server-rendered content. next/dynamic splits them
 // into a separate chunk loaded after initial paint — same props, same data
 // (still fetched server-side below, same as before), no behavioral change.
-// ChartSkeleton (Phase 4.7) is reused as the loading fallback so this
-// matches what a slow chart-data fetch already looks like elsewhere.
+// ChartSkeleton is reused as the loading fallback so this matches what a
+// slow chart-data fetch already looks like elsewhere.
 import nextDynamic from 'next/dynamic';
 import { AnalyticsCard } from '@/components/admin/analytics';
 import { ChartSkeleton } from '@/components/admin/dashboard/states';
@@ -81,11 +77,11 @@ const ActivityChart = nextDynamic(
   { loading: () => <ChartSkeleton /> }
 );
 
-// Phase 4.5 — activity feed & quick actions
+// Activity feed & quick actions
 import { RecentUpdates, QuickActions } from '@/components/admin/dashboard/activity';
 import { getRecentActivity } from '@/lib/analytics/activity';
 
-// Phase 4.6 — dashboard widgets
+// Dashboard widgets
 import {
   PortfolioProgress,
   SystemStatus,
@@ -149,8 +145,6 @@ async function getStats() {
 interface SectionCounts {
   skills: number;
   experience: number;
-  buildLog: number;
-  learnings: number;
   roadmap: number;
   profileName: string;
   profileTitle: string;
@@ -160,8 +154,6 @@ interface SectionCounts {
 const EMPTY_SECTION_COUNTS: SectionCounts = {
   skills: 0,
   experience: 0,
-  buildLog: 0,
-  learnings: 0,
   roadmap: 0,
   profileName: '',
   profileTitle: '',
@@ -170,12 +162,10 @@ const EMPTY_SECTION_COUNTS: SectionCounts = {
 
 async function getSectionCounts(): Promise<SectionCounts> {
   try {
-    const [skillsCount, expCount, buildLogCount, learningsCount, roadmapCount, profileRows] =
+    const [skillsCount, expCount, roadmapCount, profileRows] =
       await Promise.all([
         db.$count(skills),
         db.$count(experience),
-        db.$count(buildLog),
-        db.$count(learnings),
         db.$count(roadmap),
         db
           .select({ name: profileTable.name, title: profileTable.title, email: profileTable.email })
@@ -186,8 +176,6 @@ async function getSectionCounts(): Promise<SectionCounts> {
     return {
       skills: skillsCount,
       experience: expCount,
-      buildLog: buildLogCount,
-      learnings: learningsCount,
       roadmap: roadmapCount,
       profileName: p?.name ?? '',
       profileTitle: p?.title ?? '',
@@ -215,8 +203,6 @@ const CHECKLIST_ITEMS = [
   { key: 'projects', label: 'Projects', href: '/admin/projects', desc: 'Featured work' },
   { key: 'experience', label: 'Experience', href: '/admin/experience', desc: 'Work history' },
   { key: 'certifications', label: 'Certifications', href: '/admin/certifications', desc: 'Credentials' },
-  { key: 'buildlog', label: 'Build Log', href: '/admin/buildlog', desc: "What you're building" },
-  { key: 'learnings', label: 'Learnings', href: '/admin/learnings', desc: "Things you've learned" },
   { key: 'roadmap', label: 'Roadmap', href: '/admin/roadmap', desc: "What's next" },
 ] as const;
 
@@ -255,8 +241,6 @@ export default async function AdminDashboard() {
     { key: 'skills', label: 'Skills', value: sections.skills, icon: <Wrench size={18} aria-hidden="true" />, href: '/admin/skills' },
     { key: 'experience', label: 'Experience', value: sections.experience, icon: <Briefcase size={18} aria-hidden="true" />, href: '/admin/experience' },
     { key: 'certifications', label: 'Certifications', value: stats.certifications, icon: <Award size={18} aria-hidden="true" />, href: '/admin/certifications' },
-    { key: 'buildLog', label: 'Build Logs', value: sections.buildLog, icon: <Hammer size={18} aria-hidden="true" />, href: '/admin/buildlog' },
-    { key: 'learnings', label: 'Learnings', value: sections.learnings, icon: <BookOpen size={18} aria-hidden="true" />, href: '/admin/learnings' },
     { key: 'roadmap', label: 'Roadmap', value: sections.roadmap, icon: <Map size={18} aria-hidden="true" />, href: '/admin/roadmap' },
     { key: 'messages', label: 'Messages', value: stats.contacts, icon: <Mail size={18} aria-hidden="true" />, href: null },
   ];
@@ -267,8 +251,6 @@ export default async function AdminDashboard() {
     projects: stats.projects > 0,
     experience: sections.experience > 0,
     certifications: stats.certifications > 0,
-    buildlog: sections.buildLog > 0,
-    learnings: sections.learnings > 0,
     roadmap: sections.roadmap > 0,
   };
   const showChecklist = Object.values(completion).some((v) => !v);
@@ -326,8 +308,8 @@ export default async function AdminDashboard() {
             </div>
           )}
 
-          {/* ── Stat cards (Phase 4.3) ─────────────────────────────
-              Cards cascade in via MotionGridItem (Phase 4.8). */}
+          {/* ── Stat cards ─────────────────────────────────────────
+              Cards cascade in via MotionGridItem. */}
           <DashboardSection first>
             <h2 className="sr-only">Portfolio statistics</h2>
             <StatsGrid cols={4}>
@@ -339,9 +321,9 @@ export default async function AdminDashboard() {
             </StatsGrid>
           </DashboardSection>
 
-          {/* ── Analytics & charts (Phase 4.4) ─────────────────────
+          {/* ── Analytics & charts ─────────────────────────────────
               Real queries only. Section fades/rises into view on scroll
-              (Phase 4.8); each chart card also cascades. */}
+              each chart card also cascades. */}
           <DashboardSection
             title="Analytics"
             description="How your portfolio content has grown."
@@ -362,7 +344,7 @@ export default async function AdminDashboard() {
             </MotionSection>
           </DashboardSection>
 
-          {/* ── Workspace (Phase 4.5 + 4.6 merged) ─────────────────
+          {/* ── Workspace (activity, quick actions, widgets) ───────
               Recent activity feed + quick actions, plus progress/health/
               completion/system/storage/session widgets. All figures come
               from real DB reads or real env/session state — nothing faked.
