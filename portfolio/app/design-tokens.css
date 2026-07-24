@@ -1,0 +1,581 @@
+/* ================================================================== */
+/* DESIGN TOKENS v2 — extends globals.css @theme, adds new systems.    */
+/* Import AFTER globals.css. No page files touched. Pure tokens+utils. */
+/* ================================================================== */
+
+:root {
+  /* ---------------- ELEVATION SYSTEM (z-index) ---------------- */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 20;
+  --z-nav: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-popover: 60;
+  --z-toast: 70;
+  --z-tooltip: 80;
+
+  /* ---------------- BORDER RADIUS (extends globals) ------------ */
+  --radius-none: 0;
+  /* xs/sm/md/lg/xl/2xl/full already defined in globals @theme */
+  --radius-3xl: 2.75rem;
+
+  /* ---------------- SOFT SHADOW SYSTEM -------------------------- */
+  --shadow-soft-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+  --shadow-soft-2: 0 4px 12px rgba(0,0,0,0.16), 0 2px 4px rgba(0,0,0,0.10);
+  --shadow-soft-3: 0 10px 28px rgba(0,0,0,0.20), 0 4px 8px rgba(0,0,0,0.12);
+  --shadow-soft-4: 0 20px 48px rgba(0,0,0,0.28), 0 8px 16px rgba(0,0,0,0.14);
+  --shadow-inset-soft: inset 0 1px 2px rgba(0,0,0,0.15);
+  --shadow-inset-glow: inset 0 1px 0 rgba(255,255,255,0.06);
+
+  /* ---------------- FROST SYSTEM (lighter glass, more blur, less tint) */
+  --frost-bg: rgba(255,255,255,0.06);
+  --frost-bg-strong: rgba(255,255,255,0.1);
+  --frost-border: rgba(255,255,255,0.14);
+  --frost-blur: 24px;
+  --frost-blur-lg: 40px;
+  --frost-saturate: 180%;
+
+  /* ---------------- CLAY SYSTEM (soft neumorphic-ish, dual shadow) */
+  --clay-bg: var(--color-surface);
+  --clay-radius: var(--radius-xl);
+  --clay-shadow-light: -6px -6px 14px rgba(255,255,255,0.04);
+  --clay-shadow-dark: 8px 8px 18px rgba(0,0,0,0.45);
+  --clay-shadow-inset: inset 2px 2px 6px rgba(0,0,0,0.25), inset -2px -2px 6px rgba(255,255,255,0.03);
+
+  /* ---------------- BRUTALIST SYSTEM (hard edge, offset shadow) -- */
+  --brutalist-border-w: 2px;
+  --brutalist-border-color: var(--color-ink);
+  --brutalist-offset: 6px;
+  --brutalist-shadow: var(--brutalist-offset) var(--brutalist-offset) 0 0 var(--color-ink);
+  --brutalist-shadow-accent: var(--brutalist-offset) var(--brutalist-offset) 0 0 var(--color-accent-500);
+  --brutalist-radius: var(--radius-xs);
+
+  /* ---------------- BLUR SYSTEM (extends globals sm/md/lg/xl) ---- */
+  --blur-2xl: 64px;
+  --blur-none: 0px;
+
+  /* ---------------- MOTION SYSTEM: DURATIONS --------------------- */
+  --duration-instant: 80ms;
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --duration-slow: 320ms;
+  --duration-slower: 480ms;
+  --duration-slowest: 700ms;
+
+  /* ---------------- MOTION SYSTEM: EASING CURVES ----------------- */
+  --ease-linear: linear;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ---------------- ANIMATION TIMING PRESETS (name -> combo) ----- */
+  --anim-micro: var(--duration-instant) var(--ease-out);
+  --anim-ui: var(--duration-fast) var(--ease-out);
+  --anim-default: var(--duration-base) var(--ease-spring);
+  --anim-entrance: var(--duration-slow) var(--ease-out);
+  --anim-emphasis: var(--duration-slower) var(--ease-bounce);
+
+  /* ---------------- FOCUS PRESETS --------------------------------- */
+  --focus-ring-color: var(--color-accent-400);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --focus-ring-glow: 0 0 0 4px rgba(140, 99, 255, 0.16);
+}
+
+[data-theme="light"] {
+  --frost-bg: rgba(255,255,255,0.5);
+  --frost-bg-strong: rgba(255,255,255,0.7);
+  --frost-border: rgba(15,15,20,0.1);
+
+  --clay-shadow-light: -6px -6px 14px rgba(255,255,255,0.8);
+  --clay-shadow-dark: 8px 8px 18px rgba(15,15,20,0.12);
+  --clay-shadow-inset: inset 2px 2px 6px rgba(15,15,20,0.08), inset -2px -2px 6px rgba(255,255,255,0.6);
+
+  --brutalist-border-color: var(--color-ink);
+  --brutalist-shadow: var(--brutalist-offset) var(--brutalist-offset) 0 0 var(--color-ink);
+
+  --shadow-soft-1: 0 1px 3px rgba(20,20,30,0.08), 0 1px 2px rgba(20,20,30,0.05);
+  --shadow-soft-2: 0 4px 12px rgba(20,20,30,0.10), 0 2px 4px rgba(20,20,30,0.06);
+  --shadow-soft-3: 0 10px 28px rgba(20,20,30,0.12), 0 4px 8px rgba(20,20,30,0.07);
+  --shadow-soft-4: 0 20px 48px rgba(20,20,30,0.16), 0 8px 16px rgba(20,20,30,0.08);
+  --shadow-inset-glow: inset 0 1px 0 rgba(255,255,255,0.6);
+}
+
+/* ================================================================== */
+/* UTILITY CLASSES — GPU-accelerated (transform/opacity only), reusable */
+/* ================================================================== */
+
+/* --- Frost --- */
+.frost {
+  background: var(--frost-bg);
+  backdrop-filter: blur(var(--frost-blur)) saturate(var(--frost-saturate));
+  -webkit-backdrop-filter: blur(var(--frost-blur)) saturate(var(--frost-saturate));
+  border: 1px solid var(--frost-border);
+}
+.frost-strong {
+  background: var(--frost-bg-strong);
+  backdrop-filter: blur(var(--frost-blur-lg)) saturate(var(--frost-saturate));
+  -webkit-backdrop-filter: blur(var(--frost-blur-lg)) saturate(var(--frost-saturate));
+  border: 1px solid var(--frost-border);
+}
+
+/* --- Clay --- */
+.clay {
+  background: var(--clay-bg);
+  border-radius: var(--clay-radius);
+  box-shadow: var(--clay-shadow-dark), var(--clay-shadow-light);
+}
+.clay-pressed {
+  background: var(--clay-bg);
+  border-radius: var(--clay-radius);
+  box-shadow: var(--clay-shadow-inset);
+}
+
+/* --- Brutalist --- */
+.brutalist {
+  background: var(--color-card);
+  border: var(--brutalist-border-w) solid var(--brutalist-border-color);
+  border-radius: var(--brutalist-radius);
+  box-shadow: var(--brutalist-shadow);
+  transition: transform var(--anim-ui), box-shadow var(--anim-ui);
+}
+@media (hover: hover) and (pointer: fine) {
+  .brutalist:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: calc(var(--brutalist-offset) + 2px) calc(var(--brutalist-offset) + 2px) 0 0 var(--brutalist-border-color);
+  }
+}
+.brutalist:active { transform: translate(0, 0); box-shadow: 2px 2px 0 0 var(--brutalist-border-color); }
+.brutalist-accent { box-shadow: var(--brutalist-shadow-accent); }
+
+/* --- Soft shadow elevation utilities --- */
+.elevate-1 { box-shadow: var(--shadow-soft-1); }
+.elevate-2 { box-shadow: var(--shadow-soft-2); }
+.elevate-3 { box-shadow: var(--shadow-soft-3); }
+.elevate-4 { box-shadow: var(--shadow-soft-4); }
+.elevate-inset { box-shadow: var(--shadow-inset-soft); }
+
+/* --- Z-index elevation --- */
+.z-raised  { z-index: var(--z-raised); }
+.z-sticky  { z-index: var(--z-sticky); }
+.z-nav     { z-index: var(--z-nav); }
+.z-overlay { z-index: var(--z-overlay); }
+.z-modal   { z-index: var(--z-modal); }
+.z-popover { z-index: var(--z-popover); }
+.z-toast   { z-index: var(--z-toast); }
+.z-tooltip { z-index: var(--z-tooltip); }
+
+/* --- Hover presets (GPU: transform/opacity only) --- */
+.hover-scale { transition: transform var(--anim-ui); }
+@media (hover: hover) and (pointer: fine) {
+  .hover-scale:hover { transform: scale(1.03); }
+}
+.hover-scale-sm { transition: transform var(--anim-ui); }
+@media (hover: hover) and (pointer: fine) {
+  .hover-scale-sm:hover { transform: scale(1.015); }
+}
+.hover-float { transition: transform var(--anim-default); }
+@media (hover: hover) and (pointer: fine) {
+  .hover-float:hover { transform: translateY(-4px); }
+}
+.hover-fade { transition: opacity var(--anim-ui); }
+@media (hover: hover) and (pointer: fine) {
+  .hover-fade:hover { opacity: 0.75; }
+}
+.hover-tilt { transition: transform var(--anim-default); transform-style: preserve-3d; }
+@media (hover: hover) and (pointer: fine) {
+  .hover-tilt:hover { transform: perspective(600px) rotateX(2deg) rotateY(-2deg); }
+}
+
+/* --- Focus presets --- */
+.focus-ring:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-glow);
+}
+.focus-ring-inset:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+}
+.focus-ring-none:focus-visible { outline: none; box-shadow: none; }
+
+/* --- Motion / entrance utilities (opacity+transform only = GPU) --- */
+.anim-fade-in   { animation: fadeIn var(--duration-slow) var(--ease-out) both; }
+.anim-fade-up   { animation: fadeUp var(--duration-slow) var(--ease-out) both; }
+.anim-scale-in  { animation: scaleIn var(--duration-base) var(--ease-spring) both; }
+.anim-float     { animation: float 4s var(--ease-in-out) infinite; }
+.anim-glow-pulse{ animation: glow-pulse 2.4s var(--ease-in-out) infinite; }
+
+.transition-gpu {
+  transition-property: transform, opacity;
+  transition-duration: var(--duration-base);
+  transition-timing-function: var(--ease-spring);
+  will-change: transform, opacity;
+}
+
+/* --- Reduced motion: disable all above --- */
+@media (prefers-reduced-motion: reduce) {
+  .hover-scale:hover, .hover-scale-sm:hover, .hover-float:hover,
+  .hover-tilt:hover, .brutalist:hover, .brutalist:active {
+    transform: none !important;
+  }
+  .anim-fade-in, .anim-fade-up, .anim-scale-in, .anim-float, .anim-glow-pulse {
+    animation: none !important;
+  }
+}
+
+/* ================================================================== */
+/* SECTION 3 — SEMANTIC / SURFACE TOKEN EXPANSION                      */
+/* Single source of truth. Admin-theme.css must NOT redefine these.    */
+/* ================================================================== */
+:root {
+  /* Background levels (0=page floor -> 3=highest raised bg) */
+  --bg-0: var(--color-bg);
+  --bg-1: var(--color-bg-elevated);
+  --bg-2: var(--color-surface);
+  --bg-3: var(--color-surface-hover);
+
+  /* Surface levels (semantic alias, same ramp, for component code) */
+  --surface-base: var(--color-surface);
+  --surface-raised: var(--color-card);
+  --surface-hover: var(--color-surface-hover);
+  --surface-sunken: var(--color-bg-elevated);
+
+  /* Overlay levels */
+  --overlay-scrim: rgba(4, 5, 8, 0.6);
+  --overlay-scrim-strong: rgba(4, 5, 8, 0.75);
+  --overlay-modal-bg: var(--color-overlay);
+
+  /* Border levels (alias existing + one more step) */
+  --border-subtle: var(--color-border);
+  --border-default: var(--color-border-hover);
+  --border-strong: var(--color-border-strong);
+  --border-focus: var(--color-accent-400);
+
+  /* Disabled */
+  --state-disabled-opacity: 0.5;
+  --state-disabled-bg: color-mix(in srgb, var(--color-surface) 50%, transparent);
+  --state-disabled-fg: var(--color-disabled);
+
+  /* Interactive states (generic, component-agnostic) */
+  --state-hover-bg: rgba(255, 255, 255, 0.04);
+  --state-active-bg: rgba(255, 255, 255, 0.07);
+  --state-selected-bg: rgba(124, 77, 255, 0.12);
+  --state-selected-border: var(--color-accent-500);
+
+  /* Selection (::selection already set in globals; alias for reuse) */
+  --selection-bg: rgba(124, 77, 255, 0.3);
+  --selection-fg: var(--color-ink);
+
+  /* Scrollbar (alias of globals ::-webkit-scrollbar values) */
+  --scrollbar-w: 8px;
+  --scrollbar-w-thin: 5px;
+  --scrollbar-thumb: var(--color-border-strong);
+  --scrollbar-thumb-hover: var(--color-faint);
+
+  /* Charts (data-viz categorical + sequential, distinct from brand accent) */
+  --chart-1: var(--color-accent-500);
+  --chart-2: var(--color-accent2-500);
+  --chart-3: #2ED573;
+  --chart-4: #FFB020;
+  --chart-5: #FF5C71;
+  --chart-6: #A0A6B5;
+  --chart-grid: var(--color-border);
+  --chart-axis: var(--color-faint);
+
+  /* Admin colors — alias only, values owned by globals @theme (no redefinition) */
+  --admin-accent: var(--color-accent-500);
+  --admin-surface: var(--color-surface);
+
+  /* Portfolio accent colors (secondary decorative accents beyond brand duo) */
+  --accent-portfolio-rose: #FF6FA8;
+  --accent-portfolio-lime: #A6E22E;
+  --accent-portfolio-amber: #FFB020;
+}
+
+/* ================================================================== */
+/* SECTION 4 — COMPONENT TOKENS                                        */
+/* Component-scoped vars, all referencing the primitives above/globals. */
+/* No component CSS is written here beyond the token declarations —    */
+/* actual component classes stay in component files (out of scope).    */
+/* ================================================================== */
+:root {
+  /* Navbar */
+  --navbar-h: 4.5rem;
+  --navbar-bg: var(--color-bg);
+  --navbar-bg-scrolled: rgba(8, 9, 13, 0.7);
+  --navbar-border: var(--color-border);
+  --navbar-blur: var(--blur-md);
+
+  /* Hero */
+  --hero-pad-y: var(--space-section);
+  --hero-title-size: var(--text-display);
+  --hero-glow-1: rgba(124, 77, 255, 0.16);
+  --hero-glow-2: rgba(34, 197, 245, 0.08);
+
+  /* Cards (generic alias -> existing .card family) */
+  --card-bg: var(--color-card);
+  --card-border: var(--color-border);
+  --card-radius: var(--radius-lg);
+  --card-shadow: var(--shadow-sm);
+  --card-shadow-hover: var(--shadow-lg);
+  --card-pad: var(--space-card);
+
+  /* Buttons */
+  --btn-radius: var(--radius-md);
+  --btn-radius-lg: var(--radius-lg);
+  --btn-h-sm: 2rem;
+  --btn-h-md: 2.5rem;
+  --btn-h-lg: 3rem;
+  --btn-primary-bg: linear-gradient(135deg, var(--color-accent-500), var(--color-accent-600));
+  --btn-primary-fg: #fff;
+
+  /* Inputs */
+  --input-h: 2.5rem;
+  --input-bg: rgba(255, 255, 255, 0.03);
+  --input-border: var(--color-border);
+  --input-border-focus: var(--color-accent-400);
+  --input-radius: var(--radius-md);
+
+  /* Timeline */
+  --timeline-line: var(--color-border);
+  --timeline-dot-size: 0.625rem;
+  --timeline-dot-bg: var(--color-accent-500);
+  --timeline-gap: var(--space-card);
+
+  /* Project cards */
+  --project-card-radius: var(--radius-lg);
+  --project-card-img-radius: var(--radius-md);
+  --project-card-shadow-hover: var(--shadow-glow-accent);
+
+  /* Analytics cards */
+  --analytics-card-bg: var(--color-surface);
+  --analytics-card-value-size: 1.875rem;
+  --analytics-card-label-color: var(--color-faint);
+
+  /* Dashboard widgets */
+  --widget-radius: var(--radius-lg);
+  --widget-pad: var(--space-card);
+  --widget-gap: 0.75rem;
+
+  /* Dialogs */
+  --dialog-bg: var(--color-card);
+  --dialog-border: var(--color-border-hover);
+  --dialog-radius: var(--radius-lg);
+  --dialog-shadow: var(--shadow-pop);
+  --dialog-backdrop: var(--overlay-scrim-strong);
+
+  /* Dropdowns */
+  --dropdown-bg: var(--color-card);
+  --dropdown-border: var(--color-border);
+  --dropdown-radius: var(--radius-md);
+  --dropdown-shadow: var(--shadow-lg);
+  --dropdown-item-hover-bg: var(--state-hover-bg);
+
+  /* Tooltips */
+  --tooltip-bg: var(--color-ink);
+  --tooltip-fg: var(--color-bg);
+  --tooltip-radius: var(--radius-xs);
+  --tooltip-pad: 0.375rem 0.625rem;
+  --tooltip-font-size: var(--text-xs);
+
+  /* Badges */
+  --badge-h: 1.5rem;
+  --badge-radius: var(--radius-full);
+  --badge-font-size: var(--text-micro);
+
+  /* Tags */
+  --tag-h: 1.625rem;
+  --tag-bg: rgba(255, 255, 255, 0.04);
+  --tag-border: var(--color-border);
+  --tag-radius: var(--radius-full);
+
+  /* Footer */
+  --footer-bg: var(--color-bg-elevated);
+  --footer-border: var(--color-border);
+  --footer-pad-y: var(--space-section-sm);
+}
+
+/* ================================================================== */
+/* SECTION 5 — STYLE PRESETS (component-agnostic, token-driven only)    */
+/* Glassmorphism / Frost already defined above (.glass*, .frost*).      */
+/* Neumorphism, extended Claymorphism, Neo-Brutalism, Minimal added.    */
+/* ================================================================== */
+.neu {
+  background: var(--surface-base);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--clay-shadow-dark), var(--clay-shadow-light);
+  border: none;
+}
+.neu-pressed {
+  background: var(--surface-base);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--clay-shadow-inset);
+  border: none;
+}
+.neu-flat {
+  background: var(--surface-base);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft-1);
+}
+
+.minimal {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+}
+.minimal-surface {
+  background: var(--surface-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+}
+
+/* ================================================================== */
+/* SECTION 6 — MOTION SYSTEM EXTENSIONS                                */
+/* Adds loading / transitions / drawer / tooltip / lift / parallax /   */
+/* magnetic / mouse-glow / blob / floating. GPU-safe (transform/opacity*/
+/* only) except mouse-glow (background-position, cheap) and blob       */
+/* (transform only, no layout thrash).                                */
+/* ================================================================== */
+@keyframes loadingSpin { to { transform: rotate(360deg); } }
+.loading-spinner {
+  animation: loadingSpin 0.7s linear infinite;
+  transform-origin: center;
+}
+@keyframes loadingDots {
+  0%, 80%, 100% { opacity: 0.25; transform: scale(0.8); }
+  40%           { opacity: 1;    transform: scale(1); }
+}
+.loading-dot { animation: loadingDots 1.2s var(--ease-in-out) infinite; }
+
+/* Page transition (route-level fade+rise, apply to page root wrapper) */
+.page-transition-enter {
+  animation: fadeUp var(--duration-slow) var(--ease-out) both;
+}
+
+/* Modal transition */
+.modal-enter {
+  animation: scaleIn var(--duration-base) var(--ease-spring) both;
+}
+.modal-backdrop-enter {
+  animation: fadeIn var(--duration-fast) var(--ease-out) both;
+}
+
+/* Drawer (slide, GPU translateX/Y only) */
+@keyframes drawerSlideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes drawerSlideInLeft  { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes drawerSlideInUp    { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.drawer-right { animation: drawerSlideInRight var(--duration-slow) var(--ease-out) both; }
+.drawer-left  { animation: drawerSlideInLeft var(--duration-slow) var(--ease-out) both; }
+.drawer-bottom{ animation: drawerSlideInUp var(--duration-slow) var(--ease-out) both; }
+
+/* Tooltip (micro-scale+fade) */
+@keyframes tooltipIn { from { opacity: 0; transform: scale(0.92) translateY(2px); } to { opacity: 1; transform: none; } }
+.tooltip-enter { animation: tooltipIn var(--duration-fast) var(--ease-out) both; }
+
+/* Card lift (alias of .hover-float, named for discoverability) */
+.card-lift { transition: transform var(--anim-default), box-shadow var(--anim-default); }
+@media (hover: hover) and (pointer: fine) {
+  .card-lift:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+}
+
+/* Parallax (translate3d forces GPU layer, avoid top/left animation) */
+.parallax-layer {
+  will-change: transform;
+  transition: transform 0.1s linear;
+}
+
+/* Magnetic button (JS sets --mx/--my per pointer move; CSS just applies) */
+.magnetic-btn {
+  --mx: 0px;
+  --my: 0px;
+  transform: translate3d(var(--mx), var(--my), 0);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+/* Mouse glow (cursor-follow radial via --spot-x/--spot-y, see .card-spotlight) */
+.mouse-glow {
+  position: relative;
+  overflow: hidden;
+}
+.mouse-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(320px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(124, 77, 255, 0.14), transparent 65%);
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out);
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .mouse-glow:hover::after { opacity: 1; }
+}
+
+/* Blob animation (transform-only morph via scale/translate, no border-radius keyframing = no repaint) */
+@keyframes blobFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(12px, -18px) scale(1.05); }
+  66%      { transform: translate(-14px, 10px) scale(0.96); }
+}
+.blob {
+  animation: blobFloat 12s var(--ease-in-out) infinite;
+  will-change: transform;
+}
+
+/* Floating animation (alias of existing .anim-float, named for section completeness) */
+.floating { animation: float 4s var(--ease-in-out) infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner, .loading-dot, .page-transition-enter, .modal-enter,
+  .modal-backdrop-enter, .drawer-right, .drawer-left, .drawer-bottom,
+  .tooltip-enter, .card-lift:hover, .blob, .floating, .magnetic-btn {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ================================================================== */
+/* SECTION 7 — ACCESSIBILITY                                           */
+/* ================================================================== */
+/* Touch targets: interactive elements >=44px on coarse pointers */
+@media (hover: none) and (pointer: coarse) {
+  button, a[role="button"], .btn, input[type="checkbox"], input[type="radio"] {
+    min-height: 44px;
+  }
+}
+
+/* High contrast: strengthen borders/text when user requests more contrast */
+@media (prefers-contrast: more) {
+  :root {
+    --color-border: rgba(255, 255, 255, 0.28);
+    --color-border-hover: rgba(255, 255, 255, 0.4);
+    --color-muted: #C4C8D4;
+  }
+  [data-theme="light"] {
+    --color-border: rgba(15, 15, 20, 0.32);
+    --color-border-hover: rgba(15, 15, 20, 0.46);
+    --color-muted: #33374A;
+  }
+}
+
+/* Focus visibility never suppressed globally — components must opt into
+   .focus-ring-none explicitly and provide an equivalent visible affordance. */
+
+/* ================================================================== */
+/* SECTION 8 — PERFORMANCE NOTES (enforced by convention, not CSS)      */
+/* - All hover/motion utilities above animate transform/opacity only,   */
+/*   except .mouse-glow (custom-prop-driven background-position, cheap) */
+/*   and backdrop-filter surfaces (glass/frost), which are visually     */
+/*   necessary and already minimized to nav/modal/dialog/sidebar/toast. */
+/* - No new backdrop-filter usage introduced in this file.              */
+/* - No layout-thrashing properties (width/height/top/left) animated.   */
+/* - Reuse existing keyframes (fadeIn/fadeUp/scaleIn/float/shimmer/     */
+/*   gradient-shift/glow-pulse) wherever the effect matches, instead of */
+/*   declaring near-duplicate keyframes.                                */
+/* ================================================================== */
