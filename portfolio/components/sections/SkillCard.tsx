@@ -18,7 +18,7 @@ export function SkillCard({ skill, index }: { skill: Skill; index: number }) {
       viewport={{ once: true, margin: '-10% 0px' }}
       transition={{ duration: 0.45, delay: Math.min(index * 0.05, 0.4), ease: EASE }}
       whileHover={{ y: -6 }}
-      className="card-glow group relative flex flex-col gap-4 overflow-hidden rounded-[var(--radius-lg)] p-5"
+      className="clay hover-lift group relative flex flex-col gap-4 overflow-hidden p-5"
     >
       {/* Hover glow sweep */}
       <div
@@ -28,24 +28,38 @@ export function SkillCard({ skill, index }: { skill: Skill; index: number }) {
 
       <div className="flex items-center justify-between">
         <motion.div
+          className="floating"
           whileHover={{ rotate: 8, scale: 1.08 }}
           transition={{ duration: 0.25, ease: EASE }}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-accent-300 transition-colors duration-300 group-hover:border-accent-500/40"
         >
-          {skill.icon ? (
-            isImage(skill.icon) ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={skill.icon} alt="" className="h-5 w-5 object-contain" />
+          <div className="clay flex h-11 w-11 shrink-0 items-center justify-center text-accent-300 transition-colors duration-300 group-hover:text-accent-400">
+            {skill.icon ? (
+              isImage(skill.icon) ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={skill.icon} alt="" className="h-5 w-5 object-contain" />
+              ) : (
+                <span className="text-lg leading-none" aria-hidden="true">
+                  {skill.icon}
+                </span>
+              )
             ) : (
-              <span className="text-lg leading-none" aria-hidden="true">
-                {skill.icon}
-              </span>
-            )
-          ) : (
-            <Code2 size={18} strokeWidth={1.5} />
-          )}
+              <Code2 size={18} strokeWidth={1.5} />
+            )}
+          </div>
         </motion.div>
-        <span className="text-xs font-medium tabular-nums text-faint">{pct}%</span>
+
+        {/* Progress ring */}
+        <div
+          className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
+          style={{
+            background: `conic-gradient(var(--color-accent-500) ${pct * 3.6}deg, var(--color-border) 0deg)`,
+          }}
+          aria-hidden="true"
+        >
+          <div className="clay-pressed flex h-8 w-8 items-center justify-center rounded-full">
+            <span className="text-[0.625rem] font-medium tabular-nums text-faint">{pct}%</span>
+          </div>
+        </div>
       </div>
 
       <div>
@@ -57,17 +71,6 @@ export function SkillCard({ skill, index }: { skill: Skill; index: number }) {
             {skill.context}
           </p>
         )}
-      </div>
-
-      {/* Animated progress bar */}
-      <div className="mt-auto h-1 w-full overflow-hidden rounded-full bg-border" aria-hidden="true">
-        <motion.div
-          initial={{ width: 0 }}
-          whileInView={{ width: `${pct}%` }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9, delay: Math.min(index * 0.05, 0.4) + 0.15, ease: EASE }}
-          className="h-full rounded-full bg-gradient-to-r from-accent-500 to-accent2-400"
-        />
       </div>
     </motion.div>
   );
