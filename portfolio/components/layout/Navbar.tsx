@@ -109,15 +109,15 @@ export function Navbar({
         animate={{ height: scrolled ? 60 : 76 }}
         transition={{ duration: 0.3, ease: EASE }}
         className={cn(
-          'fixed inset-x-0 top-0 z-40 flex items-center',
-          scrolled ? 'glass-nav shadow-sm' : 'border-b border-transparent bg-transparent',
+          'fixed inset-x-0 top-0 z-40 flex items-center mouse-glow transition-gpu',
+          scrolled ? 'frost shadow-sm' : 'border-b border-transparent bg-transparent',
         )}
       >
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-[var(--space-gutter)]">
           {/* Brand */}
           <Link
             href="/"
-            className="rounded-sm text-sm font-medium tracking-tight text-ink transition-colors duration-200 hover:text-accent-400"
+            className="magnetic-btn hover-scale-sm rounded-sm text-sm font-medium tracking-tight text-ink transition-colors duration-200 hover:text-accent-400"
           >
             {brand}
             <span className="text-accent-500">.</span>
