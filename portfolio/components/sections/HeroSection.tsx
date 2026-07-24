@@ -58,10 +58,10 @@ export function HeroSection({ profile, socials, roles, stats }: HeroSectionProps
       <div className="pointer-events-none absolute inset-0 -z-10">
         {/* Animated mesh gradient / aurora */}
         <motion.div
-          className="absolute left-1/2 top-[-10%] h-[70vh] w-[90vw] -translate-x-1/2 rounded-full opacity-70"
+          className="blob absolute left-1/2 top-[-10%] h-[70vh] w-[90vw] -translate-x-1/2 rounded-full opacity-70"
           style={{
             background:
-              'radial-gradient(ellipse 60% 50% at 30% 30%, rgba(124,77,255,0.22), transparent 60%), radial-gradient(ellipse 50% 45% at 75% 55%, rgba(34,197,245,0.16), transparent 60%)',
+              'radial-gradient(ellipse 60% 50% at 30% 30%, var(--hero-glow-1), transparent 60%), radial-gradient(ellipse 50% 45% at 75% 55%, var(--hero-glow-2), transparent 60%)',
           }}
           animate={
             reduceMotion
@@ -72,9 +72,9 @@ export function HeroSection({ profile, socials, roles, stats }: HeroSectionProps
           }
           transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
         />
-        {/* Blurred circles */}
-        <div className="absolute left-[8%] top-[18%] h-72 w-72 rounded-full bg-accent-500/10 blur-[90px]" />
-        <div className="absolute right-[6%] top-[42%] h-80 w-80 rounded-full bg-accent2-500/10 blur-[100px]" />
+        {/* Floating blobs */}
+        <div className="blob absolute left-[8%] top-[18%] h-72 w-72 rounded-full bg-accent-500/10" style={{ filter: 'blur(var(--blur-xl))' }} />
+        <div className="blob absolute right-[6%] top-[42%] h-80 w-80 rounded-full bg-accent2-500/10" style={{ filter: 'blur(var(--blur-2xl))', animationDelay: '-4s' }} />
         {/* Noise texture */}
         <svg className="absolute inset-0 h-full w-full opacity-[0.035] mix-blend-overlay">
           <filter id="hero-noise">
@@ -84,7 +84,7 @@ export function HeroSection({ profile, socials, roles, stats }: HeroSectionProps
         </svg>
       </div>
 
-      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
+      <div className="frost mouse-glow transition-gpu mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-16 rounded-[var(--radius-2xl)] p-[var(--space-card)] lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:p-[var(--space-section-sm)]">
         {/* ================= Left: content ================= */}
         <motion.div variants={container} initial="hidden" animate="show">
           {/* Animated greeting */}
