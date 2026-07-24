@@ -39,10 +39,10 @@ export function Footer({ profile, socials: allSocials }: { profile: Profile; soc
   const reduceMotion = useReducedMotion();
 
   return (
-    <footer className="glass-strong relative mt-24 overflow-hidden border-t border-border">
+    <footer className="minimal relative mt-24 overflow-hidden border-x-0 border-b-0 rounded-none border-t border-border bg-transparent">
       {/* Ambient glow */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-0 h-64 w-[36rem] -translate-x-1/2 rounded-full bg-accent-500/8 blur-[110px]" />
+        <div className="absolute left-1/2 top-0 h-64 w-[36rem] -translate-x-1/2 rounded-full bg-accent-500/8" style={{ filter: 'blur(var(--blur-2xl))' }} />
       </div>
 
       {/* Animated divider */}
@@ -66,7 +66,7 @@ export function Footer({ profile, socials: allSocials }: { profile: Profile; soc
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
           {/* Identity */}
           <div>
-            <a href="#hero" className="text-sm font-medium text-ink transition-colors duration-200 hover:text-accent-300">
+            <a href="#hero" className="hover-scale-sm inline-block text-sm font-medium text-ink transition-colors duration-200 hover:text-accent-300">
               {brand}
               <span className="text-accent-500">.</span>
             </a>
