@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { getProfile } from '@/lib/content';
+import { themeTokens } from '@/lib/theme-tokens';
 
 export const runtime = 'edge';
 export const alt = 'Portfolio preview';
@@ -22,9 +23,9 @@ export default async function OpengraphImage() {
           alignItems: 'flex-start',
           justifyContent: 'center',
           padding: '80px',
-          backgroundColor: '#08090D',
+          backgroundColor: themeTokens.colorBg,
           backgroundImage:
-            'radial-gradient(circle at 15% 20%, rgba(124,77,255,0.35), transparent 55%), radial-gradient(circle at 85% 75%, rgba(34,197,245,0.22), transparent 55%)',
+            `radial-gradient(circle at 15% 20%, ${themeTokens.ogGlow1Rgba}, transparent 55%), radial-gradient(circle at 85% 75%, ${themeTokens.ogGlow2Rgba}, transparent 55%)`,
         }}
       >
         <div
@@ -33,12 +34,12 @@ export default async function OpengraphImage() {
             alignItems: 'center',
             gap: 12,
             fontSize: 28,
-            color: '#A0A6B5',
+            color: themeTokens.colorMuted,
             letterSpacing: 4,
             textTransform: 'uppercase',
           }}
         >
-          <div style={{ width: 10, height: 10, borderRadius: 999, backgroundColor: '#2ED573' }} />
+          <div style={{ width: 10, height: 10, borderRadius: 999, backgroundColor: themeTokens.colorSuccess }} />
           Portfolio
         </div>
         <div
@@ -46,7 +47,7 @@ export default async function OpengraphImage() {
             marginTop: 28,
             fontSize: 84,
             fontWeight: 600,
-            color: '#F7F8FA',
+            color: themeTokens.colorInk,
             letterSpacing: -2,
             lineHeight: 1.05,
           }}
@@ -54,7 +55,7 @@ export default async function OpengraphImage() {
           {name}
         </div>
         {title && (
-          <div style={{ marginTop: 20, fontSize: 36, color: '#A0A6B5' }}>{title}</div>
+          <div style={{ marginTop: 20, fontSize: 36, color: themeTokens.colorMuted }}>{title}</div>
         )}
       </div>
     ),
