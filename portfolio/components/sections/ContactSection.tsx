@@ -34,8 +34,8 @@ export function ContactSection({ profile, socials: allSocials }: { profile: Prof
     <SectionContainer id="contact" width="wide" className="relative overflow-hidden">
       {/* Background glow */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute left-1/2 top-0 h-96 w-[42rem] -translate-x-1/2 rounded-full bg-accent-500/10 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-5%] h-72 w-72 rounded-full bg-accent2-500/8 blur-[100px]" />
+        <div className="absolute left-1/2 top-0 h-96 w-[42rem] -translate-x-1/2 rounded-full bg-accent-500/10" style={{ filter: 'blur(var(--blur-2xl))' }} />
+        <div className="absolute bottom-[-10%] right-[-5%] h-72 w-72 rounded-full bg-accent2-500/8" style={{ filter: 'blur(var(--blur-2xl))' }} />
       </div>
 
       <MotionReveal>
@@ -85,7 +85,7 @@ export function ContactSection({ profile, socials: allSocials }: { profile: Prof
 
         {/* ============== Right: glass form ============== */}
         <MotionReveal from="right" delay={0.1}>
-          <div className="card-glass relative rounded-[var(--radius-xl)] p-6 sm:p-8">
+          <div className="frost mouse-glow relative rounded-[var(--radius-xl)] p-6 sm:p-8 shadow-md">
             <AnimatePresence mode="wait">
               {sent ? (
                 <motion.div
