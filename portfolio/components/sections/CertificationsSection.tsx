@@ -19,7 +19,7 @@ function CertImage({ src, alt }: { src: string; alt: string }) {
   const [loaded, setLoaded] = useState(false);
   return (
     <div
-      className={`relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-border bg-surface transition-opacity duration-500 ${
+      className={`neu-pressed relative h-10 w-10 shrink-0 overflow-hidden transition-opacity duration-500 ${
         loaded ? 'opacity-100' : 'opacity-0'
       }`}
     >
@@ -53,12 +53,12 @@ export function CertificationsSection() {
     <SectionContainer id="certifications" width="wide">
       <SectionHeading eyebrow="Credentials" title="Certifications" />
 
-      <ul className="mt-14 max-w-3xl space-y-0 border-t border-border">
+      <ul className="mt-14 grid max-w-5xl gap-4 sm:grid-cols-2">
         {items.map((cert, i) => {
           const issued = formatIssued(cert.issued_date);
 
           const inner = (
-            <article className="group flex gap-4 border-b border-border py-5 transition-colors duration-200 hover:bg-surface/50 px-1 -mx-1 rounded-lg">
+            <article className="neu hover-lift group flex gap-4 p-5 transition-colors duration-200">
               {cert.image && <CertImage src={cert.image} alt={cert.title} />}
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline justify-between gap-4 flex-wrap">
