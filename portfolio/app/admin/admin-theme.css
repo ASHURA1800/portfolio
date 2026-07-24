@@ -633,7 +633,7 @@ input[type='search'] {
   background: color-mix(in srgb, var(--color-surface) 50%, transparent);
 }
 .admin-input[aria-invalid="true"] {
-  border-color: rgb(239, 68, 68);
+  border-color: var(--color-error);
 }
 
 .admin-btn {
