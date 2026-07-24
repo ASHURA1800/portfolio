@@ -40,7 +40,7 @@ export function TimelineEntry({ experience: e, index }: { experience: Experience
         viewport={{ once: true, margin: '-10% 0px' }}
         transition={{ duration: 0.55, ease: EASE }}
         whileHover={{ y: -4 }}
-        className="card-glass rounded-[var(--radius-lg)] p-6 pb-8 transition-shadow duration-300 hover:shadow-lg"
+        className="card-glass card-lift rounded-[var(--radius-lg)] p-6 pb-8"
       >
         <div className="flex items-start gap-4">
           <CompanyLogo company={e.company} logo={e.logo} />
