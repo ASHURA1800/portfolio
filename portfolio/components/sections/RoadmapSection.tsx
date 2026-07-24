@@ -11,7 +11,7 @@ export function RoadmapSection({ roadmap }: { roadmap: RoadmapItem[] }) {
     <SectionContainer id="roadmap" width="wide">
       <SectionHeading eyebrow="Roadmap" title="What's next" />
 
-      <MotionReveal className="mt-14">
+      <MotionReveal className="glass mt-14 rounded-[var(--radius-xl)] p-6 sm:p-8">
         <RoadmapList roadmap={roadmap} />
       </MotionReveal>
     </SectionContainer>
