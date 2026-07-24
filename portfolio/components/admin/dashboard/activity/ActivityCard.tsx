@@ -10,10 +10,10 @@ const KIND_META: Record<
   ActivityKind,
   { label: string; icon: string; accent: string; dot: string }
 > = {
-  project:       { label: 'Project',       icon: '🚀', accent: 'rgba(124,77,255,0.12)', dot: '#7C4DFF' },
-  certification: { label: 'Certification', icon: '🏆', accent: 'rgba(251,191,36,0.10)', dot: '#FBBF24' },
-  roadmap:       { label: 'Roadmap',       icon: '🗺️',  accent: 'rgba(249,115,22,0.10)', dot: '#F97316' },
-  profile:       { label: 'Profile',       icon: '👤', accent: 'rgba(168,85,247,0.10)', dot: '#A855F7' },
+  project:       { label: 'Project',       icon: '🚀', accent: 'var(--activity-project-bg)', dot: 'var(--activity-project-dot)' },
+  certification: { label: 'Certification', icon: '🏆', accent: 'var(--activity-certification-bg)', dot: 'var(--activity-certification-dot)' },
+  roadmap:       { label: 'Roadmap',       icon: '🗺️',  accent: 'var(--activity-roadmap-bg)', dot: 'var(--activity-roadmap-dot)' },
+  profile:       { label: 'Profile',       icon: '👤', accent: 'var(--activity-profile-bg)', dot: 'var(--activity-profile-dot)' },
 };
 
 // ── time formatting ───────────────────────────────────────────────────────────
@@ -84,7 +84,7 @@ export default function ActivityCard({
             background: meta.dot,
             flexShrink: 0,
             marginTop: '0.375rem',
-            boxShadow: `0 0 6px ${meta.dot}88`,
+            boxShadow: `0 0 6px color-mix(in srgb, ${meta.dot} 53%, transparent)`,
           }}
         />
         {/* Connector line */}
