@@ -69,12 +69,6 @@ export function ProjectCard({
       transition={{ duration: 0.5, delay: Math.min(index * 0.07, 0.35), ease: EASE }}
       className="group relative h-full"
     >
-      {/* Gradient glow border — sits behind the card, brightens on hover */}
-      <div
-        aria-hidden="true"
-        className="absolute -inset-px rounded-[calc(var(--radius-lg)+1px)] bg-gradient-to-br from-accent-500/40 via-accent2-500/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-      />
-
       <motion.div
         ref={ref}
         onPointerMove={onPointerMove}
@@ -84,7 +78,7 @@ export function ProjectCard({
             ? undefined
             : { rotateX, rotateY, transformPerspective: 1000 }
         }
-        className="card relative flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)]"
+        className="brutalist relative flex h-full flex-col overflow-hidden"
       >
         {/* Cursor-follow spotlight */}
         <motion.div
@@ -93,7 +87,7 @@ export function ProjectCard({
           style={{
             background: reduceMotion
               ? undefined
-              : `radial-gradient(400px circle at ${glowX}% ${glowY}%, rgba(124,77,255,0.12), transparent 60%)`,
+              : `radial-gradient(400px circle at ${glowX}% ${glowY}%, var(--hero-glow-1), transparent 60%)`,
           }}
         />
 
@@ -172,7 +166,7 @@ export function ProjectCard({
             )}
           </div>
 
-          <h3 className="mt-2 text-lg font-semibold leading-tight tracking-tight text-ink">
+          <h3 className="mt-2 text-lg font-bold leading-tight tracking-tight text-ink">
             {project.title}
           </h3>
 
