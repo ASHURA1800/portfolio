@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { themeTokens } from '@/lib/theme-tokens';
 
 /**
  * Catches errors thrown by the root layout itself — the one place
@@ -30,8 +31,8 @@ export default function GlobalError({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#08090D',
-          color: '#F7F8FA',
+          background: themeTokens.colorBg,
+          color: themeTokens.colorInk,
           fontFamily: 'system-ui, -apple-system, sans-serif',
           padding: '1.5rem',
         }}
@@ -42,14 +43,14 @@ export default function GlobalError({
               width: 64,
               height: 64,
               borderRadius: 16,
-              background: 'rgba(255, 92, 113, 0.1)',
-              border: '1px solid rgba(255, 92, 113, 0.3)',
+              background: themeTokens.colorErrorBgRgba,
+              border: `1px solid ${themeTokens.colorErrorBorderRgba}`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 1.5rem',
               fontSize: 24,
-              color: '#FF5C71',
+              color: themeTokens.colorError,
             }}
           >
             ⚠
@@ -57,7 +58,7 @@ export default function GlobalError({
           <h1 style={{ fontSize: '1.5rem', fontWeight: 500, marginBottom: '0.5rem' }}>
             Something went wrong
           </h1>
-          <p style={{ color: '#A0A6B5', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
+          <p style={{ color: themeTokens.colorMuted, fontSize: '0.875rem', marginBottom: '1.5rem' }}>
             The site hit an unexpected error. Reloading usually fixes this.
           </p>
           <button
@@ -65,7 +66,7 @@ export default function GlobalError({
             style={{
               padding: '0.625rem 1.5rem',
               borderRadius: 8,
-              background: '#6633EE',
+              background: themeTokens.colorAccent600,
               color: 'white',
               fontSize: '0.875rem',
               fontWeight: 500,
