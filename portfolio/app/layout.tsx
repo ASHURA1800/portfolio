@@ -4,6 +4,7 @@ import { getProfile } from "@/lib/content";
 import { ThemeProvider, themeInitScript } from "@/components/providers/ThemeProvider";
 import { SiteChrome } from "@/components/providers/SiteChrome";
 import "./globals.css";
+import { themeTokens } from "@/lib/theme-tokens";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -64,7 +65,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#08090D",
+  themeColor: themeTokens.colorBg,
   viewportFit: "cover",
 };
 
