@@ -290,6 +290,16 @@
   --admin-accent: var(--color-accent-500);
   --admin-surface: var(--color-surface);
 
+  /* Activity-kind colors (dashboard activity feed dot/accent per item type) */
+  --activity-project-dot: var(--color-accent-500);
+  --activity-project-bg: rgba(124, 77, 255, 0.12);
+  --activity-certification-dot: #FBBF24;
+  --activity-certification-bg: rgba(251, 191, 36, 0.10);
+  --activity-roadmap-dot: #F97316;
+  --activity-roadmap-bg: rgba(249, 115, 22, 0.10);
+  --activity-profile-dot: #A855F7;
+  --activity-profile-bg: rgba(168, 85, 247, 0.10);
+
   /* Portfolio accent colors (secondary decorative accents beyond brand duo) */
   --accent-portfolio-rose: #FF6FA8;
   --accent-portfolio-lime: #A6E22E;
