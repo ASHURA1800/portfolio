@@ -40,17 +40,33 @@ export function RoadmapList({ roadmap }: { roadmap: RoadmapItem[] }) {
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, margin: '-10% 0px' }}
-      className="max-w-2xl space-y-0 border-t border-border"
+      className="relative max-w-2xl space-y-3"
     >
+      {/* Connection line running behind milestones */}
+      <div
+        className="absolute left-[0.9375rem] top-2 bottom-2 w-px bg-border"
+        aria-hidden="true"
+      />
       {roadmap.map((item) => (
         <motion.li
           key={item.task}
           variants={row}
           whileHover={{ x: 4 }}
           transition={{ duration: 0.2 }}
-          className="flex items-center gap-4 border-b border-border py-4"
+          className="clay relative flex items-center gap-4 px-4 py-4"
         >
-          <span className={`status-dot shrink-0 ${STATUS_DOT[item.status]}`} aria-hidden="true" />
+          <span className="relative shrink-0">
+            <span className={`status-dot ${STATUS_DOT[item.status]}`} aria-hidden="true" />
+            {item.status === 'done' && (
+              <motion.span
+                className="absolute inset-0 -m-1 rounded-full border border-success"
+                initial={{ scale: 0.6, opacity: 0.8 }}
+                animate={{ scale: 1.8, opacity: 0 }}
+                transition={{ duration: 1.2, ease: EASE }}
+                aria-hidden="true"
+              />
+            )}
+          </span>
           <span className={`flex-1 text-sm ${STATUS_STYLE[item.status]}`}>{item.task}</span>
           <span className="shrink-0 text-[0.625rem] uppercase tracking-[0.14em] text-faint/70">
             {STATUS_LABEL[item.status]}
