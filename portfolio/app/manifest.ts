@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { getProfile } from '@/lib/content';
+import { themeTokens } from '@/lib/theme-tokens';
 
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const profile = await getProfile();
@@ -11,8 +12,8 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     description: profile.bio || `${name}'s portfolio`,
     start_url: '/',
     display: 'standalone',
-    background_color: '#08090D',
-    theme_color: '#08090D',
+    background_color: themeTokens.colorBg,
+    theme_color: themeTokens.colorBg,
     // Only a 16/32px favicon.ico exists in this project — a real installable
     // PWA icon set (192x192 and 512x512 PNGs, ideally maskable) would need
     // to be generated from real brand assets and added to /public.
