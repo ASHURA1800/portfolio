@@ -46,8 +46,8 @@ export function SuccessCard({
             width: '3.25rem',
             height: '3.25rem',
             borderRadius: '50%',
-            background: 'rgba(52,211,153,0.12)',
-            border: '1px solid rgba(52,211,153,0.25)',
+            background: 'color-mix(in srgb, var(--color-success) 12%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--color-success) 25%, transparent)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -61,7 +61,7 @@ export function SuccessCard({
                 cx="12"
                 cy="12"
                 r="11"
-                stroke="rgba(52,211,153,0.2)"
+                stroke="color-mix(in srgb, var(--color-success) 20%, transparent)"
                 strokeWidth="1"
                 initial={{ scale: 0.6, opacity: 0 }}
                 animate={{ scale: 1.4, opacity: 0 }}
@@ -72,7 +72,7 @@ export function SuccessCard({
             {/* Check path draw-in */}
             <motion.path
               d={CHECK_PATH}
-              stroke="#34D399"
+              stroke="var(--color-success)"
               strokeWidth="2.2"
               strokeLinecap="round"
               strokeLinejoin="round"
