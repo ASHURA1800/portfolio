@@ -113,15 +113,12 @@ input[type='search'] {
 
   /* -------------------------------------------------------------- */
   /* STATUS COLORS FOR RECORD STATE                                   */
-  /* Public site has --color-success/-error/-warning already; admin   */
-  /* adds "neutral/draft/info" for CRUD record states (e.g. roadmap   */
-  /* item status, certification expiry) that don't map to a form-     */
-  /* validation success/error/warning meaning.                        */
+  /* AUDIT: --color-neutral/-neutral-bg/-info/-info-bg are now owned  */
+  /* by app/globals.css @theme (single source of truth) — do not      */
+  /* redefine here, it previously produced conflicting values for the */
+  /* same tokens depending on load order. .admin-badge below consumes */
+  /* them directly from the public @theme via var(--color-*).         */
   /* -------------------------------------------------------------- */
-  --color-neutral: var(--color-faint);
-  --color-neutral-bg: rgba(255, 255, 255, 0.06);
-  --color-info: var(--color-accent2-500);
-  --color-info-bg: rgba(34, 197, 245, 0.12);
 }
 
 /* ====================================================================== */
