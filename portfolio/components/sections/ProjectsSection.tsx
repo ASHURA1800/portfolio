@@ -43,7 +43,7 @@ export function ProjectsSection({
   return (
     <SectionContainer id="projects" width="wide" className="relative">
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute left-[-6%] top-[30%] h-72 w-72 rounded-full bg-accent-500/8 blur-[100px]" />
+        <div className="absolute left-[-6%] top-[30%] h-72 w-72 rounded-full bg-accent-500/8" style={{ filter: 'blur(var(--blur-2xl))' }} />
       </div>
 
       <MotionReveal>
